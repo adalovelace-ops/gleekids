@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Schedules Calendar</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+  <style>
+    body { background: radial-gradient(circle at top, #fff8e1, #fff); }
+    .fc-toolbar-title { font-size: 1.35rem; font-weight: 700; color: #78350f; }
+    .fc-button-primary { background-color: #f59e0b; border-color: #d97706; }
+    .fc-button-primary:hover, .fc-button-primary:focus { background-color: #d97706; border-color: #b45309; }
+    .fc-daygrid-day.fc-day-today { background-color: #fff7ed; }
+  </style>
+</head>
+<body class="min-h-screen text-gray-800">
+  <div class="min-h-screen flex">
+
+    <main class="flex-1 p-6 lg:p-10 space-y-6">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Admin Calendar</h1>
+        </div>
+      </div>
+
+      {% if dbError %}
+        <div class="p-4 border border-red-200 bg-red-50 text-red-800 rounded-lg text-sm">
+          Unable to load some scheduling data: {{ dbError }}
+        </div>
+      {% endif %}
+
+      <section>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5" id="stats-container">
+          <!-- Stats will be injected by JS or rendered by Django if needed -->
+        </div>
+      </section>
+
+      <section class="grid gap-6 lg:grid-cols-3">
+        <div class="lg:col-span-2 rounded-3xl border border-amber-100 bg-white/90 shadow-xl">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-amber-50 px-6 py-4">
+            <div>
+              <h2 class="text-lg font-semibold text-amber-900">Live Calendar</h2>
+            </div>
+            <div class="flex flex-wrap gap-2" id="filter-container">
+              <!-- Filters will be injected by JS -->
+            </div>
+          </div>
+          <div id="calendar" class="px-2 pb-6 pt-4"></div>
+          {% if events %}
+            <p class="px-6 pb-6 text-sm text-gray-500">No schedules found. Once you save schedules in the stage pages, they will appear here automatically.</p>
+          {% endif %}
+        </div>
+
+        <div class="rounded-3xl border border-gray-100 bg-white/90 p-6 shadow-lg">
+          <h2 class="text-lg font-semibold text-gray-900">Schedule Details</h2>
+          <div id="eventDetails" class="mt-4 space-y-3 text-sm text-gray-700">
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const stageMeta = {{ stageMetaJson|safe }};
+    const stageCounts = {{ stageCountsJson|safe }};
+    const rawEvents = {{ eventsJson|safe }};
+    const zoomCloneUrl = "{{ zoomCloneUrl|default:'http://127.0.0.1:3000/' }}";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const activeStages = {};
+      const statsContainer = document.getElementById('stats-container');
+      const filterContainer = document.getElementById('filter-container');
+
+      // Inject Stats & Filters
+      Object.keys(stageMeta).forEach(key => {
+        activeStages[key] = true;
+        const meta = stageMeta[key];
+        const count = stageCounts[key] || 0;
+
+        // Stat Card
+        statsContainer.innerHTML += `
+          <div class="rounded-2xl border bg-white px-4 py-4 shadow-sm flex flex-col justify-between" style="border-color: ${meta.color}40;">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">${meta.label}</p>
+                <p class="text-2xl font-bold" style="color: ${meta.color};">${count}</p>
+              </div>
+              <span class="h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background: ${meta.color};">
+                ${count}
+              </span>
+            </div>
+          </div>
+        `;
+
+        // Filter Checkbox
+        filterContainer.innerHTML += `
+          <label class="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold cursor-pointer transition" style="border-color: ${meta.color}; color: ${meta.color};">
+            <input type="checkbox" class="stage-filter rounded border-gray-300" data-stage="${key}" checked>
+            ${meta.label}
+          </label>
+        `;
+      });
+
+      const calendarEl = document.getElementById('calendar');
+      const detailsEl = document.getElementById('eventDetails');
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        height: 680,
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+        selectable: false,
+        events(fetchInfo, successCallback) {
+          const filtered = rawEvents.filter(evt => {
+            const stageKey = evt.extendedProps?.stageKey;
+            return stageKey ? !!activeStages[stageKey] : true;
+          });
+          successCallback(filtered);
+        },
+        eventClick(info) {
+          info.jsEvent.preventDefault();
+          const props = info.event.extendedProps || {};
+          const email = props.email ? `<a class="text-blue-600 hover:underline" href="mailto:${props.email}">${props.email}</a>` : '<span class="text-gray-400">Not provided</span>';
+          const phone = props.phone ? props.phone : '<span class="text-gray-400">Not provided</span>';
+
+          detailsEl.innerHTML = `
+            <div class="rounded-2xl border border-amber-100 bg-amber-50/60 p-4">
+              <p class="text-xs uppercase tracking-widest text-amber-600">${props.stageLabel || 'Stage'}</p>
+              <h3 class="text-xl font-semibold text-amber-900">${props.name || info.event.title}</h3>
+              <p class="text-sm text-gray-600">${props.stageDesc || ''}</p>
+            </div>
+            <div class="rounded-2xl border border-gray-100 bg-white p-4 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-500">Scheduled</span>
+                <span class="font-semibold text-gray-900">${props.scheduledDisplay || info.event.start.toLocaleString()}</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-gray-500">Email</span>
+                <span>${email}</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-gray-500">Phone</span>
+                <span>${phone}</span>
+              </div>
+            </div>
+            <div class="flex flex-col gap-2">
+              <a href="${props.applicantUrl || '#'}" target="_blank" class="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-2 font-semibold text-white hover:bg-amber-700">
+                View Applicant
+              </a>
+              <a href="${zoomCloneUrl}${props.scheduleId || ''}?role=admin" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700">
+                Start Room
+              </a>
+            </div>
+          `;
+        }
+      });
+
+      calendar.render();
+
+      document.querySelectorAll('.stage-filter').forEach(input => {
+        input.addEventListener('change', () => {
+          activeStages[input.dataset.stage] = input.checked;
+          calendar.refetchEvents();
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

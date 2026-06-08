@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reports</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body class="min-h-screen bg-gradient-to-br from-yellow-50 to-white text-gray-800">
+  <div class="flex min-h-screen">
+    <aside id="sidebar" class="w-64 min-h-screen bg-white shadow-xl border-r border-yellow-200 sticky top-0">
+      <div class="p-6">
+        <img src="/media/gleelogo.png" alt="Gleekids Logo" class="h-12 w-auto mb-8 mx-auto">
+        <nav class="space-y-2">
+          <a href="/admin-dashboard/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-home"></i> Dashboard
+          </a>
+          <a href="/admin-dashboard/?status=Pending" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-users"></i> Applicants
+          </a>
+          <a href="/admin-calendar/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-calendar-alt"></i> Schedules
+          </a>
+          <a href="http://127.0.0.1:3000/?role=admin" target="_blank" rel="noopener" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-video"></i> Video Conferencing
+          </a>
+          <a href="/evaluations/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-star"></i> Evaluations
+          </a>
+          <a href="/reports/" class="flex items-center gap-3 px-4 py-3 bg-yellow-500 text-white rounded-xl font-semibold shadow-md">
+            <i class="fas fa-chart-line"></i> Reports
+          </a>
+          <div class="pt-10">
+            <a href="/logout/" class="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-semibold">
+              <i class="fas fa-sign-out-alt"></i> Sign Out
+            </a>
+          </div>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="flex-1 p-8">
+      <div class="max-w-7xl mx-auto space-y-8">
+        <div>
+          <p class="text-sm uppercase tracking-[0.2em] text-amber-600">Application Journey</p>
+          <h1 class="mt-1 text-3xl font-bold text-gray-900">Reports</h1>
+          <p class="mt-2 text-sm text-gray-500">Time-to-hire and referral performance from applicant journey records.</p>
+        </div>
+
+        <section class="grid gap-4 md:grid-cols-3">
+          <div class="rounded-lg border border-amber-100 bg-white p-5 shadow">
+            <p class="text-sm text-gray-500">Applicants</p>
+            <p class="mt-2 text-3xl font-extrabold text-amber-700">{{ total_applicants }}</p>
+          </div>
+          <div class="rounded-lg border border-amber-100 bg-white p-5 shadow">
+            <p class="text-sm text-gray-500">Approved hires</p>
+            <p class="mt-2 text-3xl font-extrabold text-amber-700">{{ hired_count }}</p>
+          </div>
+          <div class="rounded-lg border border-amber-100 bg-white p-5 shadow">
+            <p class="text-sm text-gray-500">Average time to hire</p>
+            <p class="mt-2 text-3xl font-extrabold text-amber-700">
+              {% if average_time_to_hire != None %}{{ average_time_to_hire }} days{% else %}N/A{% endif %}
+            </p>
+          </div>
+        </section>
+
+        <section class="rounded-lg border border-amber-100 bg-white shadow-lg">
+          <div class="border-b border-amber-100 p-5">
+            <h2 class="text-xl font-bold text-gray-900">Time to Hire</h2>
+            <p class="mt-1 text-sm text-gray-500">Measured from Application Submitted to the first Approved event in the Application Journey.</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+              <thead class="bg-amber-50 text-xs font-semibold uppercase tracking-wider text-amber-900">
+                <tr>
+                  <th class="px-4 py-3 text-left">Applicant</th>
+                  <th class="px-4 py-3 text-left">Current Status</th>
+                  <th class="px-4 py-3 text-left">Submitted</th>
+                  <th class="px-4 py-3 text-left">Approved</th>
+                  <th class="px-4 py-3 text-left">Time to Hire</th>
+                  <th class="px-4 py-3 text-left">Journey Steps</th>
+                  <th class="px-4 py-3 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                {% for row in journey_rows %}
+                  <tr class="hover:bg-yellow-50/60">
+                    <td class="px-4 py-3">
+                      <div class="font-semibold text-gray-900">{{ row.applicant.first_name }} {{ row.applicant.last_name }}</div>
+                      <div class="text-xs text-gray-500">{{ row.applicant.email }}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">{{ row.current_status }}</span>
+                    </td>
+                    <td class="px-4 py-3 text-gray-600">{{ row.applicant.created_at|date:"M d, Y" }}</td>
+                    <td class="px-4 py-3 text-gray-600">
+                      {% if row.hired_at %}{{ row.hired_at|date:"M d, Y" }}{% else %}<span class="text-gray-400">Not approved yet</span>{% endif %}
+                    </td>
+                    <td class="px-4 py-3 font-bold text-gray-900">
+                      {% if row.time_to_hire_days != None %}{{ row.time_to_hire_days }} days{% else %}<span class="text-gray-400 font-medium">N/A</span>{% endif %}
+                    </td>
+                    <td class="px-4 py-3">
+                      <div class="text-xs font-semibold text-gray-700">{{ row.steps_count }} step(s)</div>
+                      <div class="mt-2 flex max-w-md flex-wrap gap-1">
+                        <span class="rounded-full bg-gray-100 px-2 py-1 text-[11px] text-gray-600">Submitted</span>
+                        {% for event in row.journey_events %}
+                          <span class="rounded-full bg-gray-100 px-2 py-1 text-[11px] text-gray-600">{{ event.status }}</span>
+                        {% endfor %}
+                      </div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <a href="/applicant-details/{{ row.applicant.applicant_id }}/" class="font-semibold text-amber-700 hover:text-amber-900">View Journey</a>
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="7" class="px-4 py-10 text-center text-gray-500">No applicants found.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="rounded-lg border border-amber-100 bg-white shadow-lg">
+          <div class="border-b border-amber-100 p-5">
+            <h2 class="text-xl font-bold text-gray-900">Referrals</h2>
+            <p class="mt-1 text-sm text-gray-500">Grouped by the referral field submitted on the application form.</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+              <thead class="bg-amber-50 text-xs font-semibold uppercase tracking-wider text-amber-900">
+                <tr>
+                  <th class="px-4 py-3 text-left">Referral Source</th>
+                  <th class="px-4 py-3 text-left">Applicants</th>
+                  <th class="px-4 py-3 text-left">Approved</th>
+                  <th class="px-4 py-3 text-left">Approval Rate</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                {% for row in referral_rows %}
+                  <tr class="hover:bg-yellow-50/60">
+                    <td class="px-4 py-3 font-semibold text-gray-900">{{ row.label }}</td>
+                    <td class="px-4 py-3">{{ row.total }}</td>
+                    <td class="px-4 py-3">{{ row.hired }}</td>
+                    <td class="px-4 py-3">
+                      {% widthratio row.hired row.total 100 %}%
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="4" class="px-4 py-10 text-center text-gray-500">No referral data found.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

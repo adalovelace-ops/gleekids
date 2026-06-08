@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Your Applicant Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    .progress-line {
+      position: relative;
+      height: 3px;
+      background: #e5e7eb;
+      margin: 0 12px;
+    }
+    .progress-line::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background: #10b981;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    .progress-line.completed::before {
+      width: 100%;
+    }
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+    .step-circle.completed {
+      background: #10b981;
+      color: white;
+      box-shadow: 0 0 0 4px #10b98140;
+    }
+    .step-circle.active {
+      background: #f59e0b;
+      color: white;
+      box-shadow: 0 0 0 4px #f59e0b40;
+      animation: pulse 2s infinite;
+    }
+    .step-circle.upcoming {
+      background: #e5e7eb;
+      color: #6b7280;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+    .step-label {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-top: 12px;
+      color: #6b7280;
+    }
+    .step-label.completed {
+      color: #10b981;
+    }
+    .step-label.active {
+      color: #f59e0b;
+      font-weight: 600;
+    }
+    .step-label.upcoming {
+      color: #6b7280;
+    }
+  </style>
+</head>
+<style>
+  :root {
+    --accent: #ffc122;
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --panel: #ffffff;
+    --soft: #f5f7fb;
+    --line: #e5e7eb;
+  }
+  body {
+    min-height: 100vh;
+    background: var(--soft);
+    font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--ink);
+  }
+  .page-shell {
+    padding: 28px 32px 40px;
+  }
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .identity-block h1 {
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .identity-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff7df;
+    color: #8a5b00;
+    padding: 8px 12px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .logout-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #f3f4f6;
+    color: var(--ink);
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    border: 1px solid var(--line);
+    transition: all 0.2s ease;
+  }
+  .logout-btn:hover { background: #e5e7eb; }
+  .layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .pane {
+    background: var(--panel);
+    border-radius: 18px;
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+  }
+  .pane h2 { font-weight: 700; font-size: 18px; }
+  .status-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255,193,34,0.16), #fff);
+  }
+  .meeting-card {
+    margin-top: 14px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1px dashed #f59e0b33;
+    background: #fffaf1;
+  }
+  .progress-wrap { margin-top: 6px; }
+  .progress-steps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: nowrap;
+  }
+  .progress-line {
+    height: 3px;
+    background: var(--line);
+    flex: 1 1 80px;
+    min-width: 48px;
+    position: relative;
+    margin: 0 4px;
+  }
+  .progress-line::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: var(--accent);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+  .progress-line.completed::before { transform: scaleX(1); }
+  .step-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    color: var(--muted);
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    flex-shrink: 0;
+  }
+  .step-wrap {
+    min-width: 130px;
+    text-align: center;
+  }
+  .step-label { max-width: 120px; line-height: 1.25; word-break: break-word; }
+  .step-circle.completed { background: #111827; color: #fff; border-color: #111827; }
+  .step-circle.active { background: var(--accent); color: #000; border-color: #e3ac12; }
+  .step-label { margin-top: 8px; font-size: 13px; color: var(--muted); text-align: center; }
+  .step-label.completed { color: #111827; }
+  .step-label.active { color: #8a5b00; font-weight: 600; }
+  .progress-bar {
+    margin-top: 18px;
+    height: 8px;
+    background: var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-bar > div {
+    height: 100%;
+    background: linear-gradient(90deg, #111827, var(--accent));
+    transition: width 0.3s ease;
+  }
+  .list-tile {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    background: #fff;
+  }
+  .list-tile small { color: var(--muted); }
+  .card-grid { display: grid; gap: 14px; }
+  .card-block {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    background: #fff;
+    height: 100%;
+  }
+  .panel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    align-items: start;
+  }
+  .label-sm { font-size: 12px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+  .value-lg { font-size: 20px; font-weight: 700; }
+  .doc-link, .action-btn, .ghost-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    padding: 12px 16px;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+  .action-btn { background: #111827; color: #fff; border: 1px solid #111827; }
+  .action-btn:hover { background: #0b1324; }
+  .ghost-btn { background: #fff7df; color: #8a5b00; border: 1px solid #f6d67a; }
+  .ghost-btn:hover { background: #ffe9b3; }
+  .support-btn { background: var(--accent); color: #111827; border: 1px solid #e3ac12; }
+  .support-btn:hover { background: #ffd35a; }
+  .notes-box {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    padding: 12px;
+    min-height: 220px;
+  }
+  .notes-box textarea {
+    width: 100%;
+    min-height: 140px;
+    border: none;
+    outline: none;
+    resize: vertical;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .footer {
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+  }
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+</style>
+<body>
+  <div class="page-shell">
+    <header class="page-header">
+      <div class="identity-block">
+        <h1>Welcome, {{ app.first_name }} {{ app.last_name }}</h1>
+        <div class="identity-meta">
+          <span class="pill">Application ID: {{ app.applicant_id|stringformat:"s"|slice:":8" }}...</span>
+          <span class="identity-item"><i class="fas fa-map-marker-alt mr-2 text-yellow-500"></i>Applicant Portal</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 text-sm text-gray-600">
+        <span>Last login: </span>
+        <a href="/logout/" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </header>
+
+
+    <div class="layout">
+      <aside class="pane">
+        <div class="status-card">
+          <div>
+            <p class="label-sm">Current Status</p>
+            <p class="value-lg">{{ app.status }}</p>
+          </div>
+          <div class="text-right">
+            <p class="label-sm">Application Date</p>
+            <p class="font-semibold">{{ app.created_at|date:"M d, Y" }}</p>
+          </div>
+        </div>
+
+        {% if isProbation %}
+          <div class="meeting-card">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="label-sm">Your Meeting is Scheduled!</p>
+                <h3 class="font-semibold text-lg mt-1">Meeting Details</h3>
+              </div>
+              <i class="fas fa-bell text-yellow-500"></i>
+            </div>
+            <div class="mt-3 space-y-2 text-sm">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-clock text-yellow-500"></i>
+                <span class="font-semibold">
+                  
+                </span>
+              </div>
+              {% if schedule %}
+              <div class="flex items-center gap-2">
+                <i class="fas fa-video text-yellow-500"></i>
+                <a href="{{ zoomCloneUrl|default:'http://127.0.0.1:3000/' }}{% if latest_schedule %}{{ latest_schedule.schedule_id }}{% else %}{{ app.applicant_id }}{% endif %}?role=applicant" target="_blank" rel="noopener" class="text-amber-700 font-semibold hover:underline">
+                  Join Room
+                </a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
+        {% if isProbation %}
+          <div class="card-block mt-3">
+            <h2 class="mb-2">Next Steps</h2>
+            <div class="space-y-3 text-sm text-gray-700">
+              <p><i class="fas fa-check-circle text-green-500 mr-2"></i>Congratulations! You're under probation for 6 months.</p>
+            </div>
+          </div>
+        {% else %}
+          <div class="card-block mt-3">
+            <h2 class="mb-2">Next Steps</h2>
+            <div class="space-y-3 text-sm text-gray-700">
+              {% if schedule %}
+                <p><i class="fas fa-check-circle text-green-500 mr-2"></i>Your interview is scheduled! Please join the meeting at the time shown above.</p>
+              
+                <p><i class="fas fa-clock text-amber-500 mr-2"></i>Your application is currently under review. You'll receive an update within 3-5 business days.</p>
+              
+                <p><i class="fas fa-calendar text-amber-500 mr-2"></i>Demo evaluation phase. Check your email for further instructions.</p>
+              
+                <p><i class="fas fa-video text-amber-500 mr-2"></i>Client endorsement in progress. Prepare your presentation materials.</p>
+              
+                <p><i class="fas fa-chalkboard-teacher text-amber-500 mr-2"></i>Training phase underway. Check your email for schedules and materials.</p>
+              
+                <p><i class="fas fa-graduation-cap text-amber-500 mr-2"></i>Onboarding phase. Welcome to the team!</p>
+              {% else %}
+                <p><i class="fas fa-check-circle text-green-500 mr-2"></i>Congratulations! Your onboarding is complete.</p>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="card-block mt-3">
+          <h2 class="mb-2 text-xs font-bold text-gray-400 uppercase tracking-widest">Teaching placement</h2>
+          {% if app.teaching_account %}
+            <div class="p-4 border border-amber-200 rounded-xl bg-amber-50 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider">Assigned account</p>
+                  <p class="font-bold text-amber-900 text-lg">{{ app.teaching_account }} Account</p>
+                </div>
+                <div class="h-10 w-10 rounded-full bg-amber-200 flex items-center justify-center text-amber-700">
+                  <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+              </div>
+              {% if app.teaching_account_notes %}
+                <div class="mt-3 pt-3 border-t border-amber-200">
+                  <p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider">Placement Notes</p>
+                  <p class="text-xs text-amber-800 mt-1 leading-relaxed">{{ app.teaching_account_notes }}</p>
+                </div>
+              {% endif %}
+            </div>
+          {% else %}
+            <div class="p-6 text-center border-2 border-dashed border-gray-100 rounded-2xl">
+              <p class="text-xs text-gray-400 italic">Your teaching placement will appear here once finalized by the admin.</p>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="card-block mt-3">
+          <h2 class="mb-3 text-sm font-bold text-gray-500 uppercase tracking-wider">Application Journey</h2>
+          <div class="relative space-y-4 after:absolute after:left-[7px] after:top-2 after:h-[calc(100%-12px)] after:w-0.5 after:bg-gray-100">
+            {% for event in history %}
+            <div class="relative pl-6">
+              <span class="absolute left-0 top-1.5 h-2 w-2 rounded-full bg-amber-500 z-10"></span>
+              <div class="flex flex-col">
+                <p class="text-xs font-bold text-gray-900">{{ event.status }}</p>
+                <p class="text-[10px] text-gray-500">{{ event.created_at|date:"M d, Y @ h:i A" }}</p>
+              </div>
+            </div>
+            {% endfor %}
+            <div class="relative pl-6">
+              <span class="absolute left-0 top-1.5 h-2 w-2 rounded-full bg-gray-300 z-10"></span>
+              <div class="flex flex-col">
+                <p class="text-xs font-bold text-gray-400">Application Submitted</p>
+                <p class="text-[10px] text-gray-400">{{ app.created_at|date:"M d, Y @ h:i A" }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-block mt-3 space-y-2 text-center">
+          <button type="button" onclick="window.print();" class="ghost-btn w-full justify-center">Print this page as a receipt</button>
+        </div>
+      </aside>
+
+      <main class="pane">
+          <div class="card-block mb-6">
+            <h2 class="mb-3 text-lg font-bold text-gray-900">Next Steps</h2>
+            <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-900 text-sm">
+              <i class="fas fa-info-circle mr-2"></i> {{ next_step_text }}
+            </div>
+            
+            {% if latest_schedule %}
+            <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+              <h3 class="text-sm font-bold text-blue-900 mb-2">Upcoming Meeting</h3>
+              <div class="flex items-center justify-between text-sm">
+                <div class="text-blue-800">
+                  <i class="far fa-calendar-alt mr-2"></i> {{ latest_schedule.scheduled_at|date:"F d, Y @ h:i A" }}
+                </div>
+                <a href="{{ zoomCloneUrl|default:'http://127.0.0.1:3000/' }}{{ latest_schedule.schedule_id }}?role=applicant" target="_blank" rel="noopener" class="bg-blue-600 text-white px-4 py-1 rounded-lg font-bold hover:bg-blue-700 transition">
+                  Join Room
+                </a>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        <div class="card-grid">
+          <div class="card-block">
+            <h2 class="mb-3">Application Progress</h2>
+            <div class="progress-steps">
+                {% for stage in stages %}
+                <div class="flex flex-col items-center step-wrap">
+                  <div class="step-circle {% if forloop.counter0 < current_stage_index %}completed{% elif forloop.counter0 == current_stage_index %}active{% else %}upcoming{% endif %}">
+                    {% if forloop.counter0 < current_stage_index %}
+                      <i class="fas fa-check"></i>
+                    {% else %}
+                      {{ forloop.counter }}
+                    {% endif %}
+                  </div>
+                  <div class="step-label {% if forloop.counter0 < current_stage_index %}completed{% elif forloop.counter0 == current_stage_index %}active{% endif %}">{{ stage.label }}</div>
+                </div>
+                {% if not forloop.last %}
+                  <div class="progress-line {% if forloop.counter0 < current_stage_index %}completed{% endif %}"></div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="progress-bar">
+              <div style="width: {{ current_percent }}%"></div>
+            </div>
+            <p class="text-sm text-gray-600 mt-2">Progress: <strong>{{ current_percent }}%</strong> Complete</p>
+          </div>
+
+          <div class="card-block">
+            <div class="flex items-center justify-between mb-3">
+              <h2>Evaluation Summary</h2>
+            </div>
+            {% if demoEval %}
+              <div class="panel-grid">
+                {% if demoEval %}
+                  
+                  <div class="card-block" style="border-color: #e3ac12; background: #fffaf1;">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="label-sm">Demo Evaluation</p>
+                        <h3 class="text-lg font-semibold">Teaching Demo</h3>
+                      </div>
+                      <span class="text-lg font-bold text-amber-700">
+                        {{ demoScore }}
+                      </span>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-2">
+                      {{ demoUpdated }}
+                    </p>
+                    <div class="mt-3 text-sm text-gray-700 leading-relaxed">
+                      {% if demoSummary %}
+                        {{ demoSummary }}
+                      {% else %}
+                        <span class="text-gray-500">No summary provided yet.</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endif %}
+
+                {% if clientEval %}
+                  
+                  <div class="card-block" style="border-color: #cdd5ff; background: #f8f9ff;">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="label-sm">Client Endorsement</p>
+                        <h3 class="text-lg font-semibold">Client Presentation</h3>
+                      </div>
+                      <span class="text-lg font-bold text-indigo-700">
+                        {{ clientScore }}
+                      </span>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-2">
+                      {{ clientUpdated }}
+                    </p>
+                    <div class="mt-3 text-sm text-gray-700 leading-relaxed">
+                      {% if clientSummary %}
+                        {{ clientSummary }}
+                      {% else %}
+                        <span class="text-gray-500">No summary provided yet.</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            {% else %}
+              <div class="card-block" style="background:#f9fafb;">
+                You'll see summarized scores here as soon as evaluations are completed.
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="card-block">
+            <h2 class="mb-3">Your Submitted Documents</h2>
+            
+            <div class="panel-grid">
+              <div class="card-block" style="border-color: var(--line);">
+                <div class="flex items-center justify-between mb-2">
+                  <div>
+                    <p class="label-sm">Resume/CV</p>
+                    <p class="font-semibold">PDF Document</p>
+                  </div>
+                  <i class="fas fa-file-pdf text-red-500 text-xl"></i>
+                </div>
+                {% if app %}
+                  
+                  <a href="{{ resume }}" target="_blank" rel="noopener" class="doc-link text-amber-700 hover:underline">View Document</a>
+                {% else %}
+                  <p class="text-sm text-gray-500 italic">No resume uploaded</p>
+                {% endif %}
+              </div>
+
+              <div class="card-block" style="border-color: var(--line);">
+                <div class="flex items-center justify-between mb-2">
+                  <div>
+                    <p class="label-sm">Certificate / TEFL</p>
+                    <p class="font-semibold">PDF or Image</p>
+                  </div>
+                  <i class="fas fa-certificate text-amber-500 text-xl"></i>
+                </div>
+                
+                {% if cert %}
+                  <a href="{{ cert }}" target="_blank" rel="noopener" class="doc-link text-amber-700 hover:underline">View Certificate</a>
+                {% else %}
+                  <p class="text-sm text-gray-500 italic">No certificate uploaded</p>
+                {% endif %}
+              </div>
+
+              <div class="card-block" style="border-color: var(--line);">
+                <div class="flex items-center justify-between mb-2">
+                  <div>
+                    <p class="label-sm">Video Introduction</p>
+                    <p class="font-semibold">Video File</p>
+                  </div>
+                  <i class="fas fa-video text-indigo-500 text-xl"></i>
+                </div>
+                {% if app %}
+                  
+                  <video controls class="w-full rounded-lg" src="{{ video }}"></video>
+                {% else %}
+                  <p class="text-sm text-gray-500 italic">No video uploaded</p>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mt-4 border border-dashed border-gray-300 rounded-lg p-3 bg-[#fdfbf5]">
+              <p class="label-sm">Checklist requirements</p>
+              <div class="mt-2 space-y-1 text-sm text-gray-700">
+                <div class="flex items-center gap-2">
+                  <i class="fas {{ hasCertDoc }}"></i>
+                  <span>Certificate / TEFL — PDF or Image</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <i class="fas {{ hasResumeDoc }}"></i>
+                  <span>Resume/CV — PDF Document</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+  </div>
+</body>
+</html>

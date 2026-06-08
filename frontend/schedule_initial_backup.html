@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Schedule Initial Screening</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-yellow-50">
+  <div class="max-w-4xl mx-auto p-8">
+    <div class="bg-white rounded-lg p-6 shadow">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-xl font-bold">Schedule Initial Screening</h1>
+        <a href="/admin-dashboard/" class="text-sm text-yellow-700">← Back to dashboard</a>
+      </div>
+
+      {% if apps %}
+        <div class="p-4 text-sm text-gray-600">No applicants currently in initial screening.</div>
+      {% else %}
+        <div class="space-y-4">
+          
+          <div class="border rounded p-4 flex items-start justify-between">
+            <div>
+              <div class="font-semibold">{{ app }} <span class="text-sm text-gray-500">({{ email }})</span></div>
+              <div class="text-sm text-gray-600">Applied: {{ app }}</div>
+              {% if sched %}
+                <div class="mt-2 text-sm text-green-700">Scheduled: {{ sched }} — <a href="{{ sched }}" target="_blank" class="text-yellow-700">Meeting link</a></div>
+              {% endif %}
+            </div>
+
+            <div class="w-1/2">
+              <form method="POST" action="/schedule_action" class="flex gap-2">
+                
+                <input type="hidden" name="applicant_identifier" value="{{ aid }}">
+                <input type="hidden" name="type" value="initial">
+                <input type="hidden" name="title" value="Initial screening">
+                <input type="datetime-local" name="scheduled_at" class="border rounded px-2 py-1 w-1/2" value="{{ sched }}">
+                <input type="url" name="meeting_link" placeholder="https://meet.link/..." class="border rounded px-2 py-1 flex-1" value="{{ sched }}">
+                <button type="submit" class="bg-yellow-500 text-white px-3 py-1 rounded">Save</button>
+              </form>
+            </div>
+          </div>
+          
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

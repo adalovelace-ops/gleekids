@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Your Applicant Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    .progress-line {
+      position: relative;
+      height: 3px;
+      background: #e5e7eb;
+      margin: 0 12px;
+    }
+    .progress-line::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background: #10b981;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    .progress-line.completed::before {
+      width: 100%;
+    }
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+    .step-circle.completed {
+      background: #10b981;
+      color: white;
+      box-shadow: 0 0 0 4px #10b98140;
+    }
+    .step-circle.active {
+      background: #f59e0b;
+      color: white;
+      box-shadow: 0 0 0 4px #f59e0b40;
+      animation: pulse 2s infinite;
+    }
+    .step-circle.upcoming {
+      background: #e5e7eb;
+      color: #6b7280;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+    .step-label {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-top: 12px;
+      color: #6b7280;
+    }
+    .step-label.completed {
+      color: #10b981;
+    }
+    .step-label.active {
+      color: #f59e0b;
+      font-weight: 600;
+    }
+    .step-label.upcoming {
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+  <div class="max-w-5xl mx-auto py-8 px-4">
+    <!-- Header -->
+    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800">Welcome, {{ app }}</h1>
+          <p class="text-gray-600 mt-1">Application ID: {{ app }}</p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="text-sm text-gray-500">Last login: </span>
+          <a href="/applicant_logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+          </a>
+        </div>
+      </div>
+
+      <!-- Status Card -->
+      <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-6 text-white mb-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-semibold mb-2">Current Status</h3>
+            <p class="text-2xl font-bold">{{ app }}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-sm opacity-90">Application Date</p>
+            <p class="font-semibold">{{ app }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Section -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Application Progress</h2>
+        
+        <!-- Progress Steps -->
+        <div class="flex items-center justify-between mb-8">
+          
+            <div class="flex flex-col items-center">
+              <div class="step-circle {{ completed }}">
+                {{ completed }}
+              </div>
+              <div class="step-label {{ completed }}">
+                {{ label }}
+              </div>
+            </div>
+            {% if i %}
+              <div class="progress-line {{ i }}"></div>
+            {% endif %}
+          
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 rounded-full h-3 mb-6">
+          <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500" 
+               style="width: {{ activeIndex }}%"></div>
+        </div>
+
+        <!-- Progress Percentage -->
+        <div class="text-center">
+          <p class="text-sm text-gray-600">
+            Progress: <span class="font-semibold text-gray-800">{{ activeIndex }}%</span>
+            <span class="text-gray-500">Complete</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Documents Section -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Your Submitted Documents</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- Resume -->
+          <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div class="flex items-center mb-3">
+              <i class="fas fa-file-pdf text-red-500 text-2xl mr-3"></i>
+              <div>
+                <h3 class="font-semibold text-gray-800">Resume/CV</h3>
+                <p class="text-sm text-gray-600">PDF Document</p>
+              </div>
+            </div>
+            {% if app %}
+              
+              <a href="{{ resume }}" target="_blank" rel="noopener" 
+                 class="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium">
+                <i class="fas fa-download mr-2"></i>
+                View Document
+              </a>
+            {% else %}
+              <p class="text-sm text-gray-500 italic">No resume uploaded</p>
+            {% endif %}
+          </div>
+
+          <!-- Video -->
+          <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div class="flex items-center mb-3">
+              <i class="fas fa-video text-purple-500 text-2xl mr-3"></i>
+              <div>
+                <h3 class="font-semibold text-gray-800">Video Introduction</h3>
+                <p class="text-sm text-gray-600">Video File</p>
+              </div>
+            </div>
+            {% if app %}
+              
+              <video controls class="w-full rounded-lg" src="{{ video }}"></video>
+            {% else %}
+              <p class="text-sm text-gray-500 italic">No video uploaded</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Next Steps -->
+      <div class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+        <h2 class="text-lg font-semibold text-gray-800 mb-3">
+          <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+          Next Steps
+        </h2>
+        <div class="space-y-3">
+          {% if activeIndex %}
+            <p class="text-gray-700">
+              <i class="fas fa-clock text-blue-500 mr-2"></i>
+              Your application is currently under review. You'll receive an update within 3-5 business days.
+            </p>
+          
+            <p class="text-gray-700">
+              <i class="fas fa-calendar text-blue-500 mr-2"></i>
+              Initial screening scheduled. Check your email for the interview details and time.
+            </p>
+          
+            <p class="text-gray-700">
+              <i class="fas fa-video text-blue-500 mr-2"></i>
+              Demo evaluation scheduled. Prepare your presentation materials.
+            </p>
+          
+            <p class="text-gray-700">
+              <i class="fas fa-handshake text-blue-500 mr-2"></i>
+              Client endorsement in progress. This is the final stage before onboarding.
+            </p>
+          
+            <p class="text-gray-700">
+              <i class="fas fa-graduation-cap text-blue-500 mr-2"></i>
+              Training phase initiated. Welcome to the team!
+            </p>
+          {% else %}
+            <p class="text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-2"></i>
+              Congratulations! Your onboarding is complete. Welcome to the team!
+            </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="mt-8 flex justify-center space-x-4">
+        <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+          <i class="fas fa-download mr-2"></i>
+          Download Application
+        </button>
+        <button class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+          <i class="fas fa-print mr-2"></i>
+          Print Summary
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center text-gray-600 text-sm">
+      <p>Need help? Contact our support team at <a href="mailto:support@company.com" class="text-indigo-600 hover:underline">support@company.com</a></p>
+      <p class="mt-2">©  Job Application System. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>

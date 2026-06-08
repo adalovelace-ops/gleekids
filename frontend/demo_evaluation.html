@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manage Demo Evaluations</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body class="min-h-screen bg-yellow-50">
+  <div class="max-w-5xl mx-auto p-8">
+    <div class="bg-white rounded-lg p-6 shadow">
+      <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Demo Evaluations</h1>
+        <div class="flex gap-4">
+            <a href="/admin-calendar/" class="bg-amber-100 text-amber-800 px-4 py-2 rounded-lg font-semibold hover:bg-amber-200 transition">
+                <i class="fas fa-calendar-alt mr-2"></i>View Calendar
+            </a>
+            <a href="/admin-dashboard/" class="text-sm text-yellow-700 hover:underline">← Back to dashboard</a>
+        </div>
+      </div>
+
+      {% if not applicants %}
+        <div class="p-8 text-center border-2 border-dashed border-gray-200 rounded-2xl">
+            <p class="text-gray-500">No applicants currently awaiting demo evaluation.</p>
+        </div>
+      {% else %}
+        <div class="space-y-6">
+          {% for app in applicants %}
+          <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+            <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-8">
+              <div class="flex-shrink-0 w-full lg:w-1/3">
+                <div class="flex items-center gap-3">
+                  <div class="font-bold text-xl text-gray-900">{{ app.first_name }} {{ app.last_name }}</div>
+                  <button type="button"
+                          class="email-trigger flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full hover:bg-blue-200"
+                          data-name="{{ app.first_name }}"
+                          data-email="{{ app.email }}">
+                    <i class="fas fa-envelope mr-1"></i> Email
+                  </button>
+                </div>
+                <div class="text-sm text-gray-600 mt-1">{{ app.email }}</div>
+                
+                <div class="mt-4 flex flex-col gap-2">
+                  <a href="/evaluate/{{ app.applicant_id }}/" class="w-full text-center bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl transition shadow-lg">
+                    <i class="fas fa-star mr-2"></i>Score Teaching Demo
+                  </a>
+                  <a href="/applicant-details/{{ app.applicant_id }}/" class="w-full text-center bg-white border border-gray-200 text-gray-600 font-bold py-2 rounded-xl hover:bg-gray-50 transition">
+                    View Full Profile
+                  </a>
+                </div>
+
+                {% if app.current_schedule %}
+                  <div class="mt-4 p-4 bg-white rounded-xl border border-amber-200 shadow-sm">
+                    <div class="text-xs font-bold text-amber-600 uppercase tracking-wider">
+                      <i class="fas fa-clock mr-1"></i>Demo Scheduled
+                    </div>
+                    <div class="text-sm font-semibold text-gray-800 mt-1">
+                      {{ app.current_schedule.scheduled_at|date:"F d, Y @ h:i A" }}
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="flex-1 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Update Demo Schedule</h3>
+                <form method="POST" action="/schedule-action/" class="space-y-4">
+                  {% csrf_token %}
+                  <input type="hidden" name="applicant_identifier" value="{{ app.applicant_id }}">
+                  <input type="hidden" name="redirect_to" value="/demo-evaluation/">
+                  <input type="hidden" name="type" value="demo">
+                  <input type="hidden" name="title" value="Teaching Demo Interview">
+                  
+                  <div class="grid grid-cols-1 gap-4">
+                    <div>
+                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Date & Time</label>
+                      <input type="datetime-local" 
+                             name="scheduled_at" 
+                             class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400" 
+                             value="{{ app.current_schedule.scheduled_at|date:'Y-m-dT00:00' }}"
+                             required>
+                    </div>
+                  </div>
+                  
+                  <button type="submit" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-2 rounded-lg transition">
+                    <i class="fas fa-save mr-2"></i>Save Demo Schedule
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Compose Email Modal -->
+  <div id="emailModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/40 px-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl">
+      <div class="flex items-center justify-between px-6 py-4 border-b">
+        <div class="flex items-center gap-2">
+          <span class="inline-block w-2 h-2 rounded-full bg-red-400"></span>
+          <span class="inline-block w-2 h-2 rounded-full bg-yellow-400"></span>
+          <span class="inline-block w-2 h-2 rounded-full bg-green-400"></span>
+          <h2 class="text-lg font-semibold text-gray-800 ml-3">Compose Email</h2>
+        </div>
+        <button type="button" id="closeEmailModal" class="text-gray-400 hover:text-gray-600">×</button>
+      </div>
+      <form id="emailForm" class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="emailSubject">Subject</label>
+          <input id="emailSubject" name="subject" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-400 focus:border-amber-400" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="emailRecipient">Recipient</label>
+          <input id="emailRecipient" name="recipient" type="email" class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-gray-100" readonly>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="emailMessage">Message</label>
+          <textarea id="emailMessage" name="message" rows="6" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-amber-400 focus:border-amber-400" required></textarea>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" id="cancelEmail" class="px-6 py-2 rounded-full bg-red-100 text-red-600 font-semibold">Cancel</button>
+          <button type="submit" class="px-6 py-2 rounded-full bg-blue-500 text-white font-semibold">Send</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const emailModal = document.getElementById('emailModal');
+    const emailSubject = document.getElementById('emailSubject');
+    const emailRecipient = document.getElementById('emailRecipient');
+    const emailMessage = document.getElementById('emailMessage');
+
+    const defaultSubject = 'Gleekids Demo Update - Action Required';
+
+    function buildDefaultMessage(name) {
+      return `Hi ${name || 'Applicant'},\n\nYour teaching demo has been scheduled! Please check the details in your applicant portal.\n\nBest regards,\nGleekids Recruitment Team`;
+    }
+
+    function openEmailModal(name, email) {
+      emailSubject.value = defaultSubject;
+      emailRecipient.value = email || '';
+      emailMessage.value = buildDefaultMessage(name);
+      emailModal.classList.remove('hidden');
+      emailModal.classList.add('flex');
+    }
+
+    function closeEmailModal() {
+      emailModal.classList.add('hidden');
+      emailModal.classList.remove('flex');
+    }
+
+    document.querySelectorAll('.email-trigger').forEach(button => {
+      button.addEventListener('click', () => {
+        openEmailModal(button.dataset.name, button.dataset.email);
+      });
+    });
+
+    document.getElementById('closeEmailModal').addEventListener('click', closeEmailModal);
+    document.getElementById('cancelEmail').addEventListener('click', closeEmailModal);
+  </script>
+</body>
+</html>

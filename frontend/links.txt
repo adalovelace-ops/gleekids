@@ -1,0 +1,5 @@
+Your Links are all set:
+Home: http://localhost:8000/
+Apply: http://localhost:8000/apply/
+Login: http://localhost:8000/login/
+Logout: http://localhost:8000/logout/

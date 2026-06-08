@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # THE WEBSITE (PHP)
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      DB_HOST: app_system
+      DB_NAME: app_system
+      DB_USER: user
+      DB_PASS: adare4
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - app_system
+
+  # THE DATABASE (MySQL)
+  app_system:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app_system
+      MYSQL_USER: user
+      MYSQL_PASSWORD: adare4
+    ports:
+      - "3306:3306"
+
+  # THE DATABASE MANAGER (phpMyAdmin)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:80"        # <--- Opens on Port 8081
+    environment:
+      PMA_HOST: app_system    # Connects to the DB service named "app_system"
+      PMA_USER: user          # Uses the non-root user for safety
+      PMA_PASSWORD: adare4

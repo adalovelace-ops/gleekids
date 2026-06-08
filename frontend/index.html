@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Setup Success</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; }
+        h1 { color: #28a745; }
+        .box { background: #f4f4f4; padding: 20px; border-radius: 5px; }
+        table { width: 50%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <h1>✅ SUCCESS! Database Connected</h1>
+    
+    <div class="box">
+        <p><strong>Connected to Host:</strong> {{ DB_HOST }}</p>
+        <p><strong>Database Name:</strong> {{ DB_NAME }}</p>
+    </div>
+
+    <h2>Tables in your database:</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Table Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        </tbody>
+    </table>
+
+</body>
+</html>

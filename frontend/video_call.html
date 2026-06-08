@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Video Call{% if room_title %} - {{ room_title }}{% endif %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/static/js/webrtc_client.js"></script>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #eef1f7;
+      color: #2f3442;
+    }
+  </style>
+</head>
+<body>
+  {% if error %}
+    <main class="min-h-screen grid place-items-center p-6">
+      <div class="max-w-md rounded-2xl bg-white p-8 text-center shadow-xl">
+        <h1 class="text-2xl font-bold text-gray-900">Meeting unavailable</h1>
+        <p class="mt-3 text-gray-500">{{ error }}</p>
+        <a href="/" class="mt-6 inline-flex rounded-xl bg-blue-600 px-5 py-3 font-bold text-white">Go Home</a>
+      </div>
+    </main>
+  {% else %}
+    {% include "video_conferencing.html" %}
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('videoModal');
+        const role = "{{ user_role|default:'applicant' }}";
+        const displayName = role === 'admin' ? 'Admin' : 'Applicant';
+
+        if (modal) modal.classList.remove('hidden');
+
+        const title = document.getElementById('meetingTitle');
+        const date = document.getElementById('meetingDate');
+        if (title) title.textContent = "{{ room_title|default:'Video Conference'|escapejs }}";
+        if (date) date.textContent = "{{ room_subtitle|default:'Live session'|escapejs }}";
+
+        window.videoClient = new VideoConferencingClient("{{ room_id }}", role, null, displayName);
+        window.videoClient.initConnection();
+
+        setTimeout(function() {
+          if (role === 'admin') window.videoClient.initiate();
+          else window.videoClient.accept();
+        }, 250);
+      });
+    </script>
+  {% endif %}
+</body>
+</html>

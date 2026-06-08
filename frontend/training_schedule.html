@@ -1,0 +1,104 @@
+  <!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manage Training Schedule</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body class="min-h-screen bg-yellow-50">
+  <div class="max-w-5xl mx-auto p-8">
+    <div class="bg-white rounded-lg p-6 shadow">
+      <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Training Schedule</h1>
+        <div class="flex gap-4">
+            <a href="/admin-calendar/" class="bg-amber-100 text-amber-800 px-4 py-2 rounded-lg font-semibold hover:bg-amber-200 transition">
+                <i class="fas fa-calendar-alt mr-2"></i>View Calendar
+            </a>
+            <a href="/admin-dashboard/" class="text-sm text-yellow-700 hover:underline">← Back to dashboard</a>
+        </div>
+      </div>
+
+      {% if not applicants %}
+        <div class="p-8 text-center border-2 border-dashed border-gray-200 rounded-2xl">
+            <p class="text-gray-500">No applicants currently awaiting training schedule.</p>
+        </div>
+      {% else %}
+        <div class="space-y-6">
+          {% for app in applicants %}
+          <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+            <div class="flex flex-col lg:flex-row gap-6">
+              <!-- Left: Applicant Info -->
+              <div class="w-full lg:w-1/3">
+                <div class="flex items-center gap-4 mb-4">
+                  <div class="h-12 w-12 rounded-full bg-white border border-amber-200 flex items-center justify-center font-bold text-amber-700">
+                    {{ app.first_name|first }}{{ app.last_name|first }}
+                  </div>
+                  <div>
+                    <h2 class="text-lg font-bold text-gray-900">{{ app.first_name }} {{ app.last_name }}</h2>
+                    <p class="text-xs text-gray-500">{{ app.email }}</p>
+                  </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-2 mb-4">
+                  <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-[10px] font-bold uppercase tracking-wider">
+                    {{ app.status }}
+                  </span>
+                  <a href="/applicant-details/{{ app.applicant_id }}/" target="_blank" class="px-2 py-1 bg-white border border-gray-200 text-gray-600 rounded text-[10px] font-bold hover:bg-gray-50 transition">
+                    VIEW PROFILE
+                  </a>
+                </div>
+
+                {% if app.current_schedule %}
+                  <div class="mt-4 p-4 bg-white rounded-xl border border-amber-200 shadow-sm">
+                    <div class="text-xs font-bold text-amber-600 uppercase tracking-wider">
+                      <i class="fas fa-clock mr-1"></i>Training Scheduled
+                    </div>
+                    <div class="text-sm font-semibold text-gray-800 mt-1">
+                      {{ app.current_schedule.scheduled_at|date:"F d, Y @ h:i A" }}
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Right: Schedule Form -->
+              <div class="flex-1 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Update Training Schedule</h3>
+                <form method="POST" action="/schedule-action/" class="space-y-4">
+                  {% csrf_token %}
+                  <input type="hidden" name="applicant_identifier" value="{{ app.applicant_id }}">
+                  <input type="hidden" name="redirect_to" value="/training-schedule/">
+                  <input type="hidden" name="type" value="training">
+                  <input type="hidden" name="title" value="Recruitment Training Session">
+                  
+                  <div class="grid grid-cols-1 gap-4">
+                    <div>
+                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Date & Time</label>
+                      <input type="datetime-local" 
+                             name="scheduled_at" 
+                             class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400" 
+                             value="{{ app.current_schedule.scheduled_at|date:'Y-m-dT00:00' }}"
+                             required>
+                    </div>
+                  </div>
+                  
+                  <div class="flex gap-3">
+                    <button type="submit" class="flex-1 bg-gray-900 hover:bg-black text-white font-bold py-2 rounded-lg transition">
+                      <i class="fas fa-save mr-2"></i>Save Schedule
+                    </button>
+                    <button type="submit" name="advance_status" value="Approved" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg transition">
+                      <i class="fas fa-check-circle mr-2"></i>Finish & Approve
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

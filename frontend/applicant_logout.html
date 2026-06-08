@@ -1,0 +1,15 @@
+<?php
+// Applicant logout: destroy session and redirect to applicant login
+session_start();
+// Only unset applicant-related keys to avoid logging out admins if both set
+unset($_SESSION['applicant_id'], $_SESSION['applicant_email']);
+// Optionally destroy entire session if you prefer
+if (empty($_SESSION)) {
+    if (ini_get('session.use_cookies')) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+    }
+    session_destroy();
+}
+header('Location: /login/');
+exit;

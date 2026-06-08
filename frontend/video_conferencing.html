@@ -1,0 +1,795 @@
+<!-- Video Conferencing Modal -->
+<style>
+  .vc-modal {
+    --vc-blue: #4368f4;
+    --vc-red: #df6d68;
+    --vc-ink: #2f3442;
+    --vc-muted: #8c94a6;
+    --vc-line: #eef1f7;
+    --vc-soft: #f7f8fb;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .vc-modal * { box-sizing: border-box; }
+  .vc-modal button { font: inherit; }
+
+  .vc-shell {
+    width: min(1480px, 100vw);
+    height: min(900px, 100vh);
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 28px 90px rgba(30, 44, 90, 0.24);
+    display: grid;
+    grid-template-rows: 120px 1fr 118px;
+    grid-template-columns: minmax(0, 1fr) 360px;
+  }
+
+  .vc-top {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 132px minmax(0, 1fr) 340px;
+    border-bottom: 1px solid var(--vc-line);
+    background: rgba(255, 255, 255, 0.96);
+  }
+
+  .vc-brand {
+    display: grid;
+    place-items: center;
+    border-right: 1px solid var(--vc-line);
+  }
+
+  .vc-logo {
+    width: 58px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--vc-blue);
+    position: relative;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.24);
+  }
+
+  .vc-logo::after {
+    content: "";
+    position: absolute;
+    right: -17px;
+    top: 7px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 18px solid var(--vc-blue);
+  }
+
+  .vc-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 0 30px;
+    min-width: 0;
+  }
+
+  .vc-title h2 {
+    margin: 0;
+    color: var(--vc-ink);
+    font-size: 22px;
+    line-height: 1.25;
+    font-weight: 750;
+  }
+
+  .vc-title p {
+    margin: 8px 0 0;
+    color: #afb5c1;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .vc-head-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-shrink: 0;
+  }
+
+  .vc-stack {
+    display: flex;
+    align-items: center;
+  }
+
+  .vc-stack .vc-avatar { margin-left: -8px; border: 3px solid #fff; }
+  .vc-stack .vc-avatar:first-child { margin-left: 0; }
+
+  .vc-more-count {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #eaf0ff;
+    color: var(--vc-blue);
+    font-weight: 800;
+    border: 3px solid #fff;
+    margin-left: -8px;
+  }
+
+  .vc-link-pill {
+    border: 0;
+    border-radius: 999px;
+    padding: 14px 18px;
+    background: #eaf0ff;
+    color: var(--vc-blue);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    min-width: 180px;
+    justify-content: center;
+  }
+
+  .vc-user {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 28px 22px 28px 0;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: #f6f6f7;
+  }
+
+  .vc-user strong {
+    color: var(--vc-ink);
+    display: block;
+    font-size: 14px;
+  }
+
+  .vc-user span {
+    color: #a4a9b4;
+    display: block;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .vc-main {
+    background: var(--vc-soft);
+    padding: 22px 30px 28px;
+    overflow: hidden;
+  }
+
+  .vc-stage {
+    display: grid;
+    grid-template-rows: minmax(280px, 1fr) 156px;
+    gap: 22px;
+    height: 100%;
+  }
+
+  .vc-feature {
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    background:
+      radial-gradient(circle at 28% 24%, rgba(255,255,255,0.84), transparent 31%),
+      linear-gradient(135deg, #d7dce5, #f8f9fb 52%, #d7dbe4);
+  }
+
+  .vc-feature video,
+  .vc-thumb video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: #1c2230;
+  }
+
+  .vc-video-empty video[srcObject=""] { display: none; }
+
+  .vc-avatar-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: linear-gradient(135deg, #8ea2c4, #d3dae8);
+    font-size: 72px;
+    font-weight: 800;
+  }
+
+  .vc-feature .vc-avatar-fallback { font-size: 118px; }
+
+  .vc-name-tag {
+    position: absolute;
+    left: 18px;
+    bottom: 20px;
+    min-width: 164px;
+    border-radius: 999px;
+    background: rgba(67, 73, 84, 0.52);
+    color: #fff;
+    padding: 12px 22px;
+    font-weight: 800;
+    text-align: center;
+    backdrop-filter: blur(10px);
+  }
+
+  .vc-rec {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 999px;
+    padding: 10px 16px;
+    background: rgba(47, 52, 66, 0.42);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
+    backdrop-filter: blur(10px);
+  }
+
+  .vc-rec-dot {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #f15e63;
+    box-shadow: 0 0 0 6px rgba(255,255,255,0.78);
+  }
+
+  .vc-float-btn {
+    position: absolute;
+    right: 18px;
+    width: 52px;
+    height: 52px;
+    border: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: rgba(47, 52, 66, 0.42);
+    color: #fff;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+  }
+
+  .vc-float-top { top: 18px; }
+  .vc-float-bottom { bottom: 18px; }
+
+  .vc-thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
+    gap: 16px;
+    min-height: 0;
+  }
+
+  .vc-thumb {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #c9d1df;
+    min-width: 0;
+  }
+
+  .vc-thumb::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 54px;
+    background: linear-gradient(to top, rgba(0,0,0,0.52), transparent);
+    pointer-events: none;
+  }
+
+  .vc-thumb-label {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    z-index: 1;
+    color: #fff;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(43, 49, 61, 0.58);
+    font-size: 13px;
+    font-weight: 800;
+    max-width: calc(100% - 58px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .vc-mini-state {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    z-index: 1;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: var(--vc-blue);
+    font-size: 15px;
+  }
+
+  .vc-mini-state.off { background: var(--vc-red); }
+
+  .vc-side {
+    border-left: 1px solid var(--vc-line);
+    background: #fff;
+    display: grid;
+    grid-template-rows: 315px minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .vc-panel {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .vc-panel-head {
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 26px;
+    border-bottom: 1px solid var(--vc-line);
+  }
+
+  .vc-panel-head h3 {
+    margin: 0;
+    color: var(--vc-ink);
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .vc-add {
+    border: 0;
+    border-radius: 999px;
+    background: #eaf0ff;
+    color: var(--vc-blue);
+    padding: 11px 14px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .vc-list {
+    padding: 16px 22px;
+    overflow: auto;
+  }
+
+  .vc-person {
+    height: 58px;
+    border-radius: 999px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 9px 11px;
+    margin-bottom: 12px;
+    box-shadow: 0 12px 30px rgba(30, 44, 90, 0.06);
+  }
+
+  .vc-person strong {
+    color: var(--vc-ink);
+    font-size: 13px;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .vc-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 850;
+    flex: 0 0 auto;
+  }
+
+  .vc-a1 { background: linear-gradient(135deg, #f5c84a, #7557d8); }
+  .vc-a2 { background: linear-gradient(135deg, #84d7f2, #5182df); }
+  .vc-a3 { background: linear-gradient(135deg, #f0c94f, #e98e8c); }
+  .vc-a4 { background: linear-gradient(135deg, #4e6cf2, #71d2ff); }
+  .vc-a5 { background: linear-gradient(135deg, #2f3442, #98a6bd); }
+
+  .vc-icon-mini {
+    border: 0;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    color: var(--vc-blue);
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .vc-icon-mini.off { color: var(--vc-red); }
+
+  .vc-chat {
+    background: #f7f8fb;
+    border-top: 1px solid var(--vc-line);
+    min-height: 0;
+  }
+
+  .vc-tabs {
+    background: #eaf0ff;
+    padding: 4px;
+    border-radius: 999px;
+    display: flex;
+    width: 210px;
+  }
+
+  .vc-tab {
+    flex: 1;
+    border: 0;
+    border-radius: 999px;
+    padding: 10px 12px;
+    background: transparent;
+    color: var(--vc-blue);
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .vc-tab.active { background: var(--vc-blue); color: #fff; }
+
+  .vc-messages {
+    padding: 18px 24px;
+    overflow: auto;
+    min-height: 0;
+    flex: 1;
+  }
+
+  .vc-msg {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) 44px;
+    gap: 12px;
+    align-items: start;
+    margin-bottom: 14px;
+  }
+
+  .vc-bubble {
+    background: #fff;
+    border-radius: 7px;
+    padding: 11px 13px;
+    color: var(--vc-ink);
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 700;
+  }
+
+  .vc-bubble small {
+    display: block;
+    color: #bac0cc;
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .vc-time {
+    color: #bac0cc;
+    font-size: 10px;
+    padding-top: 14px;
+  }
+
+  .vc-controls {
+    grid-column: 1 / 2;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 22px;
+    padding: 0 28px;
+    border-top: 1px solid var(--vc-line);
+    background: #fff;
+  }
+
+  .vc-control-set {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .vc-control-btn {
+    width: 52px;
+    height: 52px;
+    border: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #eaf0ff;
+    color: var(--vc-blue);
+    font-size: 21px;
+    cursor: pointer;
+    transition: transform .16s ease, background .16s ease, color .16s ease;
+  }
+
+  .vc-control-btn span {
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: 0;
+  }
+
+  .vc-control-btn:hover { transform: translateY(-1px); }
+  .vc-control-btn.active { background: var(--vc-blue); color: #fff; }
+  .vc-control-btn.off { background: #ffe9e8; color: var(--vc-red); }
+  .vc-control-btn.record { background: #fff0ef; color: var(--vc-red); box-shadow: 0 0 0 8px rgba(223,109,104,0.14); }
+
+  .vc-end {
+    justify-self: end;
+    border: 0;
+    border-radius: 999px;
+    background: var(--vc-red);
+    color: #fff;
+    height: 52px;
+    padding: 0 34px;
+    font-weight: 850;
+    cursor: pointer;
+  }
+
+  .vc-chat-input {
+    grid-column: 2 / 3;
+    border-left: 1px solid var(--vc-line);
+    border-top: 1px solid var(--vc-line);
+    padding: 26px 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+  }
+
+  .vc-chat-input input {
+    min-width: 0;
+    flex: 1;
+    border: 0;
+    outline: 0;
+    background: #f7f8fb;
+    height: 52px;
+    border-radius: 999px;
+    padding: 0 16px;
+    color: var(--vc-ink);
+    font-weight: 700;
+  }
+
+  .vc-send {
+    width: 52px;
+    height: 52px;
+    border: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--vc-blue);
+    color: #fff;
+    cursor: pointer;
+    font-size: 22px;
+  }
+
+  .vc-status {
+    position: fixed;
+    left: 28px;
+    bottom: 28px;
+    z-index: 60;
+    border-radius: 999px;
+    color: #fff;
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 16px 35px rgba(30, 44, 90, 0.18);
+  }
+
+  .vc-hidden { display: none !important; }
+
+  .vc-incoming {
+    position: fixed;
+    right: 22px;
+    top: 22px;
+    z-index: 70;
+    width: min(390px, calc(100vw - 44px));
+    background: #fff;
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 24px 65px rgba(30, 44, 90, 0.2);
+    border: 1px solid var(--vc-line);
+  }
+
+  .vc-incoming h3 { margin: 0; color: var(--vc-ink); font-size: 18px; }
+  .vc-incoming p { margin: 6px 0 16px; color: var(--vc-muted); font-size: 13px; font-weight: 700; }
+
+  .vc-incoming-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .vc-accept, .vc-reject {
+    border: 0;
+    border-radius: 12px;
+    padding: 12px;
+    color: #fff;
+    font-weight: 850;
+    cursor: pointer;
+  }
+  .vc-accept { background: #22b573; }
+  .vc-reject { background: var(--vc-red); }
+
+  @media (max-width: 1100px) {
+    .vc-shell {
+      height: 100vh;
+      border-radius: 0;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+    }
+    .vc-top { grid-template-columns: 86px 1fr; }
+    .vc-user { display: none; }
+    .vc-titlebar { padding: 16px 18px; }
+    .vc-title h2 { font-size: 18px; }
+    .vc-head-actions { display: none; }
+    .vc-side { display: none; }
+    .vc-main { padding: 14px; }
+    .vc-stage { grid-template-rows: minmax(260px, 1fr) 116px; gap: 12px; }
+    .vc-thumbs { grid-template-columns: repeat(2, 1fr); gap: 10px; overflow: hidden; }
+    .vc-thumb:nth-child(n+3) { display: none; }
+    .vc-controls { grid-column: 1; grid-template-columns: 1fr auto; padding: 16px; }
+    .vc-control-set { justify-content: start; gap: 10px; }
+    .vc-control-btn { width: 46px; height: 46px; }
+    .vc-end { padding: 0 20px; height: 46px; }
+    .vc-chat-input { display: none; }
+  }
+</style>
+
+<div id="videoModal" class="vc-modal hidden fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50">
+  <div class="vc-shell" role="dialog" aria-modal="true" aria-label="Video call">
+    <header class="vc-top">
+      <div class="vc-brand" aria-hidden="true"><div class="vc-logo"></div></div>
+      <div class="vc-titlebar">
+        <div class="vc-title">
+          <h2 id="meetingTitle">Interview Video Call</h2>
+          <p id="meetingDate">Live session</p>
+        </div>
+        <div class="vc-head-actions">
+          <div class="vc-stack" aria-label="Participants">
+            <span class="vc-avatar vc-a1">DR</span>
+            <span class="vc-avatar vc-a2">GH</span>
+            <span class="vc-avatar vc-a3">KM</span>
+            <span class="vc-avatar vc-a4">JA</span>
+            <span class="vc-more-count">+9</span>
+          </div>
+          <button type="button" class="vc-link-pill" id="copyRoomBtn" title="Copy room link">
+            <span aria-hidden="true">&#128279;</span><span id="roomCodeLabel">video-room</span>
+          </button>
+        </div>
+      </div>
+      <div class="vc-user">
+        <span class="vc-avatar vc-a5">A</span>
+        <div><strong id="currentUserLabel">Admin</strong><span>Moderator</span></div>
+        <button type="button" class="vc-icon-mini" title="More options">...</button>
+      </div>
+    </header>
+
+    <main class="vc-main">
+      <section class="vc-stage" aria-label="Call stage">
+        <div class="vc-feature" id="localTile">
+          <video id="localVideo" autoplay muted playsinline></video>
+          <div class="vc-avatar-fallback" id="localAvatar">A</div>
+          <div class="vc-rec"><span class="vc-rec-dot"></span><span id="callDuration">00:00</span></div>
+          <button type="button" class="vc-float-btn vc-float-top" id="fullscreenBtn" title="Fullscreen">[ ]</button>
+          <button type="button" class="vc-float-btn vc-float-bottom" title="Audio activity">|||</button>
+          <div class="vc-name-tag" id="localNameTag">You</div>
+        </div>
+
+        <div class="vc-thumbs">
+          <div class="vc-thumb" id="remoteTile">
+            <video id="remoteVideo" autoplay playsinline></video>
+            <div class="vc-avatar-fallback" id="remoteAvatar">G</div>
+            <span class="vc-thumb-label" id="remoteNameTag">Guest</span>
+            <span class="vc-mini-state" id="remoteMicState">Mic</span>
+          </div>
+          <div class="vc-thumb">
+            <div class="vc-avatar-fallback">C</div>
+            <span class="vc-thumb-label">Cassie Jung</span>
+            <span class="vc-mini-state off">Off</span>
+          </div>
+          <div class="vc-thumb">
+            <div class="vc-avatar-fallback">T</div>
+            <span class="vc-thumb-label">Theresa Webb</span>
+            <span class="vc-mini-state">Mic</span>
+          </div>
+          <div class="vc-thumb">
+            <div class="vc-avatar-fallback">K</div>
+            <span class="vc-thumb-label">Kathryn Murphy</span>
+            <span class="vc-mini-state off">Off</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="vc-side" aria-label="Participants and chat">
+      <section class="vc-panel">
+        <div class="vc-panel-head">
+          <h3>Participants</h3>
+          <button type="button" class="vc-add">Add Participant</button>
+        </div>
+        <div class="vc-list">
+          <div class="vc-person"><span class="vc-avatar vc-a1">DR</span><strong>Dianne Russell</strong><button class="vc-icon-mini">Mic</button><button class="vc-icon-mini off">Cam</button></div>
+          <div class="vc-person"><span class="vc-avatar vc-a2">GH</span><strong>Guy Hawkins</strong><button class="vc-icon-mini off">Off</button><button class="vc-icon-mini off">Cam</button></div>
+          <div class="vc-person"><span class="vc-avatar vc-a3">KM</span><strong>Kathryn Murphy</strong><button class="vc-icon-mini off">Off</button><button class="vc-icon-mini">Cam</button></div>
+        </div>
+      </section>
+
+      <section class="vc-panel vc-chat">
+        <div class="vc-panel-head">
+          <h3>Chats</h3>
+          <div class="vc-tabs">
+            <button type="button" class="vc-tab active">Group</button>
+            <button type="button" class="vc-tab">Personal</button>
+          </div>
+        </div>
+        <div class="vc-messages" id="chatMessages">
+          <div class="vc-msg">
+            <span class="vc-avatar vc-a3">KM</span>
+            <div class="vc-bubble"><small>Kathryn Murphy</small>Good afternoon, everyone.</div>
+            <span class="vc-time">11:01 AM</span>
+          </div>
+          <div class="vc-msg">
+            <span></span>
+            <div class="vc-bubble">We will start this meeting</div>
+            <span></span>
+          </div>
+          <div class="vc-msg">
+            <span class="vc-avatar vc-a2">JA</span>
+            <div class="vc-bubble"><small>Joshua Abraham</small>Yes, let's start this meeting</div>
+            <span class="vc-time">11:02 AM</span>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <footer class="vc-controls">
+      <span></span>
+      <div class="vc-control-set" aria-label="Call controls">
+        <button type="button" id="toggleAudioBtn" class="vc-control-btn active" title="Toggle microphone">
+          <span class="vc-control-icon">Mic</span><span class="vc-control-label vc-hidden">Mute</span>
+        </button>
+        <button type="button" id="toggleVideoBtn" class="vc-control-btn active" title="Toggle camera">
+          <span class="vc-control-icon">Cam</span><span class="vc-control-label vc-hidden">Stop Video</span>
+        </button>
+        <button type="button" id="shareScreenBtn" class="vc-control-btn" title="Share screen">
+          <span>Up</span>
+        </button>
+        <button type="button" id="recordBtn" class="vc-control-btn record" title="Record">
+          <span>Rec</span>
+        </button>
+        <button type="button" id="chatToggleBtn" class="vc-control-btn" title="Chat">
+          <span>Chat</span>
+        </button>
+        <button type="button" class="vc-control-btn" title="More">
+          <span>...</span>
+        </button>
+      </div>
+      <button type="button" id="endCallBtn" class="vc-end">End Call</button>
+    </footer>
+
+    <div class="vc-chat-input">
+      <button type="button" class="vc-icon-mini" title="Attach">+</button>
+      <input id="chatInput" type="text" placeholder="Type Something..." autocomplete="off" />
+      <button type="button" class="vc-send" id="sendChatBtn" title="Send">&gt;</button>
+    </div>
+  </div>
+</div>
+
+<!-- Incoming Call Notification -->
+<div id="incomingCallNotif" class="vc-modal vc-incoming hidden">
+  <h3 id="incomingCallerName">Admin is calling...</h3>
+  <p>Incoming video call</p>
+  <div class="vc-incoming-actions">
+    <button type="button" id="acceptCallBtn" class="vc-accept">Accept</button>
+    <button type="button" id="rejectCallBtn" class="vc-reject">Reject</button>
+  </div>
+</div>
+
+<!-- Call Status Messages -->
+<div id="callStatus" class="vc-status hidden">
+  <span id="callStatusText">Connecting...</span>
+</div>

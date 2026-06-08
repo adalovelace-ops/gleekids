@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manage Onboarding & Placement</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body class="min-h-screen bg-yellow-50">
+  <div class="max-w-6xl mx-auto p-8">
+    <div class="bg-white rounded-lg p-6 shadow">
+      <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Onboarding & Placement</h1>
+        <div class="flex gap-4">
+            <a href="/admin-dashboard/" class="text-sm text-yellow-700 hover:underline">← Back to dashboard</a>
+        </div>
+      </div>
+
+      {% if not applicants %}
+        <div class="p-8 text-center border-2 border-dashed border-gray-200 rounded-2xl">
+            <p class="text-gray-500">No applicants currently in the final onboarding stage.</p>
+        </div>
+      {% else %}
+        <div class="space-y-6">
+          {% for app in applicants %}
+          <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+            <div class="flex flex-col lg:flex-row gap-8">
+              <!-- Left: Applicant & Schedule Info -->
+              <div class="w-full lg:w-1/3">
+                <div class="flex items-center gap-4 mb-4">
+                  <div class="h-14 w-14 rounded-full bg-white border border-amber-200 flex items-center justify-center font-bold text-xl text-amber-700">
+                    {{ app.first_name|first }}{{ app.last_name|first }}
+                  </div>
+                  <div>
+                    <h2 class="text-lg font-bold text-gray-900">{{ app.first_name }} {{ app.last_name }}</h2>
+                    <p class="text-xs text-gray-500">{{ app.email }}</p>
+                  </div>
+                </div>
+
+                <div class="space-y-3">
+                  <div class="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Current Status</p>
+                    <p class="text-sm font-bold text-green-600 mt-1">APPROVED / ONBOARDING</p>
+                  </div>
+
+                  {% if app.teaching_account %}
+                  <div class="p-4 bg-amber-50 rounded-xl border border-amber-200 shadow-sm">
+                    <p class="text-[10px] font-bold text-amber-600 uppercase tracking-widest">Assigned Account</p>
+                    <p class="text-sm font-bold text-amber-900 mt-1">{{ app.teaching_account }} Account</p>
+                    {% if app.teaching_account_notes %}
+                    <p class="text-[10px] text-amber-700 mt-2 italic">Note: {{ app.teaching_account_notes }}</p>
+                    {% endif %}
+                  </div>
+                  {% endif %}
+
+                  {% if app.current_schedule %}
+                  <div class="p-4 bg-white rounded-xl border border-blue-200 shadow-sm">
+                    <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Final Orientation</p>
+                    <p class="text-sm font-bold text-gray-800 mt-1">
+                      {{ app.current_schedule.scheduled_at|date:"M d, Y @ h:i A" }}
+                    </p>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Right: Forms -->
+              <div class="flex-1 space-y-6">
+                <!-- Form 1: Placement -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                  <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Teacher Placement</h3>
+                  <form method="POST" class="space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="assign_account">
+                    <input type="hidden" name="applicant_identifier" value="{{ app.applicant_id }}">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Select Account</label>
+                        <select name="account_slug" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400" required>
+                          <option value="">Choose Account...</option>
+                          {% for slug, label in accounts %}
+                            <option value="{{ slug }}" {% if app.teaching_account == slug %}selected{% endif %}>{{ label }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Placement Notes</label>
+                        <input type="text" name="notes" placeholder="e.g. Morning Shift, Class A-1" 
+                               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400"
+                               value="{{ app.teaching_account_notes|default:'' }}">
+                      </div>
+                    </div>
+                    <button type="submit" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-2 rounded-lg transition">
+                      <i class="fas fa-user-tag mr-2"></i>Assign Account & Notify Teacher
+                    </button>
+                  </form>
+                </div>
+
+                <!-- Form 2: Orientation Schedule -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                  <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Final Orientation Schedule</h3>
+                  <form method="POST" action="/schedule-action/" class="space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="applicant_identifier" value="{{ app.applicant_id }}">
+                    <input type="hidden" name="redirect_to" value="/onboarding/">
+                    <input type="hidden" name="type" value="onboarding">
+                    <input type="hidden" name="title" value="Final Teacher Onboarding & Orientation">
+                    
+                    <div class="grid grid-cols-1 gap-4">
+                      <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Date & Time</label>
+                        <input type="datetime-local" name="scheduled_at" 
+                               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400" 
+                               value="{{ app.current_schedule.scheduled_at|date:'Y-m-dT00:00' }}"
+                               required>
+                      </div>
+                    </div>
+                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg transition">
+                      <i class="fas fa-calendar-check mr-2"></i>Save Orientation Schedule
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
+>

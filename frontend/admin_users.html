@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Users</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-amber-50 to-white text-gray-800">
+  <div class="flex min-h-screen">
+    
+    <main class="flex-1 p-6 lg:p-10">
+      <div class="max-w-6xl mx-auto space-y-8">
+        <div>
+          <p class="text-sm uppercase tracking-[0.2em] text-amber-600">Access Control</p>
+          <h1 class="mt-1 text-3xl font-bold text-gray-900">Admin Accounts</h1>
+        </div>
+
+        {% if flashSuccess %}
+          <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-800 text-sm flex items-start gap-2">
+            <span>✓</span>
+            <span>{{ flashSuccess }}</span>
+          </div>
+        {% endif %}
+        {% if flashError %}
+          <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-800 text-sm flex items-start gap-2">
+            <span>⚠</span>
+            <span>{{ flashError }}</span>
+          </div>
+        {% endif %}
+        {% if dbError %}
+          <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-800 text-sm flex items-start gap-2">
+            <span>⚠</span>
+            <span>Unable to load admin data: {{ dbError }}</span>
+          </div>
+        {% endif %}
+
+        <section class="rounded-3xl border border-amber-100 bg-white/90 p-6 shadow-xl">
+          <h2 class="text-xl font-semibold text-gray-900 mb-1">Add New Admin</h2>
+          <div class="mb-4 text-xs text-gray-600">
+          </div>
+          <form method="POST" class="grid gap-4 md:grid-cols-2">
+            
+            <input type="hidden" name="action" value="create">
+            <div>
+              <label class="text-sm font-medium text-gray-700">First Name</label>
+              <input type="text" name="first_name" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-amber-400 focus:ring-amber-200" placeholder="Jane">
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700">Last Name</label>
+              <input type="text" name="last_name" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-amber-400 focus:ring-amber-200" placeholder="Doe">
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700">Email<span class="text-red-500">*</span></label>
+              <input type="email" name="email" required class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-amber-400 focus:ring-amber-200" placeholder="name@company.com">
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700">Role</label>
+              <select name="role" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-amber-400 focus:ring-amber-200">
+                
+                  <option value="{{ key }}">{{ label }}</option>
+                
+              </select>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700">Password<span class="text-red-500">*</span></label>
+              <input type="password" name="password" required class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-amber-400 focus:ring-amber-200" placeholder="••••••••">
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700">Confirm Password<span class="text-red-500">*</span></label>
+              <input type="password" name="password_confirm" required class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-amber-400 focus:ring-amber-200" placeholder="Repeat password">
+            </div>
+            <div class="md:col-span-2 flex justify-end">
+              <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-2 text-white font-semibold hover:bg-amber-700">
+                <span>＋</span>
+                Create Admin
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="rounded-3xl border border-gray-100 bg-white/90 p-6 shadow-xl">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+              <h2 class="text-xl font-semibold text-gray-900">Existing Admins</h2>
+              <p class="text-sm text-gray-500">{{ admins }} account(s) on file.</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm text-gray-700">
+              <thead>
+                <tr class="bg-amber-50 text-left text-xs font-semibold uppercase tracking-wider text-amber-900">
+                  <th class="px-4 py-3">Name</th>
+                  <th class="px-4 py-3">Email</th>
+                  <th class="px-4 py-3">Role</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3">Created</th>
+                  <th class="px-4 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if admins %}
+                  <tr>
+                    <td colspan="6" class="px-4 py-6 text-center text-gray-500">No admins found.</td>
+                  </tr>
+                {% else %}
+                  
+                    <tr class="border-b border-gray-100 text-sm">
+                      <td class="px-4 py-3">
+                        <div class="font-semibold text-gray-900">{{ admin }}</div>
+                        <div class="text-xs text-gray-500">{{ admin }}</div>
+                      </td>
+                      <td class="px-4 py-3">
+                        <span class="text-gray-800">{{ admin }}</span>
+                      </td>
+                      <td class="px-4 py-3">
+                        <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">{{ roles }}</span>
+                      </td>
+                      <td class="px-4 py-3">
+                        {% if admin %}
+                          <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Active</span>
+                        {% else %}
+                          <span class="rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-600">Disabled</span>
+                        {% endif %}
+                      </td>
+                      <td class="px-4 py-3 text-xs text-gray-500">
+                        {{ admin }}
+                      </td>
+                      <td class="px-4 py-3">
+                        <div class="flex flex-wrap gap-2">
+                          <button type="button" class="edit-admin-btn inline-flex items-center rounded-lg border border-amber-200 px-3 py-1 text-xs font-semibold text-amber-800 hover:bg-amber-50"
+                            data-id="{{ admin }}"
+                            data-first="{{ admin }}"
+                            data-last="{{ admin }}"
+                            data-email="{{ admin }}"
+                            data-role="{{ admin }}"
+                            data-active="{{ admin }}">
+                            Edit
+                          </button>
+                          <form method="POST" onsubmit="return confirm('Delete this admin?');">
+                            
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="admin_id" value="{{ admin }}">
+                            <button type="submit" class="inline-flex items-center rounded-lg border border-red-200 px-3 py-1 text-xs font-semibold text-red-700 hover:bg-red-50">Delete</button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 px-4">
+    <div class="w-full max-w-lg rounded-3xl bg-white shadow-2xl">
+      <div class="flex items-center justify-between border-b px-6 py-4">
+        <div>
+          <p class="text-xs uppercase tracking-[0.3em] text-amber-500">Edit Admin</p>
+          <h3 class="text-lg font-semibold text-gray-900">Update Account</h3>
+        </div>
+        <button type="button" id="editModalClose" class="text-2xl leading-none text-gray-400 hover:text-gray-600">&times;</button>
+      </div>
+      <form method="POST" class="space-y-4 px-6 py-6">
+        
+        <input type="hidden" name="action" value="update">
+        <input type="hidden" name="admin_id" id="editAdminId">
+        <div class="grid gap-4 md:grid-cols-2">
+          <div>
+            <label class="text-sm font-medium text-gray-700">First Name</label>
+            <input type="text" name="edit_first_name" id="editFirstName" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-amber-400 focus:ring-amber-200">
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-700">Last Name</label>
+            <input type="text" name="edit_last_name" id="editLastName" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-amber-400 focus:ring-amber-200">
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-700">Email</label>
+            <input type="email" name="edit_email" id="editEmail" required class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-amber-400 focus:ring-amber-200">
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-700">Role</label>
+            <select name="edit_role" id="editRole" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-amber-400 focus:ring-amber-200">
+              
+                <option value="{{ key }}">{{ label }}</option>
+              
+            </select>
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-700">New Password</label>
+            <input type="password" name="edit_password" id="editPassword" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-amber-400 focus:ring-amber-200" placeholder="Leave blank to keep current">
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-700">Confirm Password</label>
+            <input type="password" name="edit_password_confirm" id="editPasswordConfirm" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-amber-400 focus:ring-amber-200">
+          </div>
+        </div>
+        <label class="mt-2 inline-flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" name="edit_is_active" id="editIsActive" class="rounded border-gray-300 text-amber-600 focus:ring-amber-500">
+          Active account
+        </label>
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" id="editModalCancel" class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="rounded-xl bg-amber-600 px-5 py-2 text-sm font-semibold text-white hover:bg-amber-700">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const editModal = document.getElementById('editModal');
+    const editBtnClose = document.getElementById('editModalClose');
+    const editBtnCancel = document.getElementById('editModalCancel');
+    const toggleModal = (show) => {
+      if (show) {
+        editModal.classList.remove('hidden');
+        editModal.classList.add('flex');
+      } else {
+        editModal.classList.add('hidden');
+        editModal.classList.remove('flex');
+      }
+    };
+
+    document.querySelectorAll('.edit-admin-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('editAdminId').value = btn.dataset.id || '';
+        document.getElementById('editFirstName').value = btn.dataset.first || '';
+        document.getElementById('editLastName').value = btn.dataset.last || '';
+        document.getElementById('editEmail').value = btn.dataset.email || '';
+        document.getElementById('editRole').value = btn.dataset.role || 'admin';
+        document.getElementById('editIsActive').checked = btn.dataset.active === '1';
+        document.getElementById('editPassword').value = '';
+        document.getElementById('editPasswordConfirm').value = '';
+        toggleModal(true);
+      });
+    });
+
+    [editBtnClose, editBtnCancel].forEach(btn => btn.addEventListener('click', () => toggleModal(false)));
+    editModal.addEventListener('click', (event) => {
+      if (event.target === editModal) {
+        toggleModal(false);
+      }
+    });
+  </script>
+</body>
+</html>

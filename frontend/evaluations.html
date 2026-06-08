@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Evaluations</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body class="min-h-screen bg-gradient-to-br from-yellow-50 to-white text-gray-800">
+  <div class="flex min-h-screen">
+    <aside id="sidebar" class="w-64 min-h-screen bg-white shadow-xl border-r border-yellow-200 sticky top-0">
+      <div class="p-6">
+        <img src="/media/gleelogo.png" alt="Gleekids Logo" class="h-12 w-auto mb-8 mx-auto">
+        <nav class="space-y-2">
+          <a href="/admin-dashboard/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-home"></i> Dashboard
+          </a>
+          <a href="/admin-dashboard/?status=Pending" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-users"></i> Applicants
+          </a>
+          <a href="/admin-calendar/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-calendar-alt"></i> Schedules
+          </a>
+          <a href="http://127.0.0.1:3000/?role=admin" target="_blank" rel="noopener" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-video"></i> Video Conferencing
+          </a>
+          <a href="/evaluations/" class="flex items-center gap-3 px-4 py-3 bg-yellow-500 text-white rounded-xl font-semibold shadow-md">
+            <i class="fas fa-star"></i> Evaluations
+          </a>
+          <a href="/reports/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-chart-line"></i> Reports
+          </a>
+          <div class="pt-10">
+            <a href="/logout/" class="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-semibold">
+              <i class="fas fa-sign-out-alt"></i> Sign Out
+            </a>
+          </div>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="flex-1 p-8">
+      <div class="max-w-7xl mx-auto space-y-8">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-sm uppercase tracking-[0.2em] text-amber-600">Shared evaluation sheet</p>
+            <h1 class="mt-1 text-3xl font-bold text-gray-900">Evaluations</h1>
+            <p class="mt-2 text-sm text-gray-500">Demo Evaluation and Client Endorsement use the same scoring form.</p>
+          </div>
+          <form method="get" class="flex gap-2">
+            <input name="q" value="{{ query }}" placeholder="Search applicant" class="w-64 rounded-lg border border-amber-200 px-3 py-2 text-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-100">
+            <button type="submit" class="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white hover:bg-amber-600">
+              Search
+            </button>
+          </form>
+        </div>
+
+        <section class="grid gap-4 md:grid-cols-3">
+          <div class="rounded-lg border border-amber-100 bg-white p-5 shadow">
+            <p class="text-sm text-gray-500">Demo Evaluation</p>
+            <p class="mt-2 text-3xl font-extrabold text-amber-700">{{ total_demo }}</p>
+          </div>
+          <div class="rounded-lg border border-amber-100 bg-white p-5 shadow">
+            <p class="text-sm text-gray-500">Client Endorsement</p>
+            <p class="mt-2 text-3xl font-extrabold text-amber-700">{{ total_client }}</p>
+          </div>
+          <div class="rounded-lg border border-amber-100 bg-white p-5 shadow">
+            <p class="text-sm text-gray-500">Saved evaluations</p>
+            <p class="mt-2 text-3xl font-extrabold text-amber-700">{{ total_evaluations }}</p>
+          </div>
+        </section>
+
+        <section class="rounded-lg border border-amber-100 bg-white shadow-lg">
+          <div class="border-b border-amber-100 p-5">
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 class="text-xl font-bold text-gray-900">Demo Evaluation</h2>
+                <p class="text-sm text-gray-500">Teaching demo candidates using the shared evaluation sheet.</p>
+              </div>
+              <a href="/demo-evaluation/" class="text-sm font-semibold text-amber-700 hover:text-amber-900">Manage demos</a>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+              <thead class="bg-amber-50 text-xs font-semibold uppercase tracking-wider text-amber-900">
+                <tr>
+                  <th class="px-4 py-3 text-left">Applicant</th>
+                  <th class="px-4 py-3 text-left">Score</th>
+                  <th class="px-4 py-3 text-left">Teaching</th>
+                  <th class="px-4 py-3 text-left">Communication</th>
+                  <th class="px-4 py-3 text-left">Curriculum</th>
+                  <th class="px-4 py-3 text-left">Engagement</th>
+                  <th class="px-4 py-3 text-left">Technical</th>
+                  <th class="px-4 py-3 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                {% for app in demo_applicants %}
+                  <tr class="hover:bg-yellow-50/60">
+                    <td class="px-4 py-3">
+                      <div class="font-semibold text-gray-900">{{ app.first_name }} {{ app.last_name }}</div>
+                      <div class="text-xs text-gray-500">{{ app.email }}</div>
+                      {% if app.latest_evaluation.comments %}
+                        <div class="mt-2 max-w-xs whitespace-pre-line rounded-lg bg-amber-50 p-2 text-xs text-amber-900">{{ app.latest_evaluation.comments }}</div>
+                      {% endif %}
+                    </td>
+                    {% if app.latest_evaluation %}
+                      <td class="px-4 py-3"><span class="rounded-full bg-amber-100 px-3 py-1 font-bold text-amber-800">{{ app.latest_evaluation.total_score }}/25</span></td>
+                      <td class="px-4 py-3">{{ app.latest_evaluation.teaching_performance }}/5</td>
+                      <td class="px-4 py-3">{{ app.latest_evaluation.communication_skills }}/5</td>
+                      <td class="px-4 py-3">{{ app.latest_evaluation.curriculum_understanding }}/5</td>
+                      <td class="px-4 py-3">{{ app.latest_evaluation.engagement_level }}/5</td>
+                      <td class="px-4 py-3">{{ app.latest_evaluation.technical_proficiency }}/5</td>
+                    {% else %}
+                      <td class="px-4 py-3" colspan="6"><span class="text-gray-400">No evaluation saved yet</span></td>
+                    {% endif %}
+                    <td class="px-4 py-3">
+                      <div class="flex flex-col gap-2">
+                        <a href="/evaluate/{{ app.applicant_id }}/" class="font-semibold text-amber-700 hover:text-amber-900">{% if app.latest_evaluation %}Edit{% else %}Evaluate{% endif %}</a>
+                        <a href="/applicant-details/{{ app.applicant_id }}/" class="text-xs font-semibold text-gray-500 hover:text-gray-800">View profile</a>
+                      </div>
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="8" class="px-4 py-10 text-center text-gray-500">No demo evaluation applicants found.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="rounded-lg border border-amber-100 bg-white shadow-lg">
+          <div class="border-b border-amber-100 p-5">
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 class="text-xl font-bold text-gray-900">Client Endorsement</h2>
+                <p class="text-sm text-gray-500">Client endorsement candidates using the same evaluation sheet.</p>
+              </div>
+              <a href="/client-endorsement/" class="text-sm font-semibold text-amber-700 hover:text-amber-900">Manage endorsements</a>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+              <thead class="bg-amber-50 text-xs font-semibold uppercase tracking-wider text-amber-900">
+                <tr>
+                  <th class="px-4 py-3 text-left">Applicant</th>
+                  <th class="px-4 py-3 text-left">Score</th>
+                  <th class="px-4 py-3 text-left">Teaching</th>
+                  <th class="px-4 py-3 text-left">Communication</th>
+                  <th class="px-4 py-3 text-left">Curriculum</th>
+                  <th class="px-4 py-3 text-left">Engagement</th>
+                  <th class="px-4 py-3 text-left">Technical</th>
+                  <th class="px-4 py-3 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                {% for app in client_applicants %}
+                  <tr class="hover:bg-yellow-50/60">
+                    <td class="px-4 py-3">
+                      <div class="font-semibold text-gray-900">{{ app.first_name }} {{ app.last_name }}</div>
+                      <div class="text-xs text-gray-500">{{ app.email }}</div>
+                      {% if app.latest_evaluation.comments %}
+                        <div class="mt-2 max-w-xs whitespace-pre-line rounded-lg bg-amber-50 p-2 text-xs text-amber-900">{{ app.latest_evaluation.comments }}</div>
+                      {% endif %}
+                    </td>
+                    {% if app.latest_evaluation %}
+                      <td class="px-4 py-3"><span class="rounded-full bg-amber-100 px-3 py-1 font-bold text-amber-800">{{ app.latest_evaluation.total_score }}/25</span></td>
+                      <td class="px-4 py-3">{{ app.latest_evaluation.teaching_performance }}/5</td>
+                      <td class="px-4 py-3">{{ app.latest_evaluation.communication_skills }}/5</td>
+                      <td class="px-4 py-3">{{ app.latest_evaluation.curriculum_understanding }}/5</td>
+                      <td class="px-4 py-3">{{ app.latest_evaluation.engagement_level }}/5</td>
+                      <td class="px-4 py-3">{{ app.latest_evaluation.technical_proficiency }}/5</td>
+                    {% else %}
+                      <td class="px-4 py-3" colspan="6"><span class="text-gray-400">No evaluation saved yet</span></td>
+                    {% endif %}
+                    <td class="px-4 py-3">
+                      <div class="flex flex-col gap-2">
+                        <a href="/evaluate/{{ app.applicant_id }}/" class="font-semibold text-amber-700 hover:text-amber-900">{% if app.latest_evaluation %}Edit{% else %}Evaluate{% endif %}</a>
+                        <a href="/applicant-details/{{ app.applicant_id }}/" class="text-xs font-semibold text-gray-500 hover:text-gray-800">View profile</a>
+                      </div>
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="8" class="px-4 py-10 text-center text-gray-500">No client endorsement applicants found.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

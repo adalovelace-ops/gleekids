@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Applicants - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+      :root { --brand:#ffc122; --ink:#1f2933; }
+      body { background: linear-gradient(135deg,#fffaf0,#fdf3d4); color: var(--ink); }
+      .card { background:#fff; border:1px solid rgba(0,0,0,0.04); box-shadow:0 16px 40px rgba(0,0,0,0.06); }
+      .pill { padding:4px 10px; border-radius:9999px; font-weight:600; font-size:0.75rem; }
+      .pill-new { background:#e0f2fe; color:#075985; }
+      .pill-approved { background:#dcfce7; color:#166534; }
+      .pill-rejected { background:#fee2e2; color:#991b1b; }
+      .pill-neutral { background:#f3f4f6; color:#374151; }
+      .btn-brand { background: var(--brand); color:#2b2b2b; font-weight:600; }
+      .btn-ghost { border:1px solid rgba(0,0,0,0.08); }
+      .avatar { width:48px; height:48px; border-radius:9999px; background:#fff7e0; border:1px solid rgba(0,0,0,0.04); display:flex; align-items:center; justify-content:center; font-weight:700; color:#b45309; }
+      .modal { display: none; position: fixed; z-index: 50; inset: 0; background: rgba(0, 0, 0, 0.5); }
+      .modal.active { display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+    <div class="flex min-h-screen">
+        
+        
+        <main class="flex-1 p-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <p class="text-sm text-gray-600">Dashboard / Applicants</p>
+                        <h1 class="text-3xl font-semibold text-gray-900">Applicants</h1>
+                    </div>
+                    <div class="flex items-center gap-3">
+
+                    </div>
+                </div>
+
+                {% if success_message %}
+                    <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">
+                        <i class="fas fa-check-circle mr-2"></i>{{ success_message }}
+                    </div>
+                {% endif %}
+
+                {% if error_message %}
+                    <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+                        <i class="fas fa-exclamation-circle mr-2"></i>{{ error_message }}
+                    </div>
+                {% endif %}
+
+                <div class="card rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-2xl font-semibold text-gray-900">Applicants</span>
+                            <span class="text-sm text-gray-500">Page {{ page }} of {{ pages }} · {{ total }} total</span>
+                        </div>
+                        <form method="GET" class="flex items-center gap-2 flex-wrap justify-end">
+                            <input name="search" type="text" placeholder="Name / email / phone" value="{{ search }}" class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-amber-300 focus:border-amber-400 text-sm w-52" />
+                            <input name="keyword" type="text" placeholder="Keywords / skills" value="{{ keyword }}" class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-amber-300 focus:border-amber-400 text-sm w-52" />
+                            <select name="source" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-amber-300 focus:border-amber-400">
+                                <option value="">All sources</option>
+                                <option value="referral" {{ sourceFilter }}>Referral</option>
+                                <option value="job_board" {{ sourceFilter }}>Job board</option>
+                                <option value="social" {{ sourceFilter }}>Social</option>
+                            </select>
+                            <select name="status" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-amber-300 focus:border-amber-400">
+                                <option value="">All statuses</option>
+                                <option value="onboarding" {{ statusFilter }}>Onboarding</option>
+                                <option value="screening" {{ statusFilter }}>Screening</option>
+                                <option value="demo" {{ statusFilter }}>Demo</option>
+                                <option value="endorsement" {{ statusFilter }}>Client Endorsement</option>
+                                <option value="training" {{ statusFilter }}>Training</option>
+                            </select>
+                            <select name="placement" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-amber-300 focus:border-amber-400">
+                                <option value="">All placements</option>
+                                
+                                    <option value="{{ slug }}" {{ placementFilter }}>{{ label }}</option>
+                                
+                                <option value="none" {{ placementFilter }}>Unassigned</option>
+                            </select>
+                            <select name="sort" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-amber-300 focus:border-amber-400">
+                                <option value="recent" {{ sort }}>Newest first</option>
+                                <option value="placement" {{ sort }}>Latest placement</option>
+                            </select>
+                            <input name="date_from" type="date" value="{{ dateFrom }}" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-amber-300 focus:border-amber-400" />
+                            <input name="date_to" type="date" value="{{ dateTo }}" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-amber-300 focus:border-amber-400" />
+                            <label class="inline-flex items-center text-xs text-gray-700 gap-1 px-2 py-1 bg-gray-50 border border-gray-200 rounded">
+                                <input type="checkbox" name="knockout" value="1" {{ knockout }} />
+                                Knockout (require keywords)
+                            </label>
+                            <button type="submit" class="px-4 py-2 bg-amber-500 text-gray-900 rounded-lg text-sm font-semibold">Apply</button>
+                            <a href="/manage_applicants" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900">Reset</a>
+                        </form>
+                    </div>
+
+                                        <div id="cardGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {% if apps %}
+                                                    <div class="text-sm text-gray-600">No applicants found.</div>
+                                                {% else %}
+                                                    
+                                                    <div class="card rounded-xl p-4 flex flex-col gap-3 shadow-sm applicant-card" data-search="{{ fullName }}">
+                                                        <div class="flex items-start justify-between">
+                                                            <div class="flex items-center gap-3">
+                                                                <div class="avatar">{{ initials }}</div>
+                                                                <div>
+                                                                    <div class="font-semibold text-gray-900 text-base">{{ fullName }}</div>
+                                                                    <div class="text-xs text-gray-500">Type: {{ applicationType }}</div>
+                                                                </div>
+                                                            </div>
+                                                            <span class="pill {{ badgeClass }}">{{ applicant }}</span>
+                                                        </div>
+                                                        {% if placementLabel %}
+                                                            <div class="inline-flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-100 px-2 py-1 rounded-full w-max">
+                                                                <span>Placement:</span>
+                                                                <span class="font-semibold">{{ placementLabel }}</span>
+                                                                {% if placementAt %}<span class="text-gray-500">· {{ placementAt }}</span>{% endif %}
+                                                            </div>
+                                                        
+                                                            <div class="inline-flex items-center gap-2 text-xs text-gray-600 bg-gray-50 border border-gray-100 px-2 py-1 rounded-full w-max">Unassigned</div>
+                                                        {% endif %}
+                                                        <div class="text-sm text-gray-700 space-y-1">
+                                                            <div class="flex items-center gap-2"><i class="fas fa-envelope text-amber-600"></i><span>{{ applicant }}</span></div>
+                                                            <div class="flex items-center gap-2"><i class="fas fa-phone text-amber-600"></i><span>{{ applicant }}</span></div>
+                                                            <div class="flex items-center gap-2 text-xs text-gray-500"><i class="fas fa-clock"></i><span>{{ created }}</span></div>
+                                                        </div>
+                                                        <div class="flex items-center gap-2 pt-2">
+                                                            <a href="/applicant-details/{{ id }}" class="flex-1 text-center px-3 py-2 border border-gray-200 rounded-lg text-sm hover:border-amber-300">View</a>
+                                                            <a href="edit_/applicant-details/{{ id }}" class="flex-1 text-center px-3 py-2 bg-amber-500 text-gray-900 rounded-lg text-sm font-semibold hover:bg-amber-400">Edit</a>
+                                                            <button type="button" onclick="confirmDelete('{{ id }}', '{{ fullName }}')" class="w-10 h-10 border border-gray-200 rounded-lg text-gray-600 hover:text-red-600 hover:border-red-200">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="flex items-center gap-2 pt-1 text-xs">
+                                                            <form method="POST" action="/update_status" class="flex-1">
+                                                                
+                                                                <input type="hidden" name="applicant_id" value="{{ id }}">
+                                                                <input type="hidden" name="new_status" value="hired">
+                                                                <input type="hidden" name="redirect_to" value="{{ _SERVER }}">
+                                                                <button type="submit" class="w-full px-2 py-2 rounded-lg border border-green-200 text-green-700 hover:bg-green-50 font-semibold">Mark Hired</button>
+                                                            </form>
+                                                            <form method="POST" action="/update_status" class="flex-1">
+                                                                
+                                                                <input type="hidden" name="applicant_id" value="{{ id }}">
+                                                                <input type="hidden" name="new_status" value="withdrawn">
+                                                                <input type="hidden" name="redirect_to" value="{{ _SERVER }}">
+                                                                <button type="submit" class="w-full px-2 py-2 rounded-lg border border-red-200 text-red-700 hover:bg-red-50 font-semibold">Withdraw</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                {% endif %}
+                                        </div>
+
+                                        {% if pages %}
+                                            <div class="mt-6 flex items-center justify-center gap-3 text-sm">
+                                                
+                                                
+                                                <a class="px-3 py-1 rounded border border-gray-200 {{ page }}" href="?{{ qs }}&page={{ prev }}">Prev</a>
+                                                <span class="text-gray-600">Page {{ page }} of {{ pages }}</span>
+                                                <a class="px-3 py-1 rounded border border-gray-200 {{ page }}" href="?{{ qs }}&page={{ next }}">Next</a>
+                                            </div>
+                                        {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="p-6">
+                <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 text-center mb-2">Delete Applicant</h3>
+                <p class="text-gray-600 text-center mb-6">
+                    Are you sure you want to delete <strong id="deleteApplicantName"></strong>? This action cannot be undone.
+                </p>
+                <form method="POST" id="deleteForm">
+                    <input type="hidden" name="action" value="delete">
+                    
+                    <input type="hidden" name="applicant_id" id="deleteApplicantId">
+                    <div class="flex items-center gap-3">
+                        <button type="button" onclick="closeDeleteModal()" 
+                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                            Delete
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmDelete(id, name) {
+            document.getElementById('deleteApplicantId').value = id;
+            document.getElementById('deleteApplicantName').textContent = name;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) { closeDeleteModal(); }
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') { closeDeleteModal(); }
+        });
+
+    </script>
+</body>
+</html>

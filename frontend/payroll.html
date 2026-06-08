@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Payroll</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    /* Excel-like sheet styling */
+    .sheet-table {
+      border-collapse: separate;
+      border-spacing: 0;
+      font-family: 'Segoe UI', 'Calibri', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .sheet-table th,
+    .sheet-table td {
+      border: 1px solid #d5dde5;
+      background-color: #fff;
+    }
+    .sheet-table thead th {
+      background: linear-gradient(180deg, #FFC122 0%, #FFC122 100%);
+      color: #f2fbf5;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.72rem;
+    }
+    .sheet-table tbody tr:nth-child(odd) {
+      background-color: #f9fbff;
+    }
+    .sheet-table tbody tr:hover td {
+      background-color: #e9f6ff;
+    }
+    .sheet-table input[type="number"] {
+      background-color: #fdfefc;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-amber-50 to-white text-gray-800">
+  <div class="flex min-h-screen">
+    
+    <main class="flex-1 p-6 lg:p-10">
+      <div class="max-w-7xl mx-auto space-y-8">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm uppercase tracking-[0.2em] text-amber-600">Compensation</p>
+            <h1 class="mt-1 text-3xl font-bold text-gray-900">Payroll</h1>
+            <p class="text-sm text-gray-600">Filter by account, cutoff, or name. Export the current view to CSV or printable salary sheets.</p>
+          </div>
+          <div class="flex gap-2">
+            <button id="exportCsv" class="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-white shadow hover:bg-amber-700">
+              Export CSV
+            </button>
+            <button id="exportSheets" class="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-amber-700 border border-amber-200 shadow hover:bg-amber-50">
+              Export Sheets
+            </button>
+          </div>
+        </div>
+
+        <section class="rounded-3xl border border-amber-100 bg-white/90 p-4 shadow-xl sm:p-6">
+          <div class="grid gap-3 sm:grid-cols-3 sm:items-end">
+            <div>
+              <label class="text-sm font-semibold text-gray-700">Account</label>
+              <select id="filterAccount" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2">
+                <option value="">All accounts</option>
+                <option value="Vietnamese">Vietnamese</option>
+                <option value="Chinese">Chinese</option>
+                <option value="Mongolia">Mongolia</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-gray-700">Cutoff</label>
+              <select id="filterCutoff" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2">
+                <option value="">All periods</option>
+                <option value="January 1-15">January 1-15</option>
+                <option value="January 16-31">January 16-31</option>
+                <option value="February 1-15">February 1-15</option>
+                <option value="February 16-28">February 16-28</option>
+                <option value="March 1-15">March 1-15</option>
+                <option value="March 16-31">March 16-31</option>
+                <option value="April 1-15">April 1-15</option>
+                <option value="April 16-30">April 16-30</option>
+                <option value="May 1-15">May 1-15</option>
+                <option value="May 16-31">May 16-31</option>
+                <option value="June 1-15">June 1-15</option>
+                <option value="June 16-30">June 16-30</option>
+                <option value="July 1-15">July 1-15</option>
+                <option value="July 16-31">July 16-31</option>
+                <option value="August 1-15">August 1-15</option>
+                <option value="August 16-31">August 16-31</option>
+                <option value="September 1-15">September 1-15</option>
+                <option value="September 16-30">September 16-30</option>
+                <option value="October 1-15">October 1-15</option>
+                <option value="October 16-31">October 16-31</option>
+                <option value="November 1-15">November 1-15</option>
+                <option value="November 16-30">November 16-30</option>
+                <option value="December 1-15">December 1-15</option>
+                <option value="December 16-31">December 16-31</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-gray-700">Search name</label>
+              <input id="filterName" type="search" placeholder="Teacher name" class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2" />
+            </div>
+          </div>
+
+          <div class="mt-6 overflow-auto rounded-2xl border border-amber-100">
+            <table class="min-w-full text-sm sheet-table" id="payrollTable">
+              <thead>
+                <tr>
+                  <th class="px-3 py-3 text-left font-semibold">#</th>
+                  <th class="px-4 py-3 text-left font-semibold">Teacher</th>
+                  <th class="px-4 py-3 text-left font-semibold">Account</th>
+                  <th class="px-4 py-3 text-left font-semibold">Cutoff</th>
+                  <th class="px-4 py-3 text-right font-semibold">Trial</th>
+                  <th class="px-4 py-3 text-right font-semibold">Regular</th>
+                  <th class="px-4 py-3 text-right font-semibold">Group</th>
+                  <th class="px-4 py-3 text-right font-semibold">Class Bonus</th>
+                  <th class="px-4 py-3 text-right font-semibold">Attendance</th>
+                  <th class="px-4 py-3 text-right font-semibold">Deductions</th>
+                  <th class="px-4 py-3 text-right font-semibold">Incentive</th>
+                  <th class="px-4 py-3 text-right font-semibold">Total*</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-amber-50" id="payrollBody"></tbody>
+            </table>
+          </div>
+          <p class="mt-2 text-xs text-gray-500">*Total = per-teacher class amounts + class bonus + attendance + incentives − deductions.</p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const rows = {{ teachers }};
+    const body = document.getElementById('payrollBody');
+
+    function computeAmounts(r) {
+      const trialAmt = (r.trial_classes || 0) * (r.trial_rate || 0);
+      const regularAmt = (r.regular_classes || 0) * (r.regular_rate || 0);
+      const groupAmt = (r.group_classes || 0) * (r.group_rate || 0);
+      const classBonus = Number(r.class_bonus || 0);
+      const attendance = Number(r.attendance_bonus || 0);
+      const deductions = Number(r.deductions || 0);
+      const incentive = Number(r.incentive || 0);
+      const total = trialAmt + regularAmt + groupAmt + classBonus + attendance + incentive - deductions;
+      return { trialAmt, regularAmt, groupAmt, classBonus, attendance, deductions, incentive, total };
+    }
+
+    function getFilteredRows() {
+      const acct = document.getElementById('filterAccount').value.toLowerCase();
+      const cutoff = document.getElementById('filterCutoff').value.toLowerCase();
+      const name = document.getElementById('filterName').value.toLowerCase();
+
+      const contains = (haystack, needle) => haystack.includes(needle);
+
+      return rows.map((r, i) => ({ ...r, __idx: i })).filter(r => {
+        const acctOk = !acct || (r.account && r.account.toLowerCase() === acct);
+        const cutoffOk = !cutoff || (r.cutoff && contains(r.cutoff.toLowerCase(), cutoff));
+        const nameOk = !name || (r.name && r.name.toLowerCase().includes(name));
+        return acctOk && cutoffOk && nameOk;
+      });
+    }
+
+    function formatMoney(v) {
+      return '₱' + Number(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function updateRowSummaries(rowEl, record) {
+      if (!rowEl || !record) return;
+      const amounts = computeAmounts(record);
+      const summaryMap = {
+        trial: `${formatMoney(amounts.trialAmt)} @ ${formatMoney(record.trial_rate || 0)}`,
+        regular: `${formatMoney(amounts.regularAmt)} @ ${formatMoney(record.regular_rate || 0)}`,
+        group: `${formatMoney(amounts.groupAmt)} @ ${formatMoney(record.group_rate || 0)}`,
+      };
+      Object.entries(summaryMap).forEach(([key, text]) => {
+        const el = rowEl.querySelector(`[data-summary="${key}"]`);
+        if (el) el.textContent = text;
+      });
+      const totalCell = rowEl.querySelector('[data-total]');
+      if (totalCell) totalCell.textContent = formatMoney(amounts.total);
+    }
+
+    function render() {
+      body.innerHTML = '';
+      getFilteredRows().forEach((r, idx) => {
+          const amounts = computeAmounts(r);
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-amber-50/60';
+          tr.innerHTML = `
+        <td class="px-3 py-3 text-gray-600">${idx + 1}</td>
+            <td class="px-4 py-3 font-medium text-gray-900">${r.name}</td>
+            <td class="px-4 py-3 text-gray-700">${r.account}</td>
+            <td class="px-4 py-3 text-gray-700">${r.cutoff}</td>
+            <td class="px-4 py-3 text-right text-gray-800">
+              <input type="number" step="1" min="0" value="${r.trial_classes}" data-idx="${r.__idx}" data-field="trial_classes" class="w-32 rounded border border-gray-200 px-3 py-2 text-right text-sm" />
+              <div class="text-[11px] text-gray-500" data-summary="trial">${formatMoney(amounts.trialAmt)} @ ${formatMoney(r.trial_rate || 0)}</div>
+            </td>
+            <td class="px-4 py-3 text-right text-gray-800">
+              <input type="number" step="1" min="0" value="${r.regular_classes}" data-idx="${r.__idx}" data-field="regular_classes" class="w-32 rounded border border-gray-200 px-3 py-2 text-right text-sm" />
+              <div class="text-[11px] text-gray-500" data-summary="regular">${formatMoney(amounts.regularAmt)} @ ${formatMoney(r.regular_rate || 0)}</div>
+            </td>
+            <td class="px-4 py-3 text-right text-gray-800">
+              <input type="number" step="1" min="0" value="${r.group_classes}" data-idx="${r.__idx}" data-field="group_classes" class="w-32 rounded border border-gray-200 px-3 py-2 text-right text-sm" />
+              <div class="text-[11px] text-gray-500" data-summary="group">${formatMoney(amounts.groupAmt)} @ ${formatMoney(r.group_rate || 0)}</div>
+            </td>
+            <td class="px-4 py-3 text-right text-gray-800">
+              <input type="number" step="0.01" min="0" value="${r.class_bonus}" data-idx="${r.__idx}" data-field="class_bonus" class="w-40 rounded border border-gray-200 px-3 py-2 text-right text-sm" />
+            </td>
+            <td class="px-4 py-3 text-right text-gray-800">
+              <input type="number" step="0.01" min="0" value="${r.attendance_bonus}" data-idx="${r.__idx}" data-field="attendance_bonus" class="w-40 rounded border border-gray-200 px-3 py-2 text-right text-sm" />
+            </td>
+            <td class="px-4 py-3 text-right text-red-600">
+              <input type="number" step="0.01" min="0" value="${r.deductions}" data-idx="${r.__idx}" data-field="deductions" class="w-40 rounded border border-gray-200 px-3 py-2 text-right text-sm text-red-700" />
+            </td>
+            <td class="px-4 py-3 text-right text-gray-800">
+              <input type="number" step="0.01" min="0" value="${r.incentive}" data-idx="${r.__idx}" data-field="incentive" class="w-40 rounded border border-gray-200 px-3 py-2 text-right text-sm" />
+            </td>
+            <td class="px-4 py-3 text-right font-semibold text-amber-700" data-total>${formatMoney(amounts.total)}</td>
+          `;
+          body.appendChild(tr);
+        });
+      bindInputs();
+    }
+
+    function handleDataInput(e) {
+      const target = e.target;
+      const idx = Number(target.getAttribute('data-idx'));
+      const field = target.getAttribute('data-field');
+      if (!field || Number.isNaN(idx)) return;
+      const val = Number(target.value);
+      rows[idx][field] = Number.isFinite(val) ? val : 0;
+      updateRowSummaries(target.closest('tr'), rows[idx]);
+    }
+
+    function bindInputs() {
+      document.querySelectorAll('[data-field]').forEach(input => {
+        input.addEventListener('input', handleDataInput);
+        input.addEventListener('change', handleDataInput);
+      });
+    }
+
+    function exportCsv() {
+      const headers = ['Teacher Name','Account','Cutoff Date','Category','Trial Class','Trial Amount','Regular Class','Regular Amount','Group Class','Group Amount','Class Bonus','Attendance Bonus','Deductions','Incentive','Total'];
+      const filtered = getFilteredRows();
+      const lines = [headers.join(',')];
+      filtered.forEach(r => {
+        const amt = computeAmounts(r);
+        lines.push([
+          r.name,
+          r.account,
+          r.cutoff,
+          r.category,
+          r.trial_classes,
+          amt.trialAmt.toFixed(2),
+          r.regular_classes,
+          amt.regularAmt.toFixed(2),
+          r.group_classes,
+          amt.groupAmt.toFixed(2),
+          amt.classBonus.toFixed(2),
+          amt.attendance.toFixed(2),
+          amt.deductions.toFixed(2),
+          amt.incentive.toFixed(2),
+          amt.total.toFixed(2)
+        ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+      });
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'payroll.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportSheets() {
+      const filtered = getFilteredRows();
+      if (!filtered.length) {
+        alert('No rows to export. Adjust your filters.');
+        return;
+      }
+      const html = `
+<!doctype html>
+<html><head><meta charset="utf-8" />
+<title>Payroll Sheets</title>
+<style>
+  body { font-family: 'Arial', sans-serif; margin: 24px; color: #111; }
+  .sheet { border: 1px solid #999; margin-bottom: 24px; padding: 16px; position: relative; }
+  .header { text-align: center; font-weight: 700; font-size: 18px; margin-bottom: 8px; }
+  .row { display: flex; justify-content: space-between; border-bottom: 1px solid #e5e5e5; padding: 4px 0; font-size: 13px; }
+  .row:last-child { border-bottom: none; }
+  .label { font-weight: 600; }
+  .amount { text-align: right; min-width: 120px; }
+  .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 13px; margin-bottom: 8px; }
+  .meta div { padding: 4px 6px; border: 1px solid #d7d7d7; background: #fafafa; }
+  .total { text-align: right; font-weight: 700; font-size: 15px; margin-top: 8px; }
+  .watermark { position: absolute; inset: 0; background: url('gleelogo.png') center center no-repeat; background-size: 200px auto; opacity: 0.08; pointer-events: none; }
+  @media print { body { margin: 12mm; } .sheet { page-break-inside: avoid; } }
+</style>
+</head><body>
+${filtered.map(r => {
+  const a = computeAmounts(r);
+  return `
+    <div class="sheet">
+      <div class="watermark"></div>
+      <div class="header">Teacher Name: ${r.name}</div>
+      <div class="meta">
+        <div><strong>Account:</strong> ${r.account}</div>
+        <div><strong>Cut-off Date:</strong> ${r.cutoff}</div>
+      </div>
+      <div class="row"><span class="label">Trial Class</span><span class="amount">${r.trial_classes}</span><span class="amount">${formatMoney(a.trialAmt)}</span></div>
+      <div class="row"><span class="label">Regular Class</span><span class="amount">${r.regular_classes}</span><span class="amount">${formatMoney(a.regularAmt)}</span></div>
+      <div class="row"><span class="label">Group Class</span><span class="amount">${r.group_classes}</span><span class="amount">${formatMoney(a.groupAmt)}</span></div>
+      <div class="row"><span class="label">Class Bonus</span><span class="amount"></span><span class="amount">${formatMoney(a.classBonus)}</span></div>
+      <div class="row"><span class="label">Attendance Bonus</span><span class="amount"></span><span class="amount">${formatMoney(a.attendance)}</span></div>
+      <div class="row"><span class="label">Deductions</span><span class="amount"></span><span class="amount">${formatMoney(a.deductions)}</span></div>
+      <div class="row"><span class="label">Incentives</span><span class="amount"></span><span class="amount">${formatMoney(a.incentive)}</span></div>
+      <div class="total">TOTAL: ${formatMoney(a.total)}</div>
+    </div>
+  `;
+}).join('')}
+</body></html>`;
+
+      const win = window.open('', '_blank');
+      if (!win) {
+        alert('Pop-up blocked. Please allow pop-ups to export.');
+        return;
+      }
+      win.document.write(html);
+      win.document.close();
+      win.focus();
+    }
+
+    ['filterAccount','filterCutoff','filterName'].forEach(id => {
+      document.getElementById(id).addEventListener('input', render);
+      document.getElementById(id).addEventListener('change', render);
+    });
+    document.getElementById('exportCsv').addEventListener('click', exportCsv);
+    document.getElementById('exportSheets').addEventListener('click', exportSheets);
+    render();
+  </script>
+</body>
+</html>
