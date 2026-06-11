@@ -3,7 +3,7 @@ services:
     name: oop-ats
     runtime: python
     rootDir: backend
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    buildCommand: pip install --default-timeout=120 --retries 10 -r requirements.txt && python manage.py collectstatic --noinput
     startCommand: python manage.py migrate && daphne -b 0.0.0.0 -p $PORT core.asgi:application
     envVars:
       - key: DEBUG
