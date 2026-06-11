@@ -1,3 +1,4 @@
+import calendar
 import mimetypes
 from pathlib import Path
 
@@ -5,14 +6,16 @@ from django.db.models import Q
 from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import render, redirect
 from django.conf import settings
+from django.utils import timezone
 from django.utils._os import safe_join
 from django.views.decorators.csrf import csrf_exempt
 from .forms import ApplicantRegistrationForm
-from .models import Applicant
+from .models import Applicant, Schedule
 
 
 def uploaded_media(request, path):
     media_roots = [
+        settings.MEDIA_ROOT,
         settings.BASE_DIR,
         settings.BASE_DIR.parent / 'frontend',
     ]
@@ -70,94 +73,170 @@ def applicant_portal(request):
     
     applicant = Applicant.objects.get(applicant_id=applicant_id)
     latest_evaluation = applicant.evaluations.order_by('-created_at').first()
-    
-    # Next Steps Content
-    next_steps_map = {
-        'Pending': 'Our team is currently reviewing your application. Please wait for an approval email to proceed.',
-        'Initial Screening': 'Your initial interview is being scheduled. Please check your email for the meeting invite.',
-        'Demo Evaluation': 'Prepare your teaching materials! Your demo evaluation session has been scheduled.',
-        'Endorsement': 'You have passed the demo! We are now presenting your profile to our clients for final review.',
-        'Training': 'Congratulations! You are now in the training phase. Please follow the instructions provided by your trainer.',
-        'Approved': 'Welcome to the team! We are finalizing your onboarding documents.',
-    }
-    
-    # Progress Calculation
-    stages = [
-        {'label': 'Pending', 'status': 'Pending', 'percent': 10},
-        {'label': 'Screening', 'status': 'Initial Screening', 'percent': 25},
-        {'label': 'Demo', 'status': 'Demo Evaluation', 'percent': 45},
-        {'label': 'Endorsement', 'status': 'Endorsement', 'percent': 65},
-        {'label': 'Training', 'status': 'Training', 'percent': 85},
-        {'label': 'Onboarding', 'status': 'Approved', 'percent': 100},
-    ]
-    
-    current_percent = 0
-    current_stage_index = 0
-    for i, stage in enumerate(stages):
-        if applicant.status == stage['status']:
-            current_percent = stage['percent']
-            current_stage_index = i
-            break
+    current_percent, current_stage_index = applicant.get_progress()
             
     context = {
         'app': applicant,
-        'stages': stages,
+        'stages': applicant.get_progress_stages(),
         'current_percent': current_percent,
         'current_stage_index': current_stage_index,
-        'next_step_text': next_steps_map.get(applicant.status, 'Check back later for updates.'),
+        'next_step_text': applicant.get_next_step_text(),
         'latest_schedule': applicant.schedules.all().order_by('-scheduled_at').first(),
         'history': applicant.history.all().order_by('-created_at'),
         'demoEval': latest_evaluation,
         'demoScore': f"{latest_evaluation.total_score}/25" if latest_evaluation else None,
         'demoUpdated': latest_evaluation.created_at.strftime('%B %d, %Y') if latest_evaluation else None,
-        'zoomCloneUrl': 'http://127.0.0.1:3000/',
+        'zoomCloneUrl': zoom_clone_base_url(),
     }
     return render(request, 'applicant_portal.html', context)
 
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
+
+SCHEDULE_COLORS = {
+    'initial': '#f59e0b',
+    'demo': '#ee5f88',
+    'training': '#3b82f6',
+    'onboarding': '#10b981',
+    'endorsement': '#8b5cf6',
+}
+
+def zoom_clone_base_url():
+    return getattr(settings, 'ZOOM_CLONE_URL', 'http://127.0.0.1:3000/')
+
+def mini_calendar_context():
+    today = timezone.localdate()
+    month_start = today.replace(day=1)
+    _, days_in_month = calendar.monthrange(today.year, today.month)
+    month_end = today.replace(day=days_in_month)
+
+    month_schedules = Schedule.objects.filter(
+        scheduled_at__date__gte=month_start,
+        scheduled_at__date__lte=month_end,
+    ).select_related('applicant')
+    event_dates = {timezone.localtime(schedule.scheduled_at).date() for schedule in month_schedules}
+
+    weeks = []
+    for week in calendar.Calendar(firstweekday=6).monthdatescalendar(today.year, today.month):
+        weeks.append([
+            {
+                'date': day,
+                'number': day.day,
+                'in_month': day.month == today.month,
+                'is_today': day == today,
+                'has_events': day in event_dates,
+            }
+            for day in week
+        ])
+
+    upcoming_schedules = Schedule.objects.filter(
+        scheduled_at__gte=timezone.now()
+    ).select_related('applicant').order_by('scheduled_at')[:4]
+    upcoming_events = [
+        {
+            'time': timezone.localtime(schedule.scheduled_at).strftime('%I:%M %p').lstrip('0'),
+            'title': schedule.title or schedule.get_type_display(),
+            'subtitle': schedule.applicant.full_name if schedule.applicant_id else schedule.get_type_display(),
+            'color': SCHEDULE_COLORS.get(schedule.type, '#6b7280'),
+        }
+        for schedule in upcoming_schedules
+    ]
+
+    return {
+        'mini_calendar': {
+            'month_label': today.strftime('%B %Y'),
+            'weeks': weeks,
+            'upcoming_events': upcoming_events,
+            'more_events_count': max(Schedule.objects.filter(scheduled_at__gte=timezone.now()).count() - len(upcoming_events), 0),
+        }
+    }
+
+def dashboard_panel_context(stats):
+    total_applicants = Applicant.objects.count()
+    pipeline_items = [
+        {
+            'label': stat['card_label'],
+            'total': stat['total'],
+            'percent': round((stat['total'] / total_applicants) * 100) if total_applicants else 0,
+            'key': stat['key'],
+        }
+        for stat in stats
+    ]
+
+    referral_counts = {}
+    for applicant in Applicant.objects.only('referral', 'status'):
+        label = (applicant.referral or '').strip() or 'No referral'
+        if label not in referral_counts:
+            referral_counts[label] = {'label': label, 'total': 0, 'approved': 0}
+        referral_counts[label]['total'] += 1
+        if applicant.status == 'Approved':
+            referral_counts[label]['approved'] += 1
+
+    referral_items = [
+        item
+        for item in sorted(referral_counts.values(), key=lambda item: (-item['total'], item['label'].lower()))[:3]
+    ]
+
+    return {
+        'pipeline_items': pipeline_items,
+        'referral_items': referral_items,
+        'referral_total': sum(item['total'] for item in referral_counts.values()),
+    }
+
+def applicant_admin_context(status_filter=None):
+    stats = [
+        {'s': 'Initial Screening', 'card_label': 'Screening', 'total': Applicant.objects.filter(status='Initial Screening').count(), 'key': 'Initial Screening'},
+        {'s': 'Demo Evaluation', 'card_label': 'Demo', 'total': Applicant.objects.filter(status='Demo Evaluation').count(), 'key': 'Demo Evaluation'},
+        {'s': 'Client Endorsement', 'card_label': 'Endorsements', 'total': Applicant.objects.filter(status='Endorsement').count(), 'key': 'Endorsement'},
+        {'s': 'Training', 'card_label': 'Training', 'total': Applicant.objects.filter(status='Training').count(), 'key': 'Training'},
+        {'s': 'Approved', 'card_label': 'Approved', 'total': Applicant.objects.filter(status='Approved').count(), 'key': 'Approved'},
+    ]
+    applicants = Applicant.objects.all().order_by('-created_at')
+    if status_filter:
+        applicants = applicants.filter(status=status_filter)
+
+    context = {
+        'applicants': applicants,
+        'stats': stats,
+        'pending_applicants_count': Applicant.objects.filter(status='Pending').count(),
+        'all_applicants_count': Applicant.objects.count(),
+        'total_applicants': applicants.count(),
+        'selected_status': status_filter or '',
+        'pdo': True
+    }
+    context.update(mini_calendar_context())
+    context.update(dashboard_panel_context(stats))
+    return context
 
 def admin_login(request):
     if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        # In Django, we typically use 'username', so I'll assume email is username
-        user = authenticate(request, username=email, password=password)
+        email = (request.POST.get('email') or '').strip()
+        password = request.POST.get('password') or ''
+        User = get_user_model()
+        matched_user = (
+            User.objects.filter(username__iexact=email).first()
+            or User.objects.filter(email__iexact=email).first()
+        )
+        username = matched_user.get_username() if matched_user else email
+        user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
             return redirect('admin_dashboard')
         else:
-            return render(request, 'login.html', {'error': 'Invalid credentials'})
+            return render(request, 'login.html', {'error': 'Invalid credentials', 'email': email})
     return render(request, 'login.html')
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_dashboard(request):
-    status_filter = request.GET.get('status')
-    if status_filter:
-        applicants = Applicant.objects.filter(status=status_filter).order_by('-created_at')
-    else:
-        applicants = Applicant.objects.all().order_by('-created_at')
-    
-    # Counts for cards
-    stats = [
-        {'s': 'Initial Screening', 'total': Applicant.objects.filter(status='Initial Screening').count(), 'key': 'Initial Screening'},
-        {'s': 'Demo Evaluation', 'total': Applicant.objects.filter(status='Demo Evaluation').count(), 'key': 'Demo Evaluation'},
-        {'s': 'Client Endorsement', 'total': Applicant.objects.filter(status='Endorsement').count(), 'key': 'Endorsement'},
-        {'s': 'Training', 'total': Applicant.objects.filter(status='Training').count(), 'key': 'Training'},
-        {'s': 'Approved', 'total': Applicant.objects.filter(status='Approved').count(), 'key': 'Approved'},
-    ]
-    
-    context = {
-        'applicants': applicants,
-        'stats': stats,
-        'pending_applicants_count': Applicant.objects.filter(status='Pending').count(),
-        'total_applicants': applicants.count(),
-        'pdo': True
-    }
-    return render(request, 'dashboard.html', context)
+    return render(request, 'dashboard.html', applicant_admin_context())
 
-from .models import Applicant, Schedule, Evaluation, StatusHistory
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def applicants_page(request):
+    return render(request, 'manage_applicants.html', applicant_admin_context(request.GET.get('status')))
+
+from .models import Applicant, Schedule, Evaluation
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
@@ -181,7 +260,7 @@ def applicant_details(request, applicant_id):
         'latest_schedule': latest_schedule,
         'latest_evaluation': latest_evaluation,
         'evaluation_items': evaluation_items,
-        'zoomCloneUrl': 'http://127.0.0.1:3000/',
+        'zoomCloneUrl': zoom_clone_base_url(),
     })
 
 @login_required
@@ -193,34 +272,15 @@ def update_status(request):
         
         # Check if we are updating status or general info
         if 'new_status' in request.POST:
-            old_status = applicant.status
             new_status = request.POST.get('new_status')
-            applicant.status = new_status
-            
-            # Log history
-            StatusHistory.objects.create(
-                applicant=applicant,
-                status=new_status,
-                notes=f"Moved from {old_status} via manual update."
-            )
+            applicant.update_status(new_status)
         else:
-            # Update general info
-            applicant.first_name = request.POST.get('first_name')
-            applicant.last_name = request.POST.get('last_name')
-            applicant.email = request.POST.get('email')
-            applicant.phone = request.POST.get('phone')
-            applicant.address = request.POST.get('address')
-            applicant.city = request.POST.get('city')
-            applicant.state = request.POST.get('state')
-            
-        applicant.save()
+            applicant.update_profile_from_post(request.POST)
         return redirect('applicant_details', applicant_id=applicant_id)
     return redirect('admin_dashboard')
 
 import json
 import uuid
-from django.utils import timezone
-from .models import Applicant, Schedule
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
@@ -266,7 +326,7 @@ def admin_calendar(request):
             'initial': schedules.filter(type='initial').count(),
             'demo': schedules.filter(type='demo').count(),
         }),
-        'zoomCloneUrl': 'http://127.0.0.1:3000/',
+        'zoomCloneUrl': zoom_clone_base_url(),
     }
     return render(request, 'admin_calendar.html', context)
 
@@ -282,28 +342,6 @@ def schedule_action(request):
         
         applicant = Applicant.objects.get(applicant_id=applicant_id)
         
-        # Mapping schedule type to applicant status
-        status_map = {
-            'initial': 'Initial Screening',
-            'demo': 'Demo Evaluation',
-            'training': 'Training',
-            'onboarding': 'Approved',
-        }
-        
-        if sched_type in status_map:
-            old_status = applicant.status
-            new_status = status_map[sched_type]
-            if old_status != new_status:
-                applicant.status = new_status
-                applicant.save()
-                
-                # Log history
-                StatusHistory.objects.create(
-                    applicant=applicant,
-                    status=new_status,
-                    notes=f"Automatically moved to {new_status} upon scheduling {title}."
-                )
-        
         # Create or Update schedule
         schedule, _ = Schedule.objects.update_or_create(
             applicant=applicant,
@@ -314,6 +352,7 @@ def schedule_action(request):
                 'meeting_link': meeting_link
             }
         )
+        schedule.sync_applicant_status(title)
 
         # Auto-generate meeting link if none provided
         if not schedule.meeting_link:
@@ -473,17 +512,9 @@ def save_evaluation(request):
         applicant_id = request.POST.get('applicant_identifier')
         applicant = Applicant.objects.get(applicant_id=applicant_id)
         
-        # Save or Update evaluation
-        eval_obj, created = Evaluation.objects.update_or_create(
+        Evaluation.objects.update_or_create(
             applicant=applicant,
-            defaults={
-                'teaching_performance': int(request.POST.get('teaching_performance_rating', 0)),
-                'communication_skills': int(request.POST.get('communication_skills_rating', 0)),
-                'curriculum_understanding': int(request.POST.get('curriculum_understanding_rating', 0)),
-                'engagement_level': int(request.POST.get('engagement_level_rating', 0)),
-                'technical_proficiency': int(request.POST.get('technical_proficiency_rating', 0)),
-                'comments': request.POST.get('overall_comments'),
-            }
+            defaults=Evaluation.rating_defaults_from_request(request.POST)
         )
         
         return redirect('demo_evaluation')
@@ -522,13 +553,6 @@ def save_room_evaluation(request):
     ratings = payload.get('ratings') or {}
     comments = payload.get('comments') or {}
 
-    def rating(key):
-        try:
-            value = int(ratings.get(key) or 0)
-        except (TypeError, ValueError):
-            value = 0
-        return max(0, min(value, 5))
-
     overall_comments = payload.get('overallComments') or '\n'.join(
         f"{label}: {comment}"
         for label, comment in comments.items()
@@ -537,14 +561,7 @@ def save_room_evaluation(request):
 
     eval_obj, _ = Evaluation.objects.update_or_create(
         applicant=applicant,
-        defaults={
-            'teaching_performance': rating('teaching_performance'),
-            'communication_skills': rating('communication_skills'),
-            'curriculum_understanding': rating('curriculum_understanding'),
-            'engagement_level': rating('engagement_level'),
-            'technical_proficiency': rating('technical_proficiency'),
-            'comments': overall_comments,
-        }
+        defaults=Evaluation.rating_defaults_from_room_payload(ratings, overall_comments)
     )
 
     return JsonResponse({
@@ -563,15 +580,9 @@ def onboarding(request):
         applicant = Applicant.objects.get(applicant_id=applicant_id)
         
         if action == 'assign_account':
-            applicant.teaching_account = request.POST.get('account_slug')
-            applicant.teaching_account_notes = request.POST.get('notes')
-            applicant.save()
-            
-            # Log history
-            StatusHistory.objects.create(
-                applicant=applicant,
-                status=applicant.status,
-                notes=f"Assigned to {applicant.teaching_account} account."
+            applicant.assign_teaching_account(
+                request.POST.get('account_slug'),
+                request.POST.get('notes')
             )
             return redirect('onboarding')
 
@@ -594,24 +605,42 @@ def video_call(request, schedule_id):
     schedule = Schedule.objects.filter(schedule_id=schedule_id).first()
     if not schedule:
         return render(request, 'video_call.html', {'error': 'Meeting not found.'})
-    return render(request, 'video_call.html', {
+    context = {
         'schedule': schedule,
         'room_id': str(schedule_id),
         'room_title': schedule.title,
         'room_subtitle': schedule.scheduled_at.strftime('%B %d, %Y @ %I:%M %p'),
         'user_role': 'admin' if request.user.is_authenticated and request.user.is_staff else 'applicant',
-    })
+    }
+    context.update(mini_calendar_context())
+    return render(request, 'video_call.html', context)
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def new_video_room(request):
     return redirect('video_room', room_id=uuid.uuid4())
 
+def video_landing(request):
+    room_id = str(uuid.uuid4())
+    role = 'admin' if request.user.is_authenticated and request.user.is_staff else 'applicant'
+    zoom_clone_url = f'{zoom_clone_base_url().rstrip("/")}/{room_id}?role={role}'
+    context = {
+        'room_id': room_id,
+        'room_title': 'Video Conference',
+        'room_subtitle': 'Live Zoom clone room',
+        'user_role': role,
+        'zoom_clone_url': zoom_clone_url,
+    }
+    context.update(mini_calendar_context())
+    return render(request, 'video_landing.html', context)
+
 def video_room(request, room_id):
     is_admin = request.user.is_authenticated and request.user.is_staff
-    return render(request, 'video_call.html', {
+    context = {
         'room_id': str(room_id),
         'room_title': 'Admin Video Conference',
         'room_subtitle': 'Live Zoom-style room',
         'user_role': 'admin' if is_admin else 'applicant',
-    })
+    }
+    context.update(mini_calendar_context())
+    return render(request, 'video_call.html', context)

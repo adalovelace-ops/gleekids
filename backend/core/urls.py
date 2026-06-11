@@ -19,11 +19,11 @@ from django.urls import path, re_path
 from ats_new.views import (
     applicant_registration, applicant_login, applicant_portal, 
     home_page, applicant_logout, admin_login, admin_dashboard,
-    applicant_details, update_status, schedule_initial,
+    applicant_details, applicants_page, update_status, schedule_initial,
     demo_evaluation, evaluations, reports, training_schedule, onboarding,
     admin_calendar, schedule_action, client_endorsement,
     evaluate_applicant, save_evaluation, video_call,
-    new_video_room, video_room, uploaded_media, save_room_evaluation
+    new_video_room, video_landing, video_room, uploaded_media, save_room_evaluation
 )
 
 urlpatterns = [
@@ -35,6 +35,7 @@ urlpatterns = [
     path('logout/', applicant_logout, name='applicant_logout'),
     path('admin-login/', admin_login, name='admin_login'),
     path('admin-dashboard/', admin_dashboard, name='admin_dashboard'),
+    path('applicants/', applicants_page, name='applicants_page'),
     path('applicant-details/<uuid:applicant_id>/', applicant_details, name='applicant_details'),
     path('update-status/', update_status, name='update_status'),
     path('schedule-initial/', schedule_initial, name='schedule_initial'),
@@ -49,6 +50,7 @@ urlpatterns = [
     path('evaluate/<uuid:applicant_id>/', evaluate_applicant, name='evaluate_applicant'),
     path('save-evaluation/', save_evaluation, name='save_evaluation'),
     path('api/room-evaluation/', save_room_evaluation, name='save_room_evaluation'),
+    path('video-conferencing/', video_landing, name='video_landing'),
     path('video-call/<uuid:schedule_id>/', video_call, name='video_call'),
     path('video-room/new/', new_video_room, name='new_video_room'),
     path('video-room/<uuid:room_id>/', video_room, name='video_room'),
