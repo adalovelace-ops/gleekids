@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login</title>
+  <title>Admin Login</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
@@ -38,12 +38,14 @@
       box-shadow: 0 0 0 2px #ffe082;
     }
   </style>
+  <link rel="stylesheet" href="/static/css/system_palette.css">
 </head>
 <body class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
   <div class="max-w-md w-full space-y-8">
     <div>
-      <img class="mx-auto h-32 w-auto" src="gleelogo.png" alt="Gleekids Logo">
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-yellow-700">Sign in to your account</h2>
+      <img class="mx-auto h-32 w-auto" src="/media/gleelogo.png" alt="Gleekids Logo">
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-yellow-700">Admin Login</h2>
+      <p class="mt-2 text-center text-sm font-semibold text-yellow-900">For Gleekids recruitment staff only.</p>
     </div>
     <form class="mt-8 space-y-6 login-card p-8 rounded-lg" action="" method="POST" novalidate>
       {% csrf_token %}
@@ -84,7 +86,7 @@
       <div>
         <button type="submit"
           class="login-btn group relative w-full flex justify-center py-2 px-4 text-sm font-medium rounded-md">
-          Sign in
+          Sign in to Admin Dashboard
         </button>
       </div>
 
@@ -97,10 +99,13 @@
       <div>
         <a href="/google_redirect" class="w-full inline-flex items-center justify-center gap-2 py-2 px-4 border border-yellow-300 text-sm font-medium rounded-md text-yellow-900 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400">
           <span aria-hidden="true">🔐</span>
-          <span>Sign in with Google</span>
+          <span>Admin sign in with Google</span>
         </a>
       </div>
     </form>
+    <div class="text-center text-sm text-yellow-900">
+      <a href="/login/" class="login-link hover:underline">Applicant login is here</a>
+    </div>
   </div>
 </body>
 </html>

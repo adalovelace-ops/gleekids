@@ -1,220 +1,272 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Applicants - Admin Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style>
-      :root { --brand:#ffc122; --ink:#1f2933; }
-      body { background: linear-gradient(135deg,#fffaf0,#fdf3d4); color: var(--ink); }
-      .card { background:#fff; border:1px solid rgba(0,0,0,0.04); box-shadow:0 16px 40px rgba(0,0,0,0.06); }
-      .pill { padding:4px 10px; border-radius:9999px; font-weight:600; font-size:0.75rem; }
-      .pill-new { background:#e0f2fe; color:#075985; }
-      .pill-approved { background:#dcfce7; color:#166534; }
-      .pill-rejected { background:#fee2e2; color:#991b1b; }
-      .pill-neutral { background:#f3f4f6; color:#374151; }
-      .btn-brand { background: var(--brand); color:#2b2b2b; font-weight:600; }
-      .btn-ghost { border:1px solid rgba(0,0,0,0.08); }
-      .avatar { width:48px; height:48px; border-radius:9999px; background:#fff7e0; border:1px solid rgba(0,0,0,0.04); display:flex; align-items:center; justify-content:center; font-weight:700; color:#b45309; }
-      .modal { display: none; position: fixed; z-index: 50; inset: 0; background: rgba(0, 0, 0, 0.5); }
-      .modal.active { display: flex; align-items: center; justify-content: center; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Applicants</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <style>
+    :root {
+      --dash-ink: #282064;
+      --dash-violet: #8b6be8;
+      --dash-violet-soft: #f3edff;
+      --dash-pink: #ee79ae;
+      --dash-line: #eadffb;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 58% 6%, rgba(238, 121, 174, 0.16) 0 9rem, transparent 9.2rem),
+        linear-gradient(135deg, #fffdfa 0%, #fbf8ff 42%, #f7fbff 100%);
+      color: var(--dash-ink);
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .dash-title {
+      font-family: 'Baloo 2', cursive;
+      line-height: 0.95;
+    }
+
+    .sidebar-group {
+      border: 1px solid #f7e1a2;
+      border-radius: 1rem;
+      background: linear-gradient(145deg, #fffdf7, #fff8d8);
+      padding: 0.55rem;
+    }
+
+    .sidebar-filter-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      border-radius: 0.8rem;
+      padding: 0.58rem 0.7rem;
+      color: #6b5b29;
+      font-size: 0.82rem;
+      font-weight: 800;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .sidebar-filter-link:hover,
+    .sidebar-filter-link.active {
+      background: #fff;
+      color: var(--dash-ink);
+    }
+
+    .sidebar-filter-count {
+      min-width: 1.6rem;
+      border-radius: 999px;
+      background: #fff;
+      color: #b45309;
+      padding: 0.12rem 0.42rem;
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .applicants-panel {
+      position: relative;
+      border: 1px solid var(--dash-line);
+      border-radius: 1.35rem;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 18px 48px rgba(40, 32, 100, 0.08);
+      overflow: hidden;
+    }
+
+    table.dataTable.no-footer {
+      border-bottom: 0;
+    }
+
+    table.dataTable thead th,
+    table thead th {
+      background: #f6f0ff;
+      color: var(--dash-ink);
+      border-bottom: 1px solid var(--dash-line) !important;
+      font-weight: 900;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    table.dataTable tbody td,
+    table tbody td {
+      border-bottom: 1px solid #eee8fb;
+      color: var(--dash-ink);
+      padding-top: 1rem !important;
+      padding-bottom: 1rem !important;
+    }
+
+    tbody tr.app-row:hover {
+      background: #fbf7ff;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      border-radius: 999px;
+      background: #fff0f7;
+      color: #bf4f88;
+      border: 1px solid #f5c2da;
+      padding: 0.35rem 0.7rem;
+      font-weight: 900;
+      font-size: 0.78rem;
+    }
+
+    .status-pill::before {
+      content: '';
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 999px;
+      background: currentColor;
+      opacity: 0.7;
+    }
+
+    .details-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      border-radius: 0.7rem;
+      background: var(--dash-violet-soft);
+      color: var(--dash-violet);
+      padding: 0.45rem 0.7rem;
+      font-weight: 900;
+    }
+
+    .dataTables_wrapper .dataTables_length select,
+    .dataTables_wrapper .dataTables_filter input {
+      border: 1px solid var(--dash-line);
+      border-radius: 0.75rem;
+      padding: 0.45rem 0.7rem;
+      color: var(--dash-ink);
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(40, 32, 100, 0.04);
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+      border: 0 !important;
+      border-radius: 0.75rem;
+      background: linear-gradient(135deg, var(--dash-violet), #7655d9) !important;
+      color: #fff !important;
+      box-shadow: 0 10px 20px rgba(139, 107, 232, 0.24);
+    }
+  </style>
+  <link rel="stylesheet" href="/static/css/system_palette.css">
 </head>
-<body>
-    <div class="flex min-h-screen">
-        
-        
-        <main class="flex-1 p-8">
-            <div class="max-w-7xl mx-auto">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <p class="text-sm text-gray-600">Dashboard / Applicants</p>
-                        <h1 class="text-3xl font-semibold text-gray-900">Applicants</h1>
-                    </div>
-                    <div class="flex items-center gap-3">
-
-                    </div>
-                </div>
-
-                {% if success_message %}
-                    <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">
-                        <i class="fas fa-check-circle mr-2"></i>{{ success_message }}
-                    </div>
-                {% endif %}
-
-                {% if error_message %}
-                    <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
-                        <i class="fas fa-exclamation-circle mr-2"></i>{{ error_message }}
-                    </div>
-                {% endif %}
-
-                <div class="card rounded-2xl p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-2xl font-semibold text-gray-900">Applicants</span>
-                            <span class="text-sm text-gray-500">Page {{ page }} of {{ pages }} · {{ total }} total</span>
-                        </div>
-                        <form method="GET" class="flex items-center gap-2 flex-wrap justify-end">
-                            <input name="search" type="text" placeholder="Name / email / phone" value="{{ search }}" class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-amber-300 focus:border-amber-400 text-sm w-52" />
-                            <input name="keyword" type="text" placeholder="Keywords / skills" value="{{ keyword }}" class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-amber-300 focus:border-amber-400 text-sm w-52" />
-                            <select name="source" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-amber-300 focus:border-amber-400">
-                                <option value="">All sources</option>
-                                <option value="referral" {{ sourceFilter }}>Referral</option>
-                                <option value="job_board" {{ sourceFilter }}>Job board</option>
-                                <option value="social" {{ sourceFilter }}>Social</option>
-                            </select>
-                            <select name="status" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-amber-300 focus:border-amber-400">
-                                <option value="">All statuses</option>
-                                <option value="onboarding" {{ statusFilter }}>Onboarding</option>
-                                <option value="screening" {{ statusFilter }}>Screening</option>
-                                <option value="demo" {{ statusFilter }}>Demo</option>
-                                <option value="endorsement" {{ statusFilter }}>Client Endorsement</option>
-                                <option value="training" {{ statusFilter }}>Training</option>
-                            </select>
-                            <select name="placement" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-amber-300 focus:border-amber-400">
-                                <option value="">All placements</option>
-                                
-                                    <option value="{{ slug }}" {{ placementFilter }}>{{ label }}</option>
-                                
-                                <option value="none" {{ placementFilter }}>Unassigned</option>
-                            </select>
-                            <select name="sort" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-amber-300 focus:border-amber-400">
-                                <option value="recent" {{ sort }}>Newest first</option>
-                                <option value="placement" {{ sort }}>Latest placement</option>
-                            </select>
-                            <input name="date_from" type="date" value="{{ dateFrom }}" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-amber-300 focus:border-amber-400" />
-                            <input name="date_to" type="date" value="{{ dateTo }}" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-amber-300 focus:border-amber-400" />
-                            <label class="inline-flex items-center text-xs text-gray-700 gap-1 px-2 py-1 bg-gray-50 border border-gray-200 rounded">
-                                <input type="checkbox" name="knockout" value="1" {{ knockout }} />
-                                Knockout (require keywords)
-                            </label>
-                            <button type="submit" class="px-4 py-2 bg-amber-500 text-gray-900 rounded-lg text-sm font-semibold">Apply</button>
-                            <a href="/manage_applicants" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900">Reset</a>
-                        </form>
-                    </div>
-
-                                        <div id="cardGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                                {% if apps %}
-                                                    <div class="text-sm text-gray-600">No applicants found.</div>
-                                                {% else %}
-                                                    
-                                                    <div class="card rounded-xl p-4 flex flex-col gap-3 shadow-sm applicant-card" data-search="{{ fullName }}">
-                                                        <div class="flex items-start justify-between">
-                                                            <div class="flex items-center gap-3">
-                                                                <div class="avatar">{{ initials }}</div>
-                                                                <div>
-                                                                    <div class="font-semibold text-gray-900 text-base">{{ fullName }}</div>
-                                                                    <div class="text-xs text-gray-500">Type: {{ applicationType }}</div>
-                                                                </div>
-                                                            </div>
-                                                            <span class="pill {{ badgeClass }}">{{ applicant }}</span>
-                                                        </div>
-                                                        {% if placementLabel %}
-                                                            <div class="inline-flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-100 px-2 py-1 rounded-full w-max">
-                                                                <span>Placement:</span>
-                                                                <span class="font-semibold">{{ placementLabel }}</span>
-                                                                {% if placementAt %}<span class="text-gray-500">· {{ placementAt }}</span>{% endif %}
-                                                            </div>
-                                                        
-                                                            <div class="inline-flex items-center gap-2 text-xs text-gray-600 bg-gray-50 border border-gray-100 px-2 py-1 rounded-full w-max">Unassigned</div>
-                                                        {% endif %}
-                                                        <div class="text-sm text-gray-700 space-y-1">
-                                                            <div class="flex items-center gap-2"><i class="fas fa-envelope text-amber-600"></i><span>{{ applicant }}</span></div>
-                                                            <div class="flex items-center gap-2"><i class="fas fa-phone text-amber-600"></i><span>{{ applicant }}</span></div>
-                                                            <div class="flex items-center gap-2 text-xs text-gray-500"><i class="fas fa-clock"></i><span>{{ created }}</span></div>
-                                                        </div>
-                                                        <div class="flex items-center gap-2 pt-2">
-                                                            <a href="/applicant-details/{{ id }}" class="flex-1 text-center px-3 py-2 border border-gray-200 rounded-lg text-sm hover:border-amber-300">View</a>
-                                                            <a href="edit_/applicant-details/{{ id }}" class="flex-1 text-center px-3 py-2 bg-amber-500 text-gray-900 rounded-lg text-sm font-semibold hover:bg-amber-400">Edit</a>
-                                                            <button type="button" onclick="confirmDelete('{{ id }}', '{{ fullName }}')" class="w-10 h-10 border border-gray-200 rounded-lg text-gray-600 hover:text-red-600 hover:border-red-200">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div class="flex items-center gap-2 pt-1 text-xs">
-                                                            <form method="POST" action="/update_status" class="flex-1">
-                                                                
-                                                                <input type="hidden" name="applicant_id" value="{{ id }}">
-                                                                <input type="hidden" name="new_status" value="hired">
-                                                                <input type="hidden" name="redirect_to" value="{{ _SERVER }}">
-                                                                <button type="submit" class="w-full px-2 py-2 rounded-lg border border-green-200 text-green-700 hover:bg-green-50 font-semibold">Mark Hired</button>
-                                                            </form>
-                                                            <form method="POST" action="/update_status" class="flex-1">
-                                                                
-                                                                <input type="hidden" name="applicant_id" value="{{ id }}">
-                                                                <input type="hidden" name="new_status" value="withdrawn">
-                                                                <input type="hidden" name="redirect_to" value="{{ _SERVER }}">
-                                                                <button type="submit" class="w-full px-2 py-2 rounded-lg border border-red-200 text-red-700 hover:bg-red-50 font-semibold">Withdraw</button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                {% endif %}
-                                        </div>
-
-                                        {% if pages %}
-                                            <div class="mt-6 flex items-center justify-center gap-3 text-sm">
-                                                
-                                                
-                                                <a class="px-3 py-1 rounded border border-gray-200 {{ page }}" href="?{{ qs }}&page={{ prev }}">Prev</a>
-                                                <span class="text-gray-600">Page {{ page }} of {{ pages }}</span>
-                                                <a class="px-3 py-1 rounded border border-gray-200 {{ page }}" href="?{{ qs }}&page={{ next }}">Next</a>
-                                            </div>
-                                        {% endif %}
-                </div>
+<body class="min-h-screen">
+  <div class="flex">
+    <aside id="sidebar" class="w-64 min-h-screen bg-white shadow-xl border-r border-yellow-200 sticky top-0">
+      <div class="p-6">
+        <img src="/media/gleelogo.png" alt="Gleekids Logo" class="h-12 w-auto mb-8 mx-auto">
+        <nav class="space-y-2">
+          <a href="/admin-dashboard/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-home"></i> Dashboard
+          </a>
+          <div class="sidebar-group">
+            <a href="/applicants/" class="flex items-center justify-between gap-3 px-3 py-3 text-gray-800 rounded-xl font-extrabold">
+              <span class="flex items-center gap-3"><i class="fas fa-users text-yellow-600"></i> Applicants</span>
+              <span class="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-bold text-yellow-800">{{ all_applicants_count }}</span>
+            </a>
+            <div class="mt-1 grid gap-1">
+              <a href="/applicants/" class="sidebar-filter-link {% if not selected_status %}active{% endif %}">
+                <span>All applicants</span>
+                <span class="sidebar-filter-count">{{ all_applicants_count }}</span>
+              </a>
+              <a href="/applicants/?status=Pending" class="sidebar-filter-link {% if selected_status == 'Pending' %}active{% endif %}">
+                <span>Pending</span>
+                <span class="sidebar-filter-count">{{ pending_applicants_count }}</span>
+              </a>
+              {% for stat in stats %}
+                <a href="/applicants/?status={{ stat.key }}" class="sidebar-filter-link {% if selected_status == stat.key %}active{% endif %}">
+                  <span>{{ stat.s }}</span>
+                  <span class="sidebar-filter-count">{{ stat.total }}</span>
+                </a>
+              {% endfor %}
             </div>
-        </main>
-    </div>
+          </div>
+          <a href="/admin-calendar/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-calendar-alt"></i> Schedules
+          </a>
+          <a href="/video-conferencing/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-video"></i> Video Conferencing
+          </a>
+          <a href="/evaluations/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-star"></i> Evaluations
+          </a>
+          <a href="/reports/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
+            <i class="fas fa-chart-line"></i> Reports
+          </a>
+          <div class="pt-10">
+            <a href="/logout/" class="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-semibold">
+              <i class="fas fa-sign-out-alt"></i> Sign Out
+            </a>
+          </div>
+        </nav>
+      </div>
+    </aside>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal">
-        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div class="p-6">
-                <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
-                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
-                </div>
-                <h3 class="text-lg font-semibold text-gray-900 text-center mb-2">Delete Applicant</h3>
-                <p class="text-gray-600 text-center mb-6">
-                    Are you sure you want to delete <strong id="deleteApplicantName"></strong>? This action cannot be undone.
-                </p>
-                <form method="POST" id="deleteForm">
-                    <input type="hidden" name="action" value="delete">
-                    
-                    <input type="hidden" name="applicant_id" id="deleteApplicantId">
-                    <div class="flex items-center gap-3">
-                        <button type="button" onclick="closeDeleteModal()" 
-                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
-                            Cancel
-                        </button>
-                        <button type="submit" 
-                                class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
-                            Delete
-                        </button>
-                    </div>
-                </form>
-            </div>
+    <main class="flex-1 p-8">
+      <div class="max-w-7xl mx-auto">
+        <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="text-sm font-bold uppercase tracking-[0.2em] text-amber-600">Applicant Management</p>
+            <h1 class="dash-title mt-2 text-5xl font-extrabold">Applicants</h1>
+          </div>
+          <a href="/admin-dashboard/" class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-extrabold text-yellow-700 shadow-sm border border-yellow-100">
+            <i class="fas fa-arrow-left"></i> Back to dashboard
+          </a>
         </div>
-    </div>
 
-    <script>
-        function confirmDelete(id, name) {
-            document.getElementById('deleteApplicantId').value = id;
-            document.getElementById('deleteApplicantName').textContent = name;
-            document.getElementById('deleteModal').classList.add('active');
-        }
+        <section class="applicants-panel p-5 md:p-7">
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <h2 class="text-3xl font-extrabold">Applicant List</h2>
+            <p class="text-sm font-bold text-gray-500">{{ total_applicants }} shown</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table id="applicants-table" class="min-w-full divide-y divide-gray-200" style="width:100%">
+              <thead>
+                <tr>
+                  <th class="px-4 py-3 text-left text-sm">Name</th>
+                  <th class="px-4 py-3 text-left text-sm">Email</th>
+                  <th class="px-4 py-3 text-left text-sm">Status</th>
+                  <th class="px-4 py-3 text-left text-sm">Applied</th>
+                  <th class="px-4 py-3 text-left text-sm">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for app in applicants %}
+                  <tr class="app-row">
+                    <td class="px-4 py-3 text-sm font-extrabold">{{ app.first_name }} {{ app.last_name }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">{{ app.email }}</td>
+                    <td class="px-4 py-3 text-sm">
+                      <span class="status-pill">{{ app.status }}</span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-500">{{ app.created_at|date:"M d, Y" }}</td>
+                    <td class="px-4 py-3 text-sm">
+                      <a href="/applicant-details/{{ app.applicant_id }}/" class="details-link"><i class="fas fa-eye"></i> View Details</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
 
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').classList.remove('active');
-        }
-
-        document.getElementById('deleteModal').addEventListener('click', function(e) {
-            if (e.target === this) { closeDeleteModal(); }
-        });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') { closeDeleteModal(); }
-        });
-
-    </script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script>
+    (function(){
+      if (typeof jQuery === 'undefined') return;
+      jQuery(function($){
+        $('#applicants-table').DataTable({ pageLength: 25, order: [[3, 'desc']] });
+      });
+    })();
+  </script>
 </body>
 </html>

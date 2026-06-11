@@ -21,7 +21,7 @@
             content: '';
             position: fixed;
             inset: 0;
-            background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.7), rgba(118, 75, 162, 0.55)), url('gleeglee.jpg');
+            background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.7), rgba(118, 75, 162, 0.55)), url('/media/gleeglee.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -114,7 +114,7 @@
             position: relative;
             padding: 8rem 2rem 6rem;
             min-height: 95vh;
-            background-image: linear-gradient(115deg, rgba(255, 193, 34, 0.15), rgba(138, 138, 226, 0.12)), url('Untitled design (3).png');
+            background-image: linear-gradient(115deg, rgba(255, 193, 34, 0.15), rgba(138, 138, 226, 0.12)), url('/media/Untitled design (3).png');
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
@@ -1709,8 +1709,7 @@
             background: rgba(255, 250, 240, 0.96) !important;
         }
 
-        #resources,
-        #faq {
+        #resources {
             background:
                 radial-gradient(circle at 10% 10%, rgba(223, 90, 169, 0.14), transparent 18rem),
                 radial-gradient(circle at 82% 30%, rgba(105, 183, 212, 0.16), transparent 18rem),
@@ -2152,7 +2151,7 @@
         body::before {
             background:
                 linear-gradient(135deg, rgba(198, 241, 238, 0.92), rgba(250, 248, 224, 0.9)),
-                url('gleeglee.jpg');
+                url('/media/gleeglee.jpg');
             background-size: cover;
             background-position: center;
             opacity: 0.18;
@@ -2165,15 +2164,15 @@
         }
 
         .logo-img {
-            width: 168px !important;
-            height: 58px !important;
+            width: 230px !important;
+            height: 82px !important;
             object-fit: contain;
         }
 
         .hero-section {
             overflow: hidden;
-            min-height: calc(100svh - 76px);
-            padding-top: 7.2rem;
+            min-height: calc(100svh - 96px);
+            padding-top: 8.6rem;
             background:
                 linear-gradient(rgba(255, 255, 255, 0.25) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.25) 1px, transparent 1px),
@@ -2557,7 +2556,7 @@
             box-shadow: 5px 5px 0 rgba(32, 50, 68, 0.88);
             color: var(--gk-ink);
             font-family: 'Baloo 2', cursive;
-            font-size: 1.25rem;
+            font-size: 1.95rem;
         }
 
         .gk-account-pill:nth-child(2) span {
@@ -2568,13 +2567,340 @@
             background: #b7cf6b;
         }
 
-        .gk-account-pill:nth-child(4) span {
-            background: #65b8d5;
+        .gk-about-story {
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 9% 18%, rgba(231, 90, 169, 0.2), transparent 20rem),
+                radial-gradient(circle at 88% 12%, rgba(101, 184, 213, 0.24), transparent 22rem),
+                linear-gradient(135deg, #fffaf0 0%, #eef9ff 47%, #fff5fb 100%) !important;
         }
 
-        .gk-account-pill:nth-child(5) span {
-            background: #e75aa9;
-            color: #fff;
+        .gk-about-story::before {
+            content: '';
+            position: absolute;
+            inset: 2rem;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(32, 50, 68, 0.055) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(32, 50, 68, 0.055) 1px, transparent 1px);
+            background-size: 34px 34px;
+            mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent);
+        }
+
+        .gk-about-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            color: var(--gk-pink);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+        }
+
+        .gk-about-kicker::before,
+        .gk-about-kicker::after {
+            content: '';
+            width: 2.4rem;
+            height: 0.55rem;
+            border: 2px solid var(--gk-ink);
+            background: var(--gk-blue);
+            box-shadow: 3px 3px 0 var(--gk-ink);
+        }
+
+        .gk-about-title,
+        .gk-mission-title,
+        .gk-community-title {
+            color: var(--gk-ink);
+            font-family: 'Baloo 2', cursive;
+            font-weight: 900;
+            line-height: 0.98;
+            letter-spacing: 0;
+        }
+
+        .gk-about-title {
+            max-width: 900px;
+            margin: 1rem auto 0;
+            font-size: clamp(2.6rem, 6vw, 5.8rem);
+        }
+
+        .gk-about-copy {
+            max-width: 760px;
+            margin: 1.2rem auto 0;
+            color: #405568;
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            line-height: 1.75;
+        }
+
+        .gk-mission-grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+            gap: clamp(1.6rem, 4vw, 3.5rem);
+            align-items: center;
+            margin-top: 4rem;
+        }
+
+        .gk-mission-copy {
+            position: relative;
+            padding: clamp(1.5rem, 4vw, 2.5rem);
+            border: 3px solid var(--gk-ink);
+            border-radius: 8px;
+            background: rgba(255, 255, 247, 0.94);
+            box-shadow: 9px 9px 0 var(--gk-pink);
+        }
+
+        .gk-mission-copy::after {
+            content: 'ESL';
+            position: absolute;
+            right: 1rem;
+            top: -1.1rem;
+            padding: 0.35rem 0.85rem;
+            border: 2px solid var(--gk-ink);
+            background: var(--gk-blue);
+            box-shadow: 4px 4px 0 var(--gk-ink);
+            color: var(--gk-ink);
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.05rem;
+            font-weight: 900;
+            transform: rotate(3deg);
+        }
+
+        .gk-mission-title {
+            margin-top: 0.65rem;
+            font-size: clamp(2.2rem, 4vw, 4rem);
+        }
+
+        .gk-mission-text,
+        .gk-community-text {
+            color: #405568;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .gk-mission-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin-top: 1.4rem;
+        }
+
+        .gk-mission-tags span {
+            padding: 0.55rem 0.85rem;
+            border: 2px solid var(--gk-ink);
+            border-radius: 999px;
+            background: #ffffff;
+            box-shadow: 3px 3px 0 rgba(32, 50, 68, 0.85);
+            color: var(--gk-ink);
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .gk-mission-tags span:nth-child(2) {
+            background: #f8d2e9;
+        }
+
+        .gk-mission-tags span:nth-child(3) {
+            background: #d6f2fb;
+        }
+
+        .gk-mission-photo {
+            position: relative;
+            min-height: 430px;
+        }
+
+        .gk-mission-photo::before {
+            content: '';
+            position: absolute;
+            inset: 2rem -0.6rem -1rem 2.5rem;
+            border: 3px solid var(--gk-ink);
+            border-radius: 8px;
+            background: repeating-linear-gradient(-45deg, #f8d2e9 0 12px, #d6f2fb 12px 24px);
+            transform: rotate(3deg);
+        }
+
+        .gk-mission-photo img {
+            position: relative;
+            width: 100%;
+            min-height: 430px;
+            object-fit: cover;
+            border: 3px solid var(--gk-ink);
+            border-radius: 8px;
+            box-shadow: 10px 10px 0 var(--gk-ink);
+            transform: rotate(-1.5deg);
+        }
+
+        .gk-photo-ribbon {
+            position: absolute;
+            left: -0.8rem;
+            bottom: 1.4rem;
+            z-index: 2;
+            max-width: 16rem;
+            padding: 0.8rem 1rem;
+            border: 3px solid var(--gk-ink);
+            border-radius: 8px;
+            background: var(--gk-yellow);
+            box-shadow: 5px 5px 0 var(--gk-ink);
+            color: var(--gk-ink);
+            font-weight: 900;
+            transform: rotate(2deg);
+        }
+
+        .gk-community-feature {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+            gap: clamp(1.4rem, 4vw, 3rem);
+            align-items: center;
+            margin-top: 4.5rem;
+        }
+
+        .gk-community-media {
+            overflow: hidden;
+            border: 3px solid var(--gk-ink);
+            border-radius: 8px;
+            background: var(--gk-ink);
+            box-shadow: 9px 9px 0 var(--gk-blue);
+            aspect-ratio: 16 / 9;
+        }
+
+        .gk-community-media iframe {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border: 0;
+        }
+
+        .gk-community-copy {
+            padding: clamp(1.4rem, 3vw, 2rem);
+            border-left: 8px solid var(--gk-pink);
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        .gk-community-title {
+            margin: 0.65rem 0 0.85rem;
+            font-size: clamp(2rem, 4vw, 3.4rem);
+        }
+
+        .gk-faq-section {
+            position: relative;
+            overflow: hidden;
+            background:
+                linear-gradient(115deg, rgba(32, 50, 68, 0.88) 0%, rgba(32, 50, 68, 0.68) 42%, rgba(231, 90, 169, 0.42) 100%),
+                url('/media/gleeglee.jpg') center / cover no-repeat !important;
+            isolation: isolate;
+        }
+
+        .gk-faq-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 12% 22%, rgba(101, 184, 213, 0.45), transparent 17rem),
+                radial-gradient(circle at 86% 18%, rgba(255, 226, 108, 0.35), transparent 15rem),
+                linear-gradient(180deg, transparent 55%, rgba(32, 50, 68, 0.35));
+            mix-blend-mode: screen;
+        }
+
+        .gk-faq-section::after {
+            content: '';
+            position: absolute;
+            left: -4rem;
+            right: -4rem;
+            bottom: -2rem;
+            height: 7rem;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse at center, rgba(255, 250, 240, 0.72) 0%, rgba(255, 250, 240, 0.12) 62%, transparent 70%);
+            transform: rotate(-1deg);
+        }
+
+        .gk-faq-shell {
+            position: relative;
+            z-index: 1;
+        }
+
+        .gk-faq-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.45rem 0.8rem;
+            border: 2px solid var(--gk-ink);
+            border-radius: 999px;
+            background: var(--gk-yellow);
+            box-shadow: 4px 4px 0 var(--gk-ink);
+            color: var(--gk-ink);
+            font-size: 0.74rem;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .gk-faq-title {
+            margin-top: 1rem;
+            color: #fffdf3;
+            font-family: 'Baloo 2', cursive;
+            font-size: clamp(2.8rem, 6vw, 5.6rem);
+            font-weight: 900;
+            line-height: 0.95;
+            text-shadow: 4px 4px 0 rgba(32, 50, 68, 0.72);
+        }
+
+        .gk-faq-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.08rem;
+            line-height: 1.7;
+        }
+
+        .gk-faq-list {
+            position: relative;
+        }
+
+        .gk-faq-list::before {
+            content: '?';
+            position: absolute;
+            left: -4.2rem;
+            top: -3.3rem;
+            color: rgba(255, 226, 108, 0.5);
+            font-family: 'Baloo 2', cursive;
+            font-size: 9rem;
+            font-weight: 900;
+            line-height: 1;
+            transform: rotate(-10deg);
+            pointer-events: none;
+        }
+
+        .gk-faq-section .faq-item {
+            border: 3px solid var(--gk-ink) !important;
+            border-radius: 8px !important;
+            background: rgba(255, 255, 247, 0.92) !important;
+            box-shadow: 7px 7px 0 rgba(32, 50, 68, 0.92) !important;
+            backdrop-filter: blur(10px);
+        }
+
+        .gk-faq-section .faq-item:nth-child(2) {
+            transform: translateX(1.2rem);
+        }
+
+        .gk-faq-section .faq-item button {
+            color: var(--gk-ink);
+        }
+
+        .gk-faq-section .faq-item button:hover {
+            background: rgba(214, 242, 251, 0.72);
+        }
+
+        .gk-faq-section .faq-icon {
+            color: var(--gk-pink);
+        }
+
+        .gk-faq-section .faq-answer p {
+            color: #405568;
         }
 
         @media (max-width: 980px) {
@@ -2608,8 +2934,8 @@
 
         @media (max-width: 640px) {
             .logo-img {
-                width: 136px !important;
-                height: 48px !important;
+                width: 172px !important;
+                height: 62px !important;
             }
 
             .hero-section {
@@ -2818,7 +3144,22 @@
         .gk-account-pill span {
             width: 58px;
             height: 58px;
-            font-size: 1.05rem;
+            font-size: 1.75rem;
+        }
+
+        .gk-mission-grid,
+        .gk-community-feature {
+            grid-template-columns: 1fr;
+        }
+
+        .gk-mission-photo,
+        .gk-mission-photo img {
+            min-height: 320px;
+        }
+
+        .gk-community-copy {
+            border-left-width: 0;
+            border-top: 8px solid var(--gk-pink);
         }
 
         .quick-links .container.grid {
@@ -2870,6 +3211,14 @@
 
             .quick-links .container.grid {
                 grid-template-columns: 1fr;
+            }
+
+            .gk-faq-list::before {
+                display: none;
+            }
+
+            .gk-faq-section .faq-item:nth-child(2) {
+                transform: none;
             }
         }
 
@@ -2997,7 +3346,196 @@
                 max-width: 230px;
             }
         }
+
+        /* Mobile-first landing guardrails: scoped to small screens only. */
+        @media (max-width: 768px) {
+            html,
+            body {
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            img,
+            iframe {
+                max-width: 100%;
+            }
+
+            .glass-header .container {
+                min-height: 86px;
+                padding-top: 0.65rem;
+                padding-bottom: 0.65rem;
+            }
+
+            .logo-img {
+                width: clamp(158px, 45vw, 190px) !important;
+                height: auto !important;
+                max-height: 68px;
+            }
+
+            .mobile-menu {
+                top: 86px;
+                height: calc(100dvh - 86px);
+                overflow-y: auto;
+            }
+
+            main {
+                padding-top: 5.4rem;
+            }
+
+            .hero-section {
+                min-height: auto;
+                padding-top: 6.2rem;
+                padding-bottom: 3.5rem;
+            }
+
+            .hero-content,
+            .gk-about-story .container,
+            #resources .container,
+            #process .container,
+            .gk-faq-shell,
+            #contact .container,
+            footer .container {
+                width: min(100%, 100vw);
+            }
+
+            .gk-hero-grid {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 2rem;
+            }
+
+            .gk-hero-copy,
+            .gk-hero-copy h1,
+            .gk-hero-copy p,
+            .gk-about-title,
+            .gk-about-copy,
+            .gk-mission-title,
+            .gk-community-title,
+            .gk-faq-title,
+            .gk-faq-subtitle {
+                max-width: 100%;
+            }
+
+            .gk-hero-copy h1 {
+                font-size: clamp(2.65rem, 13vw, 4.35rem);
+            }
+
+            .gk-hero-actions a,
+            .btn-primary,
+            .btn-secondary {
+                white-space: normal;
+            }
+
+            .gk-mini-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .gk-model-collage {
+                width: min(100%, 560px);
+                min-height: 430px;
+            }
+
+            .gk-model-collage::before {
+                width: min(88vw, 340px);
+                height: min(88vw, 340px);
+            }
+
+            .gk-model-stage {
+                min-height: 430px;
+                transform: scale(0.86);
+                transform-origin: top center;
+            }
+
+            .gk-side-menu {
+                width: 100%;
+            }
+
+            .gk-account-row {
+                gap: 1rem;
+            }
+
+            .quick-links .container.grid,
+            #resources .grid,
+            #process .grid,
+            #contact .grid,
+            footer .grid {
+                grid-template-columns: minmax(0, 1fr) !important;
+            }
+
+            .quick-link-card,
+            .card-hover,
+            #process .rounded-xl,
+            .faq-item {
+                width: 100%;
+            }
+
+            .gk-mission-grid,
+            .gk-community-feature {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 2rem;
+            }
+
+            .gk-mission-photo,
+            .gk-mission-photo img {
+                min-height: 280px;
+            }
+
+            .gk-photo-ribbon {
+                left: 0.75rem;
+                right: 0.75rem;
+                max-width: none;
+            }
+
+            .values-inner {
+                padding: 1.25rem !important;
+            }
+
+            .values-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .value-flag {
+                width: 100%;
+                max-width: none;
+            }
+
+            .gk-faq-list::before {
+                display: none;
+            }
+
+            .gk-faq-section .faq-item:nth-child(2) {
+                transform: none;
+            }
+
+            .gk-faq-section .faq-item button {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .hero-section {
+                padding-left: 0.9rem;
+                padding-right: 0.9rem;
+            }
+
+            .gk-model-collage {
+                min-height: 380px;
+            }
+
+            .gk-model-stage {
+                transform: scale(0.74);
+                min-height: 380px;
+            }
+
+            .gk-about-kicker {
+                letter-spacing: 0.14em;
+            }
+
+            .values-row {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
     </style>
+  <link rel="stylesheet" href="/static/css/system_palette.css">
 </head>
 
 <body class="text-gray-800">
@@ -3011,7 +3549,7 @@
     <header class="glass-header shadow-lg fixed w-full top-0 z-40">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-2">
-                <img src="gleelogo.png" alt="Gleekids Logo" class="logo-img w-96 h-36 object-contain">
+                <img src="/media/gleelogo.png" alt="Gleekids Logo" class="logo-img w-96 h-36 object-contain">
             </div>
 
             <nav class="hidden md:flex space-x-8">
@@ -3034,7 +3572,7 @@
                         Apply Now
                     </a>
                     <a href="/login/" class="btn-secondary px-6 py-2 rounded-full">
-                        Portal Login
+                        Applicant Login
                     </a>
                     <a href="/admin-login/" class="bg-gray-800 text-white hover:bg-gray-900 px-6 py-2 rounded-full transition shadow-md">
                         Admin Login
@@ -3060,7 +3598,7 @@
                 <a href="#contact" class="mobile-nav-link text-gray-700 hover:text-yellow-500 py-2">Contact</a>
                 <div class="pt-4 space-y-3">
                     <a href="/apply/" class="w-full btn-secondary px-6 py-2 rounded-full text-center block">Apply Now</a>
-                    <a href="/login/" class="w-full bg-yellow-500 text-white px-6 py-2 rounded-full text-center block">Portal Login</a>
+                    <a href="/login/" class="w-full bg-yellow-500 text-white px-6 py-2 rounded-full text-center block">Applicant Login</a>
                     <a href="/admin-login/" class="w-full bg-gray-800 text-white px-6 py-2 rounded-full text-center block">Admin Login</a>
                 </div>
             </nav>
@@ -3093,20 +3631,6 @@
                             <a href="/apply/" class="gk-button gk-button-primary px-7 py-3">Start Application</a>
                             <a href="#process" class="gk-button gk-button-secondary px-7 py-3">View Hiring Steps</a>
                         </div>
-                        <div class="gk-mini-stats" aria-label="Gleekids highlights">
-                            <div class="gk-stat">
-                                <strong>Online</strong>
-                                <span>ESL classes</span>
-                            </div>
-                            <div class="gk-stat">
-                                <strong>3</strong>
-                                <span>Teaching accounts</span>
-                            </div>
-                            <div class="gk-stat">
-                                <strong>4</strong>
-                                <span>Hiring steps</span>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="gk-lesson-board gk-model-collage" aria-label="Gleekids teacher applicant preview">
@@ -3119,17 +3643,17 @@
                         </div>
                         <div class="gk-model-stage">
                             <div class="gk-model-frame">
-                                <img src="joy.jpg" alt="Smiling ESL teacher with headset">
+                                <img src="/media/jun.png" alt="Smiling ESL teacher with headset">
                                 <span class="gk-model-badge">Demo ready</span>
                             </div>
                             <div class="gk-photo-card gk-photo-card-one">
-                                <img src="rea.jpg" alt="Online ESL teacher greeting students">
+                                <img src="/media/grace.png" alt="Online ESL teacher greeting students">
                             </div>
                             <div class="gk-photo-card gk-photo-card-two">
-                                <img src="tes.jpg" alt="Online ESL teacher using headset">
+                                <img src="/media/cla-orangr.png" alt="Online ESL teacher using headset">
                             </div>
                             <div class="gk-photo-card gk-photo-card-three">
-                                <img src="cla.jpg" alt="Online ESL teacher holding lesson materials">
+                                <img src="/media/joylyn.png" alt="Online ESL teacher holding lesson materials">
                             </div>
                             <div class="gk-floating-label gk-floating-label-one">Teacher</div>
                             <div class="gk-floating-label gk-floating-label-two">ESL</div>
@@ -3162,24 +3686,16 @@
                 <h2 class="gk-strip-title">I want to teach</h2>
                 <div class="gk-account-row" aria-label="Teaching account options">
                     <a href="#resources" class="gk-account-pill">
-                        <span>VN</span>
+                        <span aria-hidden="true">🇻🇳</span>
                         Vietnamese
                     </a>
                     <a href="#resources" class="gk-account-pill">
-                        <span>CN</span>
+                        <span aria-hidden="true">🇨🇳</span>
                         Chinese
                     </a>
                     <a href="#resources" class="gk-account-pill">
-                        <span>MN</span>
+                        <span aria-hidden="true">🇲🇳</span>
                         Mongolian
-                    </a>
-                    <a href="#process" class="gk-account-pill">
-                        <span>DE</span>
-                        Demo
-                    </a>
-                    <a href="/apply/" class="gk-account-pill">
-                        <span>AP</span>
-                        Apply
                     </a>
                 </div>
             </div>
@@ -3214,62 +3730,54 @@
             </div>
         </section>
 
-        <!-- About Section -->
-        <section id="about" class="py-16 bg-white">
-            <div class="container mx-auto px-4">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl font-extrabold text-slate-900 mb-6">About GleeKids</h2>
-                    <p class="text-lg text-slate-700 max-w-4xl mx-auto">
-                        GleeKids was established in 2022 in Talisay City, Negros Occidental, Philippines.<br>
-                        Gleekids is a recruitment center for office-based and home-based Online ESL Teachers. We aim to
-                        provide our clients with the best quality service and competent teachers.
+        <!-- About / Mission / Community / Values Interface -->
+        <section id="about" class="gk-about-story py-16 lg:py-24">
+            <div class="container mx-auto px-6 lg:px-12">
+                <div class="relative z-[1] text-center">
+                    <p class="gk-about-kicker">About Us</p>
+                    <h2 class="gk-about-title">Where great teachers meet bright classrooms.</h2>
+                    <p class="gk-about-copy">
+                        GleeKids was established in 2022 in Talisay City, Negros Occidental. We connect office-based and
+                        home-based Online ESL Teachers with institutions that need dependable, high-quality teaching
+                        talent.
                     </p>
                 </div>
 
-            </div>
-        </section>
-
-        <!-- Mission / Community / Values Interface -->
-        <section id="mission" class="py-16 lg:py-24 bg-white">
-            <div class="container mx-auto px-6 lg:px-12">
-                <div class="grid lg:grid-cols-2 gap-10 items-start mb-12">
-                    <div class="flex flex-col justify-center h-full">
-                        <div class="text-left lg:text-right space-y-4 lg:pr-10">
-                            <p class="text-xs font-semibold uppercase tracking-[0.32em] text-amber-500">ABOUT US</p>
-                            <h2 class="text-3xl lg:text-4xl font-extrabold text-slate-900 leading-tight">Our Mission
-                            </h2>
-                            <p class="text-lg text-slate-700">Empower educators with fulfilling careers and provide
-                                institutions with top-tier teaching talent.</p>
+                <div id="mission" class="gk-mission-grid">
+                    <div class="gk-mission-copy">
+                        <p class="gk-about-kicker">Our Mission</p>
+                        <h3 class="gk-mission-title">Fulfilling careers, top-tier teaching talent.</h3>
+                        <p class="gk-mission-text mt-4">
+                            Empower educators with fulfilling careers and provide institutions with top-tier teaching
+                            talent through careful recruitment, warm support, and a community that helps teachers grow.
+                        </p>
+                        <div class="gk-mission-tags" aria-label="Gleekids mission highlights">
+                            <span>Teacher growth</span>
+                            <span>Partner trust</span>
+                            <span>Quality ESL</span>
                         </div>
                     </div>
-                    <div class="relative overflow-hidden rounded-3xl shadow-2xl flex items-center justify-center">
-                        <img src="mission.jpg" alt="Teachers collaborating"
-                            class="w-full h-full object-cover max-h-80 lg:max-h-96">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-br from-amber-100/40 via-transparent to-slate-900/10">
-                        </div>
+                    <div class="gk-mission-photo" aria-label="Teachers collaborating">
+                        <img src="/media/mission.jpg" alt="Teachers collaborating during a Gleekids session">
+                        <div class="gk-photo-ribbon">Teachers collaborating, growing, and teaching with heart.</div>
                     </div>
                 </div>
 
-
-
-                <!-- Community spotlight with embedded video -->
-                <div id="community" class="mt-16 flex flex-col lg:flex-row items-center justify-center gap-8">
-                    <div class="bg-slate-100 rounded-3xl overflow-hidden shadow-2xl border border-slate-200 flex items-center justify-center p-0"
-                        style="width:560px; height:314px; margin:0;">
+                <div id="community" class="gk-community-feature">
+                    <div class="gk-community-media">
                         <iframe
                             src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F8524974767513673%2F&show_text=false&width=560&t=0"
-                            width="560" height="314"
-                            style="border:none;overflow:hidden; width:560px; height:314px; display:block; margin:0; border-radius:1rem; background:#000;"
                             scrolling="no" frameborder="0" allowfullscreen="true"
                             allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
                             allowFullScreen="true" title="Gleekids Facebook Reel"></iframe>
                     </div>
-                    <div class="flex flex-col justify-center h-full text-left lg:pl-8" style="min-width:260px;">
-                        <p class="text-xs font-semibold uppercase tracking-[0.32em] text-amber-500 mb-2">Our Community
+                    <div class="gk-community-copy">
+                        <p class="gk-about-kicker">Our Community</p>
+                        <h3 class="gk-community-title">See our teachers and partners in action.</h3>
+                        <p class="gk-community-text">
+                            Real lessons, real teamwork, and the everyday energy behind Gleekids. This is the community
+                            applicants join when they teach with us.
                         </p>
-                        <h3 class="text-2xl lg:text-3xl font-extrabold text-slate-900 mb-2">See our teachers and
-                            partners in action.</h3>
                     </div>
                 </div>
 
@@ -3342,7 +3850,7 @@
                                     platform is user-friendly, the students are eager to learn, and the support from the
                                     team is outstanding. I've grown both professionally and personally.</p>
                                 <div class="testimonial-author">
-                                    <img class="testimonial-avatar object-cover" src="joy.jpg"
+                                    <img class="testimonial-avatar object-cover" src="/media/joy.jpg"
                                         alt="Teach Joylyn profile photo">
                                     <div>
                                         <div class="testimonial-name">Teach Joylyn</div>
@@ -3357,7 +3865,7 @@
                                     can teach on my own schedule while still feeling part of a supportive community.
                                     Gleekids truly values its educators.</p>
                                 <div class="testimonial-author">
-                                    <img class="testimonial-avatar object-cover" src="cla.jpg"
+                                    <img class="testimonial-avatar object-cover" src="/media/cla.jpg"
                                         alt="Teach Clarence profile photo">
                                     <div>
                                         <div class="testimonial-name">Teach Clarence</div>
@@ -3372,7 +3880,7 @@
                                     attracts. The company really invests in teacher development and creates a positive
                                     learning environment for everyone.</p>
                                 <div class="testimonial-author">
-                                    <img class="testimonial-avatar object-cover" src="rea.jpg"
+                                    <img class="testimonial-avatar object-cover" src="/media/rea.jpg"
                                         alt="Teach Rea profile photo">
                                     <div>
                                         <div class="testimonial-name">Teach Rea</div>
@@ -3387,7 +3895,7 @@
                                     team goes above and beyond to support their teachers, and the students are wonderful
                                     to work with. Highly recommended!</p>
                                 <div class="testimonial-author">
-                                    <img class="testimonial-avatar object-cover" src="tes.jpg"
+                                    <img class="testimonial-avatar object-cover" src="/media/tes.jpg"
                                         alt="Teach Ver profile photo">
                                     <div>
                                         <div class="testimonial-name">Teach Ver</div>
@@ -3523,17 +4031,17 @@
             </div>
         </section>
         <!-- FAQ Section -->
-        <section id="faq" class="py-16"
-            style="background: linear-gradient(135deg, rgba(138, 138, 226, 0.1), rgba(255, 193, 34, 0.1));">
-            <div class="container mx-auto px-4">
+        <section id="faq" class="gk-faq-section py-16 lg:py-24">
+            <div class="gk-faq-shell container mx-auto px-4">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">Frequently Asked Questions</h2>
-                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    <p class="gk-faq-kicker">Teacher Guide</p>
+                    <h2 class="gk-faq-title mb-4">Frequently Asked Questions</h2>
+                    <p class="gk-faq-subtitle max-w-3xl mx-auto">
                         Got questions? We've got answers. Find solutions to common inquiries about Gleekids.
                     </p>
                 </div>
 
-                <div class="max-w-3xl mx-auto space-y-4">
+                <div class="gk-faq-list max-w-3xl mx-auto space-y-4">
                     <div class="faq-item bg-white rounded-xl overflow-hidden shadow-sm">
                         <button onclick="toggleFAQ(this)"
                             class="w-full p-6 text-left font-semibold text-gray-800 hover:bg-gray-50 transition-colors flex justify-between items-center">
@@ -3599,7 +4107,7 @@
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <!-- Left Side - Image -->
                     <div class="flex items-center justify-center">
-                        <img src="contacts.jpg" alt="Gleekids Team"
+                        <img src="/media/contacts.jpg" alt="Gleekids Team"
                             class="rounded-lg shadow-lg w-full max-w-3xl object-cover">
                     </div>
 
@@ -3658,7 +4166,7 @@
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <div>
                 <a href="hero.html" class="flex items-center space-x-2 mb-4" aria-label="Gleekids Homepage">
-                    <img src="gleelogo.png" alt="Gleekids Logo" class="w-60 h-50 rounded-full object-cover">
+                    <img src="/media/gleelogo.png" alt="Gleekids Logo" class="w-60 h-50 rounded-full object-cover">
                 </a>
                 <p class="text-gray-400 text-sm">Empowering educators, connecting opportunities.</p>
                 <div class="flex space-x-4 mt-6">

@@ -35,12 +35,13 @@
       box-shadow: 0 0 0 2px #ffe082;
     }
   </style>
+  <link rel="stylesheet" href="/static/css/system_palette.css">
 </head>
 <body class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
   <div class="max-w-md w-full space-y-8">
     <div>
-      <img class="mx-auto h-32 w-auto" src="gleelogo.png" alt="Gleekids Logo">
-      <h2 class="mt-6 text-center text-2xl font-bold text-yellow-700">Applicant Portal Login</h2>
+      <img class="mx-auto h-32 w-auto" src="/media/gleelogo.png" alt="Gleekids Logo">
+      <h2 class="mt-6 text-center text-2xl font-bold text-yellow-700">Applicant Login</h2>
       <p class="mt-2 text-center text-sm text-yellow-900">Enter the email you used to apply and the password you created on the application form.</p>
     </div>
     <form class="mt-8 space-y-6 login-card p-8 rounded-lg" action="" method="POST" novalidate>
@@ -67,12 +68,14 @@
       <div>
         <button type="submit"
           class="login-btn group relative w-full flex justify-center py-2 px-4 text-sm font-medium rounded-md">
-          Sign in
+          Sign in to Applicant Portal
         </button>
       </div>
     </form>
     <div class="text-center text-sm text-yellow-900">
       <a href="/" class="login-link hover:underline">Back to homepage</a>
+      <span class="mx-2">|</span>
+      <a href="/admin-login/" class="login-link hover:underline">Admin login</a>
     </div>
   </div>
 </body>

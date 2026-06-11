@@ -6,6 +6,7 @@
   <title>Your Applicant Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     .progress-line {
       position: relative;
@@ -78,99 +79,252 @@
       color: #6b7280;
     }
   </style>
+  <link rel="stylesheet" href="/static/css/system_palette.css">
 </head>
 <style>
   :root {
-    --accent: #ffc122;
-    --ink: #1f2937;
-    --muted: #6b7280;
-    --panel: #ffffff;
-    --soft: #f5f7fb;
-    --line: #e5e7eb;
+    --accent: #8b6be8;
+    --accent-2: #ee79ae;
+    --success: #9ac96b;
+    --warning: #e5b73e;
+    --ink: #282064;
+    --muted: #737894;
+    --panel: rgba(255, 255, 255, 0.92);
+    --soft: #fbf8ff;
+    --line: #eadffb;
+    --violet-soft: #f3edff;
+    --pink-soft: #fff0f7;
+    --blue-soft: #eef6ff;
+    --gold-soft: #fff8d8;
+    --mint-soft: #edfffb;
   }
+
   body {
     min-height: 100vh;
-    background: var(--soft);
-    font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(circle at 41% 4%, rgba(139, 107, 232, 0.14) 0 12rem, transparent 12.2rem),
+      radial-gradient(circle at 95% 72%, rgba(238, 121, 174, 0.13) 0 10rem, transparent 10.2rem),
+      linear-gradient(135deg, #fffdfa 0%, var(--soft) 48%, #f7fbff 100%);
+    font-family: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
     color: var(--ink);
   }
+
   .page-shell {
     padding: 28px 32px 40px;
+    position: relative;
+    overflow: hidden;
   }
+
   .page-header {
-    display: flex;
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 420px) auto;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    gap: 24px;
     margin-bottom: 24px;
+    min-height: 178px;
   }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    left: 28%;
+    right: 31%;
+    bottom: -20px;
+    height: 145px;
+    border-radius: 55% 45% 0 0 / 78% 62% 0 0;
+    background: linear-gradient(135deg, rgba(139, 107, 232, 0.14), rgba(238, 121, 174, 0.1));
+    z-index: 0;
+  }
+
+  .identity-block,
+  .portal-hero-art,
+  .header-actions {
+    position: relative;
+    z-index: 1;
+  }
+
   .identity-block h1 {
-    font-size: 28px;
-    font-weight: 700;
+    font-family: 'Baloo 2', 'Nunito', sans-serif;
+    font-size: clamp(34px, 4vw, 50px);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: 0;
+    color: var(--ink);
   }
+
+  .identity-block h1 .name-highlight {
+    display: block;
+    color: var(--accent-2);
+  }
+
   .identity-meta {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 14px;
-    margin-top: 6px;
+    margin-top: 18px;
     color: var(--muted);
     font-size: 14px;
+    font-weight: 800;
   }
+
   .pill {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #fff7df;
-    color: #8a5b00;
-    padding: 8px 12px;
+    background: var(--gold-soft);
+    color: #8f6d12;
+    padding: 10px 16px;
     border-radius: 9999px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 900;
+    box-shadow: 0 8px 20px rgba(229, 183, 62, 0.14);
   }
+
+  .portal-hero-art {
+    min-height: 160px;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+  }
+
+  .portal-hero-art::before {
+    content: '';
+    position: absolute;
+    width: 230px;
+    height: 128px;
+    bottom: 0;
+    border-radius: 48% 52% 0 0;
+    background: linear-gradient(135deg, rgba(139, 107, 232, 0.2), rgba(238, 121, 174, 0.1));
+  }
+
+  .portal-hero-art img {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 999px;
+    border: 7px solid rgba(255, 255, 255, 0.86);
+    box-shadow: 0 18px 38px rgba(40, 32, 100, 0.12);
+  }
+
+  .hero-chat {
+    position: absolute;
+    top: 10px;
+    right: 56px;
+    width: 62px;
+    height: 48px;
+    border-radius: 16px 16px 16px 4px;
+    background: linear-gradient(135deg, #f4a6c9, #de76aa);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 26px;
+    box-shadow: 0 14px 24px rgba(238, 121, 174, 0.22);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    color: var(--ink);
+    font-weight: 900;
+    font-size: 14px;
+  }
+
+  .last-login {
+    color: var(--ink);
+    line-height: 1.35;
+  }
+
+  .last-login span {
+    display: block;
+    color: var(--muted);
+    font-weight: 800;
+  }
+
   .logout-btn {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background: #f3f4f6;
-    color: var(--ink);
-    padding: 10px 16px;
-    border-radius: 12px;
-    font-weight: 600;
-    border: 1px solid var(--line);
+    background: var(--pink-soft);
+    color: #bf4f88;
+    padding: 14px 24px;
+    border-radius: 16px;
+    font-weight: 900;
+    border: 2px solid #f1bfd7;
     transition: all 0.2s ease;
+    box-shadow: 0 12px 24px rgba(238, 121, 174, 0.12);
   }
-  .logout-btn:hover { background: #e5e7eb; }
+
+  .logout-btn:hover {
+    background: #ffe4f0;
+    transform: translateY(-1px);
+  }
+
   .layout {
     display: grid;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 360px 1fr;
     gap: 20px;
     align-items: start;
   }
+
   .pane {
     background: var(--panel);
-    border-radius: 18px;
+    border-radius: 22px;
     padding: 18px 20px;
     border: 1px solid var(--line);
-    box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+    box-shadow: 0 18px 48px rgba(40, 32, 100, 0.08);
+    backdrop-filter: blur(10px);
   }
-  .pane h2 { font-weight: 700; font-size: 18px; }
+
+  .pane h2 {
+    font-family: 'Baloo 2', 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: 0;
+  }
+
   .status-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 18px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: linear-gradient(135deg, rgba(255,193,34,0.16), #fff);
+    padding: 22px;
+    border: 1px solid #f2df9f;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(255, 248, 216, 0.9), #fff);
+    min-height: 148px;
   }
+
+  .status-card .value-lg {
+    font-family: 'Baloo 2', 'Nunito', sans-serif;
+    color: var(--ink);
+    font-size: 31px;
+    line-height: 1;
+  }
+
+  .status-art {
+    width: 84px;
+    height: 84px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: rgba(139, 107, 232, 0.14);
+    color: var(--accent);
+    font-size: 42px;
+  }
+
   .meeting-card {
     margin-top: 14px;
     padding: 16px 18px;
-    border-radius: 14px;
-    border: 1px dashed #f59e0b33;
-    background: #fffaf1;
+    border-radius: 16px;
+    border: 1px dashed rgba(139, 107, 232, 0.28);
+    background: var(--violet-soft);
   }
+
   .progress-wrap { margin-top: 6px; }
+
   .progress-steps {
     display: flex;
     align-items: center;
@@ -179,7 +333,7 @@
     flex-wrap: nowrap;
   }
   .progress-line {
-    height: 3px;
+    height: 4px;
     background: var(--line);
     flex: 1 1 80px;
     min-width: 48px;
@@ -193,7 +347,7 @@
     left: 0;
     height: 100%;
     width: 100%;
-    background: var(--accent);
+    background: linear-gradient(90deg, var(--success), var(--accent), var(--warning));
     transform-origin: left;
     transform: scaleX(0);
     transition: transform 0.3s ease;
@@ -218,10 +372,12 @@
   }
   .step-label { max-width: 120px; line-height: 1.25; word-break: break-word; }
   .step-circle.completed { background: #111827; color: #fff; border-color: #111827; }
-  .step-circle.active { background: var(--accent); color: #000; border-color: #e3ac12; }
+  .step-circle.completed { background: var(--success); color: #fff; border-color: var(--success); }
+  .step-circle.active { background: var(--warning); color: var(--ink); border-color: #e1c047; }
   .step-label { margin-top: 8px; font-size: 13px; color: var(--muted); text-align: center; }
-  .step-label.completed { color: #111827; }
-  .step-label.active { color: #8a5b00; font-weight: 600; }
+  .step-label.completed { color: var(--ink); }
+  .step-label.active { color: var(--ink); font-weight: 900; }
+
   .progress-bar {
     margin-top: 18px;
     height: 8px;
@@ -231,9 +387,10 @@
   }
   .progress-bar > div {
     height: 100%;
-    background: linear-gradient(90deg, #111827, var(--accent));
+    background: linear-gradient(90deg, var(--success), var(--accent), var(--warning));
     transition: width 0.3s ease;
   }
+
   .list-tile {
     border: 1px solid var(--line);
     border-radius: 12px;
@@ -246,13 +403,16 @@
   }
   .list-tile small { color: var(--muted); }
   .card-grid { display: grid; gap: 14px; }
+
   .card-block {
     border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 14px;
-    background: #fff;
+    border-radius: 18px;
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.88);
     height: 100%;
+    box-shadow: 0 10px 26px rgba(40, 32, 100, 0.04);
   }
+
   .panel-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -261,23 +421,26 @@
   }
   .label-sm { font-size: 12px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
   .value-lg { font-size: 20px; font-weight: 700; }
+
   .doc-link, .action-btn, .ghost-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    border-radius: 12px;
-    font-weight: 700;
+    border-radius: 14px;
+    font-weight: 900;
     padding: 12px 16px;
     transition: all 0.2s ease;
     text-align: center;
   }
-  .action-btn { background: #111827; color: #fff; border: 1px solid #111827; }
-  .action-btn:hover { background: #0b1324; }
-  .ghost-btn { background: #fff7df; color: #8a5b00; border: 1px solid #f6d67a; }
-  .ghost-btn:hover { background: #ffe9b3; }
-  .support-btn { background: var(--accent); color: #111827; border: 1px solid #e3ac12; }
-  .support-btn:hover { background: #ffd35a; }
+
+  .action-btn { background: var(--accent); color: #fff; border: 1px solid var(--accent); }
+  .action-btn:hover { background: #7655d9; }
+  .ghost-btn { background: #fff; color: var(--accent); border: 2px solid #d8c9fa; }
+  .ghost-btn:hover { background: var(--violet-soft); }
+  .support-btn { background: var(--accent-2); color: #fff; border: 1px solid var(--accent-2); }
+  .support-btn:hover { background: #d8669d; }
+
   .notes-box {
     border: 1px solid var(--line);
     border-radius: 14px;
@@ -300,22 +463,173 @@
     font-size: 13px;
     text-align: center;
   }
+
+  .portal-alert {
+    background: var(--violet-soft);
+    border: 1px solid #dfd2fb;
+    color: var(--accent);
+  }
+
+  .portal-meeting {
+    background: linear-gradient(135deg, #fff, var(--blue-soft));
+    border: 1px solid #dce8fb;
+  }
+
+  .evaluation-card {
+    border-color: #f0dc9c !important;
+    background: linear-gradient(135deg, #fff, var(--gold-soft)) !important;
+    min-height: 150px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .evaluation-card::after {
+    content: '\f46d';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 42px;
+    bottom: -18px;
+    width: 96px;
+    height: 96px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: rgba(238, 121, 174, 0.14);
+    color: var(--ink);
+    font-size: 52px;
+    opacity: 0.85;
+  }
+
+  .documents-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .document-card {
+    min-height: 224px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .document-card .doc-preview {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    min-height: 98px;
+    color: var(--muted);
+  }
+
+  .document-card .doc-preview i {
+    font-size: 48px;
+    color: color-mix(in srgb, var(--accent) 70%, white);
+  }
+
+  .submitted-documents .panel-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .submitted-documents .doc-link {
+    color: var(--accent);
+  }
+
+  .submitted-documents .doc-link:hover {
+    color: var(--accent-2);
+  }
+
+  .submitted-documents video {
+    max-height: 180px;
+    object-fit: cover;
+    background: var(--violet-soft);
+  }
+
+  .submitted-documents .checklist-card span {
+    color: var(--ink);
+  }
+
+  .submitted-documents .checklist-card .fas,
+  .submitted-documents .checklist-card .far {
+    width: 18px;
+    text-align: center;
+  }
+
+  .submitted-documents .checklist-card .fa-check-circle {
+    color: var(--success);
+  }
+
+  .submitted-documents .checklist-card .fa-times-circle,
+  .submitted-documents .checklist-card .fa-circle {
+    color: var(--accent-2);
+  }
+
+  @media (max-width: 1280px) {
+    .submitted-documents .panel-grid {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+  }
+
+  .checklist-card {
+    background: linear-gradient(135deg, #fff, var(--gold-soft));
+    border: 1px solid #f0dc9c;
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  .checklist-card .fa-check-circle {
+    color: var(--success);
+  }
+
+  .journey-dot {
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(139, 107, 232, 0.14);
+  }
+
   @media (max-width: 1100px) {
     .layout { grid-template-columns: 1fr; }
+    .page-header {
+      grid-template-columns: 1fr;
+    }
+    .portal-hero-art {
+      order: -1;
+    }
+    .header-actions {
+      justify-content: space-between;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .page-shell { padding: 18px 14px 28px; }
+    .layout { gap: 14px; }
+    .progress-steps {
+      overflow-x: auto;
+      justify-content: flex-start;
+      padding-bottom: 8px;
+    }
+    .documents-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 <body>
   <div class="page-shell">
     <header class="page-header">
       <div class="identity-block">
-        <h1>Welcome, {{ app.first_name }} {{ app.last_name }}</h1>
+        <h1>Welcome back,<span class="name-highlight">{{ app.first_name }} {{ app.last_name }}! <i class="fas fa-hand-paper" style="color: var(--warning); font-size: 0.72em;"></i></span></h1>
         <div class="identity-meta">
           <span class="pill">Application ID: {{ app.applicant_id|stringformat:"s"|slice:":8" }}...</span>
-          <span class="identity-item"><i class="fas fa-map-marker-alt mr-2 text-yellow-500"></i>Applicant Portal</span>
+          <span class="identity-item"><i class="fas fa-map-marker-alt mr-2" style="color: var(--accent);"></i>Applicant Portal</span>
         </div>
       </div>
-      <div class="flex items-center gap-3 text-sm text-gray-600">
-        <span>Last login: </span>
+      <div class="portal-hero-art" aria-hidden="true">
+        <img src="joy.jpg" alt="">
+        <span class="hero-chat"><i class="fas fa-ellipsis-h"></i></span>
+      </div>
+      <div class="header-actions">
+        <div class="last-login">
+          <span>Last login:</span>
+          {{ app.updated_at|date:"M d, Y" }} - {{ app.updated_at|date:"h:i A" }}
+        </div>
         <a href="/logout/" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
       </div>
     </header>
@@ -328,9 +642,25 @@
             <p class="label-sm">Current Status</p>
             <p class="value-lg">{{ app.status }}</p>
           </div>
-          <div class="text-right">
-            <p class="label-sm">Application Date</p>
-            <p class="font-semibold">{{ app.created_at|date:"M d, Y" }}</p>
+          <div class="status-art">
+            <i class="fas fa-clipboard-check"></i>
+          </div>
+        </div>
+
+        <div class="card-block mt-3">
+          <p class="label-sm">Application Date</p>
+          <p class="font-extrabold mt-2"><i class="far fa-calendar-alt mr-3" style="color: var(--ink);"></i>{{ app.created_at|date:"M d, Y" }}</p>
+        </div>
+
+        <div class="card-block mt-3">
+          <div class="flex items-center gap-4">
+            <div class="status-art" style="width: 74px; height: 74px; font-size: 34px; background: var(--mint-soft); color: var(--success);">
+              <i class="far fa-calendar-check"></i>
+            </div>
+            <div>
+              <p class="label-sm">Next Step</p>
+              <p class="font-extrabold text-sm leading-relaxed mt-1">{{ next_step_text }}</p>
+            </div>
           </div>
         </div>
 
@@ -424,7 +754,7 @@
           <div class="relative space-y-4 after:absolute after:left-[7px] after:top-2 after:h-[calc(100%-12px)] after:w-0.5 after:bg-gray-100">
             {% for event in history %}
             <div class="relative pl-6">
-              <span class="absolute left-0 top-1.5 h-2 w-2 rounded-full bg-amber-500 z-10"></span>
+              <span class="journey-dot absolute left-0 top-1.5 h-2 w-2 rounded-full z-10"></span>
               <div class="flex flex-col">
                 <p class="text-xs font-bold text-gray-900">{{ event.status }}</p>
                 <p class="text-[10px] text-gray-500">{{ event.created_at|date:"M d, Y @ h:i A" }}</p>
@@ -448,19 +778,20 @@
 
       <main class="pane">
           <div class="card-block mb-6">
-            <h2 class="mb-3 text-lg font-bold text-gray-900">Next Steps</h2>
-            <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-900 text-sm">
+            <h2 class="mb-3">Next Up</h2>
+            <div class="portal-alert p-4 rounded-xl text-sm font-extrabold">
               <i class="fas fa-info-circle mr-2"></i> {{ next_step_text }}
             </div>
             
             {% if latest_schedule %}
-            <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-              <h3 class="text-sm font-bold text-blue-900 mb-2">Upcoming Meeting</h3>
+            <div class="portal-meeting mt-4 p-4 rounded-xl">
+              <h3 class="text-sm font-extrabold mb-2" style="color: var(--ink);">Upcoming Meeting</h3>
               <div class="flex items-center justify-between text-sm">
-                <div class="text-blue-800">
+                <div class="font-extrabold" style="color: var(--ink);">
                   <i class="far fa-calendar-alt mr-2"></i> {{ latest_schedule.scheduled_at|date:"F d, Y @ h:i A" }}
                 </div>
-                <a href="{{ zoomCloneUrl|default:'http://127.0.0.1:3000/' }}{{ latest_schedule.schedule_id }}?role=applicant" target="_blank" rel="noopener" class="bg-blue-600 text-white px-4 py-1 rounded-lg font-bold hover:bg-blue-700 transition">
+                <a href="{{ zoomCloneUrl|default:'http://127.0.0.1:3000/' }}{{ latest_schedule.schedule_id }}?role=applicant" target="_blank" rel="noopener" class="action-btn px-4 py-2">
+                  <i class="fas fa-video"></i>
                   Join Room
                 </a>
               </div>
@@ -468,7 +799,7 @@
             {% endif %}
           </div>
         <div class="card-grid">
-          <div class="card-block">
+          <div class="card-block evaluation-card">
             <h2 class="mb-3">Application Progress</h2>
             <div class="progress-steps">
                 {% for stage in stages %}
@@ -501,13 +832,13 @@
               <div class="panel-grid">
                 {% if demoEval %}
                   
-                  <div class="card-block" style="border-color: #e3ac12; background: #fffaf1;">
+                  <div class="card-block" style="border-color: transparent; background: transparent; box-shadow: none; padding: 0;">
                     <div class="flex items-center justify-between">
                       <div>
                         <p class="label-sm">Demo Evaluation</p>
-                        <h3 class="text-lg font-semibold">Teaching Demo</h3>
+                        <h3 class="text-lg font-extrabold">Teaching Demo</h3>
                       </div>
-                      <span class="text-lg font-bold text-amber-700">
+                      <span class="text-2xl font-extrabold" style="color: var(--accent);">
                         {{ demoScore }}
                       </span>
                     </div>
@@ -526,13 +857,13 @@
 
                 {% if clientEval %}
                   
-                  <div class="card-block" style="border-color: #cdd5ff; background: #f8f9ff;">
+                  <div class="card-block" style="border-color: #d8c9fa; background: rgba(255,255,255,0.7);">
                     <div class="flex items-center justify-between">
                       <div>
                         <p class="label-sm">Client Endorsement</p>
-                        <h3 class="text-lg font-semibold">Client Presentation</h3>
+                        <h3 class="text-lg font-extrabold">Client Presentation</h3>
                       </div>
-                      <span class="text-lg font-bold text-indigo-700">
+                      <span class="text-lg font-extrabold" style="color: var(--accent);">
                         {{ clientScore }}
                       </span>
                     </div>
@@ -550,53 +881,55 @@
                 {% endif %}
               </div>
             {% else %}
-              <div class="card-block" style="background:#f9fafb;">
+              <div class="card-block" style="background: rgba(255,255,255,0.7);">
                 You'll see summarized scores here as soon as evaluations are completed.
               </div>
             {% endif %}
           </div>
 
-          <div class="card-block">
+          <div class="card-block submitted-documents">
             <h2 class="mb-3">Your Submitted Documents</h2>
             
             <div class="panel-grid">
-              <div class="card-block" style="border-color: var(--line);">
+              <div class="card-block document-card" style="border-color: var(--line);">
                 <div class="flex items-center justify-between mb-2">
                   <div>
                     <p class="label-sm">Resume/CV</p>
-                    <p class="font-semibold">PDF Document</p>
+                    <p class="font-extrabold">PDF Document</p>
                   </div>
                   <i class="fas fa-file-pdf text-red-500 text-xl"></i>
                 </div>
                 {% if app %}
                   
-                  <a href="{{ resume }}" target="_blank" rel="noopener" class="doc-link text-amber-700 hover:underline">View Document</a>
+                  <div class="doc-preview"><i class="fas fa-file-pdf"></i></div>
+                  <a href="{{ resume }}" target="_blank" rel="noopener" class="doc-link"><i class="fas fa-eye"></i> View Document</a>
                 {% else %}
                   <p class="text-sm text-gray-500 italic">No resume uploaded</p>
                 {% endif %}
               </div>
 
-              <div class="card-block" style="border-color: var(--line);">
+              <div class="card-block document-card" style="border-color: var(--line);">
                 <div class="flex items-center justify-between mb-2">
                   <div>
                     <p class="label-sm">Certificate / TEFL</p>
-                    <p class="font-semibold">PDF or Image</p>
+                    <p class="font-extrabold">PDF or Image</p>
                   </div>
-                  <i class="fas fa-certificate text-amber-500 text-xl"></i>
+                  <i class="fas fa-certificate text-xl" style="color: var(--accent);"></i>
                 </div>
                 
                 {% if cert %}
-                  <a href="{{ cert }}" target="_blank" rel="noopener" class="doc-link text-amber-700 hover:underline">View Certificate</a>
+                  <div class="doc-preview"><i class="fas fa-file-alt"></i></div>
+                  <a href="{{ cert }}" target="_blank" rel="noopener" class="doc-link"><i class="fas fa-eye"></i> View Certificate</a>
                 {% else %}
                   <p class="text-sm text-gray-500 italic">No certificate uploaded</p>
                 {% endif %}
               </div>
 
-              <div class="card-block" style="border-color: var(--line);">
+              <div class="card-block document-card" style="border-color: var(--line);">
                 <div class="flex items-center justify-between mb-2">
                   <div>
                     <p class="label-sm">Video Introduction</p>
-                    <p class="font-semibold">Video File</p>
+                    <p class="font-extrabold">Video File</p>
                   </div>
                   <i class="fas fa-video text-indigo-500 text-xl"></i>
                 </div>
@@ -609,16 +942,31 @@
               </div>
             </div>
 
-            <div class="mt-4 border border-dashed border-gray-300 rounded-lg p-3 bg-[#fdfbf5]">
-              <p class="label-sm">Checklist requirements</p>
-              <div class="mt-2 space-y-1 text-sm text-gray-700">
-                <div class="flex items-center gap-2">
+            <div class="checklist-card mt-4">
+              <div class="flex items-center justify-between gap-3">
+                <h2>Checklist Requirements</h2>
+                <i class="fas fa-search text-3xl" style="color: var(--accent);"></i>
+              </div>
+              <div class="mt-4 space-y-4 text-sm text-gray-700">
+                <div class="flex items-center gap-3 border-b border-dashed pb-3" style="border-color: var(--line);">
                   <i class="fas {{ hasCertDoc }}"></i>
-                  <span>Certificate / TEFL — PDF or Image</span>
+                  <span class="font-extrabold">Certificate / TEFL - PDF or Image</span>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-3 border-b border-dashed pb-3" style="border-color: var(--line);">
                   <i class="fas {{ hasResumeDoc }}"></i>
-                  <span>Resume/CV — PDF Document</span>
+                  <span class="font-extrabold">Resume/CV - PDF Document</span>
+                </div>
+                <div class="flex items-center gap-3 border-b border-dashed pb-3" style="border-color: var(--line);">
+                  <i class="fas fa-check-circle"></i>
+                  <span class="font-extrabold">Video Introduction - MP4 File</span>
+                </div>
+                <div class="flex items-center gap-3 border-b border-dashed pb-3" style="border-color: var(--line);">
+                  <i class="far fa-circle" style="color: var(--accent-2);"></i>
+                  <span class="font-extrabold">Stable Internet Connection</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <i class="far fa-circle" style="color: var(--accent-2);"></i>
+                  <span class="font-extrabold">Valid ID</span>
                 </div>
               </div>
             </div>

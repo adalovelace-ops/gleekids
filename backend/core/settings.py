@@ -32,21 +32,15 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-v2rh!=93in+3ms8w5c$$7x-m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=True)
 
-RENDER_EXTERNAL_HOSTNAME = env('RENDER_EXTERNAL_HOSTNAME', default='')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
-if RENDER_EXTERNAL_HOSTNAME:
-    CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
-
-if not DEBUG:
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = env.int('SECURE_HSTS_SECONDS', default=31536000)
+CSRF_TRUSTED_ORIGINS = env.list(
+    'CSRF_TRUSTED_ORIGINS',
+    default=[
+        'http://localhost:8000',
+        'http://127.0.0.1:8000',
+    ],
+)
 
 
 # Application definition
@@ -64,7 +58,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -104,30 +97,20 @@ CHANNEL_LAYERS = {
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-#
-# Supabase/PostgreSQL is the only supported database for this project. You can
-# either set DATABASE_URL to the full Supabase URI, or keep the DB_* values in
-# backend/.env.
-database_url = env('DATABASE_URL', default=None)
 
-if database_url:
-    DATABASES = {'default': env.db('DATABASE_URL')}
-    DATABASES['default'].setdefault('OPTIONS', {})
-    DATABASES['default']['OPTIONS'].setdefault('sslmode', 'require')
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': env('DB_NAME', default='postgres'),
-            'USER': env('DB_USER'),
-            'PASSWORD': env('DB_PASSWORD'),
-            'HOST': env('DB_HOST'),
-            'PORT': env('DB_PORT', default='6543'),
-            'OPTIONS': {
-                'sslmode': 'require',
-            },
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DB_NAME', default='postgres'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT', default='6543'),
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
+}
 
 
 # Password validation
@@ -168,8 +151,6 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = Path(env('MEDIA_ROOT', default=str(BASE_DIR)))

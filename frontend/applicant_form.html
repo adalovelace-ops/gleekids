@@ -5,55 +5,177 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Apply to Teach – Gleekids</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
     <style>
+        :root {
+            --gk-blue: #2c2a78;
+            --gk-blue-soft: #eef1ff;
+            --gk-blue-line: #d9def2;
+            --gk-pink: #f48bc1;
+            --gk-pink-soft: #fff0f8;
+            --gk-violet: #7d6bd6;
+            --gk-ink: #27265f;
+            --gk-muted: #737894;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
-            background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.75), rgba(88, 28, 135, 0.65)), url('gleebg.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            font-family: 'Nunito', sans-serif;
+            background:
+                radial-gradient(circle at 78% 3%, rgba(244, 139, 193, 0.34) 0 11rem, transparent 11.2rem),
+                radial-gradient(circle at 2% 22%, rgba(125, 107, 214, 0.18) 0 12rem, transparent 12.2rem),
+                linear-gradient(135deg, #fffdfa 0%, #f7f8ff 48%, #fff1f8 100%);
             min-height: 100vh;
-            color: #0f172a;
+            color: var(--gk-ink);
         }
 
-        .glass-shell {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            box-shadow: 0 35px 120px rgba(15, 23, 42, 0.45);
+        h1,
+        h2,
+        .brand-wordmark {
+            font-family: 'Baloo 2', cursive;
+            letter-spacing: 0;
         }
 
-        .glass-surface {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(16px);
-        }
-
-        .brand-panel {
+        .application-shell {
             position: relative;
-            background: linear-gradient(160deg, rgba(11, 16, 27, 0.92), rgba(30, 41, 59, 0.92));
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid rgba(217, 222, 242, 0.8);
+            border-radius: 1.25rem;
+            box-shadow: 0 28px 70px rgba(44, 42, 120, 0.13);
             overflow: hidden;
         }
 
-        .brand-panel::before {
+        .application-shell::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: url('gleebg.jpg') center/cover;
-            opacity: 0.35;
-            mix-blend-mode: screen;
+            pointer-events: none;
+            background-image: radial-gradient(var(--gk-pink) 1px, transparent 1px);
+            background-size: 16px 16px;
+            background-position: right 1rem top 1rem;
+            opacity: 0.14;
         }
 
-        .brand-panel > * {
+        .application-hero {
             position: relative;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 22rem;
+            gap: 2rem;
+            min-height: 15rem;
+            padding: 2.25rem 2.75rem 1.25rem;
+            align-items: center;
+        }
+
+        .application-title {
+            color: var(--gk-blue);
+            font-size: clamp(2.65rem, 5vw, 4rem);
+            line-height: 0.95;
+            font-weight: 800;
+        }
+
+        .application-subtitle {
+            color: var(--gk-pink);
+            font-size: clamp(1.45rem, 2vw, 1.9rem);
+            font-weight: 900;
+            margin-top: 0.75rem;
+        }
+
+        .application-copy {
+            color: var(--gk-muted);
+            max-width: 28rem;
+            margin-top: 0.8rem;
+            font-weight: 700;
+            line-height: 1.6;
+        }
+
+        .hero-illustration {
+            position: relative;
+            min-height: 13rem;
+            display: flex;
+            justify-content: center;
+            align-items: end;
+        }
+
+        .hero-blob {
+            position: absolute;
+            width: 18rem;
+            height: 12rem;
+            right: 1rem;
+            bottom: 0;
+            border-radius: 48% 52% 0 0 / 58% 60% 0 0;
+            background: linear-gradient(135deg, rgba(244, 139, 193, 0.34), rgba(125, 107, 214, 0.28));
+        }
+
+        .hero-person {
+            position: relative;
+            width: 8.8rem;
+            height: 8.8rem;
+            border-radius: 999px;
+            overflow: hidden;
+            border: 0.45rem solid rgba(255, 255, 255, 0.86);
+            box-shadow: 0 18px 36px rgba(44, 42, 120, 0.16);
+        }
+
+        .hero-person img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-person-one {
+            transform: translate(1.2rem, -0.8rem);
+            z-index: 2;
+        }
+
+        .hero-person-two {
+            transform: translate(-1.2rem, 0.4rem);
             z-index: 1;
+        }
+
+        .hero-badge {
+            position: absolute;
+            right: 1.5rem;
+            bottom: 1.2rem;
+            z-index: 3;
+            border-radius: 1.15rem;
+            background: var(--gk-blue);
+            color: #fff;
+            padding: 0.55rem 0.85rem;
+            font-size: 1.35rem;
+            font-weight: 900;
+            box-shadow: 0 16px 28px rgba(44, 42, 120, 0.22);
+        }
+
+        .spark {
+            position: absolute;
+            color: var(--gk-pink);
+            font-size: 1.7rem;
+            font-weight: 900;
+        }
+
+        .spark-one {
+            right: 18.5rem;
+            top: 2rem;
+            color: var(--gk-violet);
+        }
+
+        .spark-two {
+            right: 2.2rem;
+            top: 1rem;
+        }
+
+        #registerForm label {
+            color: var(--gk-blue);
+            font-weight: 800;
         }
 
         #registerForm input,
         #registerForm select {
-            background-color: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(15, 23, 42, 0.15);
-            border-radius: 0.85rem;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            background-color: #fff;
+            border: 1px solid var(--gk-blue-line);
+            border-radius: 0.9rem;
+            box-shadow: inset 0 1px 0 rgba(44, 42, 120, 0.02);
+            color: var(--gk-ink);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
         }
 
         #registerForm input:not([type="file"]),
@@ -63,115 +185,151 @@
 
         #registerForm input:focus,
         #registerForm select:focus {
-            border-color: rgb(251, 191, 36);
-            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.35);
+            border-color: var(--gk-pink);
+            box-shadow: 0 0 0 4px rgba(244, 139, 193, 0.18), 0 10px 24px rgba(44, 42, 120, 0.08);
             outline: none;
+            transform: translateY(-1px);
         }
 
         #registerForm input::placeholder {
-            color: #94a3b8;
+            color: #9aa7b7;
         }
 
         #registerForm input[type="file"] {
-            padding: 0.65rem;
+            padding: 0.55rem;
             cursor: pointer;
         }
+
+        #registerForm input[type="file"]::file-selector-button {
+            border: 0;
+            border-radius: 0.65rem;
+            background: var(--gk-pink-soft);
+            color: var(--gk-blue);
+            font-weight: 900;
+            margin-right: 1rem;
+            padding: 0.65rem 1.05rem;
+        }
+
+        .landing-cta {
+            background: linear-gradient(135deg, var(--gk-pink) 0%, var(--gk-violet) 48%, var(--gk-blue) 100%);
+            color: #fff;
+            box-shadow: 0 16px 34px rgba(125, 107, 214, 0.25);
+        }
+
+        .landing-cta:hover {
+            box-shadow: 0 20px 44px rgba(244, 139, 193, 0.34);
+        }
+
+        .form-note {
+            color: var(--gk-muted);
+            font-weight: 700;
+        }
+
+        .form-card {
+            position: relative;
+            margin: 0 1.25rem 1.25rem;
+            background: #fff;
+            border: 1px solid rgba(217, 222, 242, 0.88);
+            border-radius: 1.15rem;
+            box-shadow: 0 20px 45px rgba(44, 42, 120, 0.08);
+            padding: clamp(1.5rem, 3vw, 3rem);
+        }
+
+        @media (max-width: 900px) {
+            .application-hero {
+                grid-template-columns: 1fr;
+                padding: 2rem 1.5rem 1rem;
+            }
+
+            .hero-illustration {
+                min-height: 10.5rem;
+            }
+
+            .form-card {
+                margin: 0 0.75rem 0.75rem;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .hero-person {
+                width: 7.2rem;
+                height: 7.2rem;
+            }
+
+            .hero-blob {
+                width: 15rem;
+            }
+        }
     </style>
+  <link rel="stylesheet" href="/static/css/system_palette.css">
 </head>
-<body class="relative min-h-screen overflow-y-auto">
-    <div class="absolute inset-0 bg-slate-900/60"></div>
-    <div class="relative z-10 flex flex-col min-h-screen">
-        <header class="bg-white/80 backdrop-blur-md border-b border-white/30">
-            <div class="container mx-auto px-6 py-4 flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <img src="gleelogo.png" alt="Gleekids" class="w-12 h-12 rounded-full border border-slate-200" />
-                    <div>
-                        <span class="text-xl font-semibold text-slate-900 block">Gleekids</span>
-                        <p class="text-xs uppercase tracking-[0.35em] text-slate-500">Play. Learn. Grow.</p>
-                    </div>
-                </div>
-                <a href="/" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition">&larr; Back to Home</a>
-            </div>
-        </header>
-
-        <main class="container mx-auto px-4 py-10 flex-1 flex items-start md:items-center">
-            <div class="w-full max-w-5xl grid md:grid-cols-5 rounded-3xl overflow-hidden glass-shell">
-                <div class="brand-panel md:col-span-2 p-8 md:p-10 flex flex-col gap-6 text-white">
-                    <div class="flex items-center space-x-4">
-                        <img src="gleelogo.png" alt="Gleekids" class="w-16 h-16 rounded-full border-2 border-white/70" />
-                        <div>
-                            <p class="text-xs uppercase tracking-[0.4em] text-yellow-100/80">Gleekids</p>
-                            <h2 class="text-3xl font-semibold">Create joyful classrooms.</h2>
-                        </div>
-                    </div>
-                    <p class="text-sm text-slate-100/85 leading-relaxed">
-                        Join a global team of playful educators guiding young learners through story-driven, project-based experiences.
+<body class="min-h-screen overflow-y-auto">
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        <div class="application-shell max-w-6xl mx-auto">
+            <section class="application-hero">
+                <div>
+                    <h1 class="application-title">Start your application</h1>
+                    <h2 class="application-subtitle">Apply Online</h2>
+                    <p class="application-copy">
+                        Tell us who you are and upload the essentials for your ESL teaching profile.
                     </p>
-                    <ul class="space-y-3 text-sm text-slate-100/90">
-                        <li class="flex items-start space-x-3">
-                            <span class="text-yellow-300 text-lg">&bull;</span>
-                            <span>Live online lessons with curated Gleekids curriculum support.</span>
-                        </li>
-                        <li class="flex items-start space-x-3">
-                            <span class="text-yellow-300 text-lg">&bull;</span>
-                            <span>Flexible schedules and personalized coaching for every facilitator.</span>
-                        </li>
-                        <li class="flex items-start space-x-3">
-                            <span class="text-yellow-300 text-lg">&bull;</span>
-                            <span>Connect with a community of creatives making learning magical.</span>
-                        </li>
-                    </ul>
-                    <div class="mt-auto">
-                        <p class="text-xs uppercase tracking-[0.45em] text-yellow-100/80">Now accepting</p>
-                        <p class="text-2xl font-semibold">Teacher applications</p>
-                    </div>
                 </div>
-
-                <div class="glass-surface md:col-span-3 p-6 md:p-10">
-                    <div class="text-center mb-6">
-                        <p class="text-xs uppercase tracking-[0.4em] text-slate-400">Start today</p>
-                        <h1 class="text-3xl font-bold text-slate-900">Create Your Account</h1>
-                        <p class="text-slate-500 mt-2">Fill in your details to apply as a Gleekids teacher.</p>
+                <div class="hero-illustration" aria-hidden="true">
+                    <div class="hero-blob"></div>
+                    <span class="spark spark-one">+</span>
+                    <span class="spark spark-two">+</span>
+                    <div class="hero-person hero-person-one">
+                        <img src="joy.jpg" alt="" />
                     </div>
+                    <div class="hero-person hero-person-two">
+                        <img src="tes.jpg" alt="" />
+                    </div>
+                    <div class="hero-badge">esl</div>
+                </div>
+            </section>
+
+            <section class="form-card">
 
                     {% if success %}
                         <div class="text-center py-12 px-6">
-                            <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <div class="w-20 h-20 bg-pink-50 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
                             </div>
-                            <h2 class="text-3xl font-bold text-slate-900 mb-2">Application submitted</h2>
-                            <p class="text-slate-600 mb-8">Please check your email for your progress</p>
-                            <a href="/login/" class="inline-block bg-slate-900 text-white font-semibold px-8 py-3 rounded-full shadow-lg transition hover:bg-slate-800">
-                                Login to Portal
+                            <h2 class="text-4xl font-extrabold text-slate-900 mb-2">Application sent</h2>
+                            <p class="text-slate-600 mb-8 font-semibold">Your Gleekids profile is in. Check your email for the next hiring step.</p>
+                            <a href="/login/" class="inline-block landing-cta font-extrabold px-8 py-3 rounded-full transition hover:scale-[1.01]">
+                                Open Applicant Portal
                             </a>
                         </div>
                     {% else %}
-                        <form id="registerForm" action="" method="POST" enctype="multipart/form-data" class="space-y-4">
+                        <form id="registerForm" action="" method="POST" enctype="multipart/form-data" class="space-y-6">
                             {% csrf_token %}
                             <!-- Personal Info -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
                                 <div>
                                     <label for="first_name" class="block text-sm font-medium mb-1">First Name *</label>
-                                    <input type="text" id="first_name" name="first_name" placeholder="First Name" required pattern="[A-Za-z\s'-]+" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                    <input type="text" id="first_name" name="first_name" placeholder="First name" required pattern="[A-Za-z\s'-]+" value="" class="w-full px-4 py-2 border rounded-lg" />
                                 </div>
                                 <div>
                                     <label for="middle_name" class="block text-sm font-medium mb-1">Middle Name</label>
-                                    <input type="text" id="middle_name" name="middle_name" placeholder="Middle Name" pattern="[A-Za-z\s'-]*" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                    <input type="text" id="middle_name" name="middle_name" placeholder="Middle name" pattern="[A-Za-z\s'-]*" value="" class="w-full px-4 py-2 border rounded-lg" />
                                 </div>
                                 <div>
                                     <label for="last_name" class="block text-sm font-medium mb-1">Last Name *</label>
-                                    <input type="text" id="last_name" name="last_name" placeholder="Last Name" required pattern="[A-Za-z\s'-]+" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                    <input type="text" id="last_name" name="last_name" placeholder="Last name" required pattern="[A-Za-z\s'-]+" value="" class="w-full px-4 py-2 border rounded-lg" />
                                 </div>
                             </div>
-                            <div class="mb-4">
-                                <label for="email" class="block text-sm font-medium mb-1">Email *</label>
-                                <input type="email" id="email" name="email" placeholder="Email" required value="" class="w-full px-4 py-2 border rounded-lg" />
-                            </div>
-                            <div class="mb-4">
-                                <label for="phone" class="block text-sm font-medium mb-1">Phone (Optional)</label>
-                                <input type="text" id="phone" name="phone" placeholder="Phone" pattern="[0-9+\-()\s]*" value="" class="w-full px-4 py-2 border rounded-lg" />
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                <div>
+                                    <label for="email" class="block text-sm font-medium mb-1">Email *</label>
+                                    <input type="email" id="email" name="email" placeholder="Email address" required value="" class="w-full px-4 py-2 border rounded-lg" />
+                                </div>
+                                <div>
+                                    <label for="phone" class="block text-sm font-medium mb-1">Phone <span class="font-semibold text-slate-500">(Optional)</span></label>
+                                    <input type="text" id="phone" name="phone" placeholder="+1 (555) 123-4567" pattern="[0-9+\-()\s]*" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                                 <div>
@@ -191,9 +349,9 @@
                             </div>
                             <div class="mb-4">
                                 <label for="address" class="block text-sm font-medium mb-1">Street Address</label>
-                                <input type="text" id="address" name="address" placeholder="Street Address" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                <input type="text" id="address" name="address" placeholder="Street address" value="" class="w-full px-4 py-2 border rounded-lg" />
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
                                 <div>
                                     <label for="city" class="block text-sm font-medium mb-1">City</label>
                                     <input type="text" id="city" name="city" placeholder="City" value="" class="w-full px-4 py-2 border rounded-lg" />
@@ -206,52 +364,53 @@
                                     <label for="zip_code" class="block text-sm font-medium mb-1">ZIP Code</label>
                                     <input type="text" id="zip_code" name="zip_code" placeholder="ZIP Code" pattern="[0-9A-Za-z\- ]*" value="" class="w-full px-4 py-2 border rounded-lg" />
                                 </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="referral" class="block text-sm font-medium mb-1">Referral <span class="font-semibold text-slate-500">(Optional)</span></label>
+                                <input type="text" id="referral" name="referral" placeholder="Referral name" value="" class="w-full px-4 py-2 border rounded-lg" />
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                                 <div>
-                                    <label for="referral" class="block text-sm font-medium mb-1">Referral (Optional)</label>
-                                    <input type="text" id="referral" name="referral" placeholder="Referral" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                    <label for="password" class="block text-sm font-medium mb-1">Create Password *</label>
+                                    <div class="relative">
+                                        <input type="password" id="password" name="password" placeholder="Create Password" minlength="8" required class="w-full px-4 py-2 border rounded-lg pr-12" />
+                                        <button type="button" tabindex="-1" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-pink-500 focus:outline-none" onclick="togglePassword('password', this)">
+                                            <svg id="eye-password" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 3.866-3.582 7-8 7s-8-3.134-8-7 3.582-7 8-7 8 3.134 8 7z" /></svg>
+                                        </button>
+                                    </div>
+                                    <p class="form-note text-xs mt-1">Minimum 8 characters</p>
                                 </div>
-                            </div>
-                            <div class="mb-4">
-                                <label for="password" class="block text-sm font-medium mb-1">Create Password *</label>
-                                <div class="relative">
-                                    <input type="password" id="password" name="password" placeholder="Create Password" minlength="8" required class="w-full px-4 py-2 border rounded-lg pr-12" />
-                                    <button type="button" tabindex="-1" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-amber-500 focus:outline-none" onclick="togglePassword('password', this)">
-                                        <svg id="eye-password" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 3.866-3.582 7-8 7s-8-3.134-8-7 3.582-7 8-7 8 3.134 8 7z" /></svg>
-                                    </button>
+                                <div>
+                                    <label for="confirm_password" class="block text-sm font-medium mb-1">Confirm Password *</label>
+                                    <div class="relative">
+                                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required class="w-full px-4 py-2 border rounded-lg pr-12" />
+                                        <button type="button" tabindex="-1" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-pink-500 focus:outline-none" onclick="togglePassword('confirm_password', this)">
+                                            <svg id="eye-confirm_password" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 3.866-3.582 7-8 7s-8-3.134-8-7 3.582-7 8-7 8 3.134 8 7z" /></svg>
+                                        </button>
+                                    </div>
+                                    <p id="passwordMatch" class="text-xs text-red-600 mt-1 hidden">Passwords do not match</p>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
-                            </div>
-                            <div class="mb-4">
-                                <label for="confirm_password" class="block text-sm font-medium mb-1">Confirm Password *</label>
-                                <div class="relative">
-                                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required class="w-full px-4 py-2 border rounded-lg pr-12" />
-                                    <button type="button" tabindex="-1" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-amber-500 focus:outline-none" onclick="togglePassword('confirm_password', this)">
-                                        <svg id="eye-confirm_password" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 3.866-3.582 7-8 7s-8-3.134-8-7 3.582-7 8-7 8 3.134 8 7z" /></svg>
-                                    </button>
-                                </div>
-                                <p id="passwordMatch" class="text-xs text-red-600 mt-1 hidden">Passwords do not match</p>
                             </div>
                             <div class="mb-4">
                                 <label for="resume" class="block text-sm font-medium mb-1">Resume (PDF, max 5MB) *</label>
                                 <input type="file" id="resume" name="resume" accept=".pdf" required class="w-full px-4 py-2 border rounded-lg" />
-                                <p class="text-xs text-gray-500 mt-1">PDF only, max 5MB</p>
+                                <p class="form-note text-xs mt-1">PDF only, max 5MB</p>
                             </div>
                             <div class="mb-4">
                                 <label for="video" class="block text-sm font-medium mb-1">Video Introduction (MP4, max 100MB) *</label>
                                 <input type="file" id="video" name="video" accept=".mp4" required class="w-full px-4 py-2 border rounded-lg" />
-                                <p class="text-xs text-gray-500 mt-1">MP4 only, max 100MB</p>
+                                <p class="form-note text-xs mt-1">MP4 only, max 100MB</p>
                             </div>
                             <div class="text-center pt-6">
-                                <button type="submit" class="w-full bg-gradient-to-r from-yellow-300 via-yellow-400 to-amber-500 text-slate-900 font-semibold px-6 py-3 rounded-full shadow-lg shadow-yellow-500/30 transition hover:scale-[1.01]">
+                                <button type="submit" class="w-full landing-cta font-extrabold px-6 py-3 rounded-full transition hover:scale-[1.01]">
                                     Submit Application
                                 </button>
                             </div>
                         </form>
                     {% endif %}
-                </div>
-            </div>
-        </main>
-    </div>
+            </section>
+        </div>
+    </main>
 
     <script>
         function togglePassword(fieldId, btn) {

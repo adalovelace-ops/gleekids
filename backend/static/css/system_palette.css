@@ -1,0 +1,201 @@
+:root {
+  --esl-ink: #282064;
+  --esl-muted: #6d6896;
+  --esl-violet: #8b6be8;
+  --esl-violet-soft: #f3edff;
+  --esl-pink: #ee79ae;
+  --esl-pink-soft: #fff0f7;
+  --esl-mint: #6fc9b8;
+  --esl-mint-soft: #edfffb;
+  --esl-blue: #6ca2ef;
+  --esl-blue-soft: #eef6ff;
+  --esl-gold: #e5b73e;
+  --esl-line: #eadffb;
+  --esl-page: #fbf8ff;
+}
+
+html body {
+  color: var(--esl-ink);
+}
+
+body:not(.landing-page) {
+  background:
+    radial-gradient(circle at 92% 8%, rgba(238, 121, 174, 0.14) 0 10rem, transparent 10.2rem),
+    radial-gradient(circle at 4% 28%, rgba(108, 162, 239, 0.13) 0 12rem, transparent 12.2rem),
+    linear-gradient(135deg, #fffdfa 0%, var(--esl-page) 46%, #f7fbff 100%) !important;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--esl-ink);
+}
+
+a:not(aside a):not(.footer-link):not(.btn-primary):not(.btn-secondary):not(.gk-button) {
+  color: var(--esl-violet);
+}
+
+a:not(aside a):hover {
+  color: var(--esl-pink);
+}
+
+input,
+select,
+textarea {
+  border-color: var(--esl-line) !important;
+  color: var(--esl-ink);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--esl-pink) !important;
+  box-shadow: 0 0 0 3px rgba(238, 121, 174, 0.18) !important;
+  outline: none !important;
+}
+
+button[type="submit"]:not(.unstyled),
+.btn-brand,
+.login-btn,
+.btn-primary:not(.gk-button),
+.bg-amber-500,
+.bg-amber-600,
+.bg-yellow-500,
+.bg-yellow-600 {
+  background: linear-gradient(135deg, var(--esl-pink), var(--esl-violet)) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+button[type="submit"]:hover,
+.btn-brand:hover,
+.login-btn:hover,
+.bg-amber-500:hover,
+.bg-amber-600:hover,
+.hover\:bg-amber-600:hover,
+.hover\:bg-amber-700:hover,
+.hover\:bg-yellow-600:hover {
+  background: linear-gradient(135deg, #e967a4, #7655d9) !important;
+  color: #fff !important;
+}
+
+.text-amber-500,
+.text-amber-600,
+.text-amber-700,
+.text-amber-800,
+.text-amber-900,
+.text-yellow-500,
+.text-yellow-600,
+.text-yellow-700,
+.text-yellow-800,
+.text-yellow-900 {
+  color: var(--esl-violet) !important;
+}
+
+.bg-amber-50,
+.bg-yellow-50,
+.bg-yellow-100 {
+  background-color: var(--esl-violet-soft) !important;
+}
+
+.bg-amber-100,
+.bg-amber-200,
+.bg-yellow-200 {
+  background-color: var(--esl-pink-soft) !important;
+}
+
+.border-amber-50,
+.border-amber-100,
+.border-amber-200,
+.border-yellow-100,
+.border-yellow-200,
+.border-yellow-300 {
+  border-color: var(--esl-line) !important;
+}
+
+.focus\:ring-amber-100:focus,
+.focus\:ring-amber-200:focus,
+.focus\:ring-amber-300:focus,
+.focus\:ring-amber-400:focus,
+.focus\:ring-amber-500:focus,
+.focus\:ring-yellow-400:focus {
+  --tw-ring-color: rgba(238, 121, 174, 0.22) !important;
+}
+
+.focus\:border-amber-400:focus,
+.focus\:border-amber-500:focus,
+.focus\:border-yellow-400:focus {
+  border-color: var(--esl-pink) !important;
+}
+
+.rounded-lg,
+.rounded-xl,
+.rounded-2xl,
+.rounded-3xl {
+  border-color: var(--esl-line);
+}
+
+.shadow,
+.shadow-lg,
+.shadow-xl {
+  box-shadow: 0 18px 45px rgba(40, 32, 100, 0.08) !important;
+}
+
+table thead,
+thead.bg-amber-50 {
+  background: var(--esl-violet-soft) !important;
+  color: var(--esl-ink) !important;
+}
+
+tbody tr:hover,
+.hover\:bg-yellow-50\/60:hover,
+.hover\:bg-amber-50\/60:hover {
+  background-color: #fbf7ff !important;
+}
+
+.badge,
+.rounded-full.bg-amber-100,
+.rounded-full.bg-yellow-100,
+span.bg-amber-100,
+span.bg-yellow-100 {
+  background-color: var(--esl-pink-soft) !important;
+  color: var(--esl-violet) !important;
+  border-color: #f5c2da !important;
+}
+
+.login-card,
+.card-soft,
+section.bg-white,
+.bg-white,
+.bg-white\/90,
+.bg-white\/95 {
+  border-color: rgba(234, 223, 251, 0.9) !important;
+}
+
+aside .bg-yellow-500,
+aside .hover\:bg-yellow-50:hover,
+aside .bg-yellow-100,
+aside .text-yellow-800,
+aside .border-yellow-200 {
+  /* Sidebar colors are intentionally restored to their local template rules. */
+}
+
+aside .bg-yellow-500 {
+  background-color: #eab308 !important;
+}
+
+aside .hover\:bg-yellow-50:hover {
+  background-color: #fefce8 !important;
+}
+
+aside .bg-yellow-100 {
+  background-color: #fef9c3 !important;
+}
+
+aside .text-yellow-800 {
+  color: #854d0e !important;
+}
+
+aside .border-yellow-200 {
+  border-color: #fef08a !important;
+}
