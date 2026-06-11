@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: oop-ats
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: python manage.py migrate && daphne -b 0.0.0.0 -p $PORT core.asgi:application
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MEDIA_ROOT
+        value: /var/data
+      - key: DATABASE_URL
+        sync: false
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+    disks:
+      - name: uploads
+        mountPath: /var/data
+        sizeGB: 1
