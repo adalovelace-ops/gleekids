@@ -31,8 +31,11 @@
         <h1 class="text-3xl font-semibold text-gray-900">Applicant Profile</h1>
       </div>
       <div class="flex items-center gap-3">
-        <a href="{{ zoomCloneUrl|default:'http://127.0.0.1:3000/' }}{% if latest_schedule %}{{ latest_schedule.schedule_id }}{% else %}{{ app.applicant_id }}{% endif %}?role=admin" target="_blank" rel="noopener" class="btn-brand px-4 py-2 rounded-md text-sm font-bold">
-          Join Room
+        <a href="{{ app.demo_room_url }}" target="_blank" rel="noopener" class="btn-brand px-4 py-2 rounded-md text-sm font-bold">
+          Demo Room
+        </a>
+        <a href="{{ app.client_room_url }}" target="_blank" rel="noopener" class="btn-ghost bg-white px-4 py-2 rounded-md text-sm font-bold text-gray-700">
+          Client Room
         </a>
         <a href="/admin-dashboard/" class="btn-ghost px-3 py-2 rounded-md text-sm text-gray-700">← Back to Dashboard</a>
       </div>
@@ -46,12 +49,22 @@
           </div>
           <div>
             <h2 class="text-xl font-semibold text-gray-900">{{ app.first_name }} {{ app.last_name }}</h2>
-            <div class="mt-2 inline-flex items-center gap-2 pill px-3 py-1 rounded-full text-xs font-semibold">
-              <span class="inline-block w-2 h-2 rounded-full bg-amber-500"></span>
-              <span>Status: {{ app.status }}</span>
+              <div class="mt-2 inline-flex items-center gap-2 pill px-3 py-1 rounded-full text-xs font-semibold">
+                <span class="inline-block w-2 h-2 rounded-full bg-amber-500"></span>
+                <span>Status: {{ app.status }}</span>
+              </div>
+              <div class="mt-2 inline-flex items-center gap-2 rounded-full border border-pink-100 bg-pink-50 px-3 py-1 text-xs font-bold text-pink-700">
+                <span>Preferred demo:</span>
+                <span>
+                  {% if app.preferred_demo_time %}
+                    {{ app.preferred_demo_time|time:"g:i A" }}
+                  {% else %}
+                    Not selected
+                  {% endif %}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
         <div class="flex items-center gap-2 flex-wrap">
           {% if app.status == 'Pending' %}
           <form method="POST" action="/update-status/" class="inline">
@@ -85,6 +98,7 @@
             {% csrf_token %}
             <input type="hidden" name="applicant_id" value="{{ app.applicant_id }}" />
             <input type="hidden" name="new_status" value="Training" />
+            <input type="hidden" name="status_note" value="Moved forward from Endorsement to Training." />
             <button type="submit" class="bg-purple-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-lg hover:bg-purple-700 transition">
                 Move to Training Stage
             </button>
@@ -93,9 +107,29 @@
           <form method="POST" action="/update-status/" class="inline">
             {% csrf_token %}
             <input type="hidden" name="applicant_id" value="{{ app.applicant_id }}" />
+            <input type="hidden" name="new_status" value="Endorsement" />
+            <input type="hidden" name="status_note" value="Moved back from Training to Endorsement." />
+            <button type="submit" class="bg-white text-purple-700 border border-purple-200 px-6 py-2 rounded-lg text-sm font-bold shadow hover:bg-purple-50 transition">
+                Back to Endorsement
+            </button>
+          </form>
+          <form method="POST" action="/update-status/" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="applicant_id" value="{{ app.applicant_id }}" />
             <input type="hidden" name="new_status" value="Approved" />
+            <input type="hidden" name="status_note" value="Moved forward from Training to Approved." />
             <button type="submit" class="bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-lg hover:bg-emerald-700 transition">
                 Finalize Onboarding
+            </button>
+          </form>
+          {% elif app.status == 'Approved' %}
+          <form method="POST" action="/update-status/" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="applicant_id" value="{{ app.applicant_id }}" />
+            <input type="hidden" name="new_status" value="Training" />
+            <input type="hidden" name="status_note" value="Moved back from Approved to Training." />
+            <button type="submit" class="bg-white text-emerald-700 border border-emerald-200 px-6 py-2 rounded-lg text-sm font-bold shadow hover:bg-emerald-50 transition">
+                Back to Training
             </button>
           </form>
           {% endif %}
@@ -166,6 +200,14 @@
             {% else %}
               <div class="w-full aspect-video rounded-xl border border-dashed border-amber-200 bg-amber-50 flex items-center justify-center text-sm text-amber-700">No video uploaded yet.</div>
             {% endif %}
+            <div class="mt-4">
+              <h4 class="font-semibold text-gray-900 mb-2">Second video</h4>
+              {% if app.video_2 %}
+                <video controls class="w-full rounded-xl border border-gray-100" src="{{ app.video_2.url }}"></video>
+              {% else %}
+                <div class="w-full aspect-video rounded-xl border border-dashed border-amber-200 bg-amber-50 flex items-center justify-center text-sm text-amber-700">No second video uploaded.</div>
+              {% endif %}
+            </div>
           </div>
         </div>
 
@@ -181,6 +223,16 @@
                   </a>
                 {% else %}
                   <div class="p-3 rounded-lg border border-dashed border-amber-200 bg-amber-50 text-amber-800">No resume uploaded.</div>
+                {% endif %}
+              </div>
+              <div>
+                <span class="font-medium text-gray-900">TEFL Certificate:</span><br>
+                {% if app.tefl_certificate %}
+                  <a class="flex items-center justify-between p-3 rounded-lg hover:bg-amber-50 border border-gray-100" href="{{ app.tefl_certificate.url }}" target="_blank" rel="noopener">
+                    <span class="text-gray-900">View TEFL Certificate</span>
+                  </a>
+                {% else %}
+                  <div class="p-3 rounded-lg border border-dashed border-amber-200 bg-amber-50 text-amber-800">No TEFL certificate uploaded.</div>
                 {% endif %}
               </div>
             </div>

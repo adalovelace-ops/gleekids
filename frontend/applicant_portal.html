@@ -538,6 +538,50 @@
     color: var(--accent-2);
   }
 
+  .submitted-documents .doc-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .submitted-documents .upload-form {
+    display: inline-flex;
+  }
+
+  .submitted-documents .upload-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .submitted-documents .upload-label {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: inline-grid;
+    place-items: center;
+    background: var(--violet-soft);
+    border: 2px solid #d8c9fa;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .submitted-documents .upload-label:hover {
+    background: var(--pink-soft);
+    border-color: #f1bfd7;
+    color: var(--accent-2);
+    transform: translateY(-1px);
+  }
+
+  .submitted-documents .upload-label i {
+    font-size: 18px;
+  }
+
   .submitted-documents video {
     max-height: 180px;
     object-fit: cover;
@@ -683,7 +727,7 @@
               {% if schedule %}
               <div class="flex items-center gap-2">
                 <i class="fas fa-video text-yellow-500"></i>
-                <a href="{{ zoomCloneUrl|default:'http://127.0.0.1:3000/' }}{% if latest_schedule %}{{ latest_schedule.schedule_id }}{% else %}{{ app.applicant_id }}{% endif %}?role=applicant" target="_blank" rel="noopener" class="text-amber-700 font-semibold hover:underline">
+                <a href="{{ zoomCloneRoomUrl }}" target="_blank" rel="noopener" class="text-amber-700 font-semibold hover:underline">
                   Join Room
                 </a>
               </div>
@@ -790,13 +834,50 @@
                 <div class="font-extrabold" style="color: var(--ink);">
                   <i class="far fa-calendar-alt mr-2"></i> {{ latest_schedule.scheduled_at|date:"F d, Y @ h:i A" }}
                 </div>
-                <a href="{{ zoomCloneUrl|default:'http://127.0.0.1:3000/' }}{{ latest_schedule.schedule_id }}?role=applicant" target="_blank" rel="noopener" class="action-btn px-4 py-2">
+                <a href="{{ zoomCloneRoomUrl }}" target="_blank" rel="noopener" class="action-btn px-4 py-2">
                   <i class="fas fa-video"></i>
                   Join Room
                 </a>
               </div>
             </div>
             {% endif %}
+
+            <div class="portal-meeting mt-4 p-4 rounded-xl">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h3 class="text-sm font-extrabold" style="color: var(--ink);">Preferred Demo Time</h3>
+                  <p class="text-xs font-bold text-gray-500 mt-1">Choose a time from morning until 5:00 PM.</p>
+                  {% if app.preferred_demo_time %}
+                    <p class="mt-2 text-sm font-extrabold text-amber-700">
+                      Current preference: {{ app.preferred_demo_time|time:"g:i A" }}
+                    </p>
+                  {% endif %}
+                </div>
+                <form method="POST" class="flex flex-col sm:flex-row gap-3 sm:items-center">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="update_preferred_demo_time">
+                  <input
+                    type="time"
+                    name="preferred_demo_time"
+                    min="08:00"
+                    max="17:00"
+                    value="{{ app.preferred_demo_time|time:'H:i' }}"
+                    required
+                    class="rounded-xl border border-amber-200 bg-white px-4 py-3 text-sm font-extrabold text-gray-800 focus:border-amber-400 focus:ring-2 focus:ring-amber-200"
+                  >
+                  <button type="submit" class="action-btn px-4 py-3 justify-center">
+                    <i class="fas fa-save"></i>
+                    Save Time
+                  </button>
+                </form>
+              </div>
+              {% if preferred_time_saved %}
+                <p class="mt-3 text-xs font-extrabold text-green-600"><i class="fas fa-check-circle mr-1"></i>Preferred demo time saved.</p>
+              {% endif %}
+              {% if preferred_time_error %}
+                <p class="mt-3 text-xs font-extrabold text-red-600"><i class="fas fa-exclamation-circle mr-1"></i>{{ preferred_time_error }}</p>
+              {% endif %}
+            </div>
           </div>
         <div class="card-grid">
           <div class="card-block evaluation-card">
@@ -828,7 +909,7 @@
             <div class="flex items-center justify-between mb-3">
               <h2>Evaluation Summary</h2>
             </div>
-            {% if demoEval %}
+            {% if demoEval or clientEval %}
               <div class="panel-grid">
                 {% if demoEval %}
                   
@@ -863,8 +944,8 @@
                         <p class="label-sm">Client Endorsement</p>
                         <h3 class="text-lg font-extrabold">Client Presentation</h3>
                       </div>
-                      <span class="text-lg font-extrabold" style="color: var(--accent);">
-                        {{ clientScore }}
+                      <span class="text-lg font-extrabold" style="color: {% if clientScore == 'Pass' %}var(--success){% else %}var(--accent-2){% endif %};">
+                        {{ clientScore|default:"Pending" }}
                       </span>
                     </div>
                     <p class="text-xs text-gray-600 mt-2">
@@ -889,6 +970,17 @@
 
           <div class="card-block submitted-documents">
             <h2 class="mb-3">Your Submitted Documents</h2>
+
+            {% if document_upload_saved %}
+              <div class="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-extrabold text-green-700">
+                <i class="fas fa-check-circle mr-2"></i>{{ document_upload_saved }} uploaded.
+              </div>
+            {% endif %}
+            {% if document_upload_error %}
+              <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-extrabold text-red-700">
+                <i class="fas fa-exclamation-circle mr-2"></i>{{ document_upload_error }}
+              </div>
+            {% endif %}
             
             <div class="panel-grid">
               <div class="card-block document-card" style="border-color: var(--line);">
@@ -899,12 +991,34 @@
                   </div>
                   <i class="fas fa-file-pdf text-red-500 text-xl"></i>
                 </div>
-                {% if app %}
+                {% if app.resume %}
                   
                   <div class="doc-preview"><i class="fas fa-file-pdf"></i></div>
-                  <a href="{{ resume }}" target="_blank" rel="noopener" class="doc-link"><i class="fas fa-eye"></i> View Document</a>
+                  <div class="doc-actions">
+                    <a href="{{ app.resume.url }}" target="_blank" rel="noopener" class="doc-link"><i class="fas fa-eye"></i> View Document</a>
+                    <form method="POST" enctype="multipart/form-data" class="upload-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="upload_document">
+                      <input type="hidden" name="document_field" value="resume">
+                      <label class="upload-label" title="Upload resume" aria-label="Upload resume">
+                        <i class="fas fa-upload" aria-hidden="true"></i>
+                        <input type="file" name="document_file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="upload-input" onchange="this.form.submit()">
+                      </label>
+                    </form>
+                  </div>
                 {% else %}
                   <p class="text-sm text-gray-500 italic">No resume uploaded</p>
+                  <div class="doc-actions">
+                    <form method="POST" enctype="multipart/form-data" class="upload-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="upload_document">
+                      <input type="hidden" name="document_field" value="resume">
+                      <label class="upload-label" title="Upload resume" aria-label="Upload resume">
+                        <i class="fas fa-upload" aria-hidden="true"></i>
+                        <input type="file" name="document_file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="upload-input" onchange="this.form.submit()">
+                      </label>
+                    </form>
+                  </div>
                 {% endif %}
               </div>
 
@@ -917,11 +1031,33 @@
                   <i class="fas fa-certificate text-xl" style="color: var(--accent);"></i>
                 </div>
                 
-                {% if cert %}
+                {% if app.tefl_certificate %}
                   <div class="doc-preview"><i class="fas fa-file-alt"></i></div>
-                  <a href="{{ cert }}" target="_blank" rel="noopener" class="doc-link"><i class="fas fa-eye"></i> View Certificate</a>
+                  <div class="doc-actions">
+                    <a href="{{ app.tefl_certificate.url }}" target="_blank" rel="noopener" class="doc-link"><i class="fas fa-eye"></i> View Certificate</a>
+                    <form method="POST" enctype="multipart/form-data" class="upload-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="upload_document">
+                      <input type="hidden" name="document_field" value="tefl_certificate">
+                      <label class="upload-label" title="Upload certificate" aria-label="Upload certificate">
+                        <i class="fas fa-upload" aria-hidden="true"></i>
+                        <input type="file" name="document_file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png" class="upload-input" onchange="this.form.submit()">
+                      </label>
+                    </form>
+                  </div>
                 {% else %}
                   <p class="text-sm text-gray-500 italic">No certificate uploaded</p>
+                  <div class="doc-actions">
+                    <form method="POST" enctype="multipart/form-data" class="upload-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="upload_document">
+                      <input type="hidden" name="document_field" value="tefl_certificate">
+                      <label class="upload-label" title="Upload certificate" aria-label="Upload certificate">
+                        <i class="fas fa-upload" aria-hidden="true"></i>
+                        <input type="file" name="document_file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png" class="upload-input" onchange="this.form.submit()">
+                      </label>
+                    </form>
+                  </div>
                 {% endif %}
               </div>
 
@@ -933,12 +1069,48 @@
                   </div>
                   <i class="fas fa-video text-indigo-500 text-xl"></i>
                 </div>
-                {% if app %}
+                {% if app.video %}
                   
-                  <video controls class="w-full rounded-lg" src="{{ video }}"></video>
+                  <video controls class="w-full rounded-lg" src="{{ app.video.url }}"></video>
                 {% else %}
                   <p class="text-sm text-gray-500 italic">No video uploaded</p>
                 {% endif %}
+                <div class="doc-actions">
+                  <form method="POST" enctype="multipart/form-data" class="upload-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="upload_document">
+                    <input type="hidden" name="document_field" value="video">
+                    <label class="upload-label" title="Upload intro video" aria-label="Upload intro video">
+                      <i class="fas fa-upload" aria-hidden="true"></i>
+                      <input type="file" name="document_file" accept=".mp4,video/mp4" class="upload-input" onchange="this.form.submit()">
+                    </label>
+                  </form>
+                </div>
+              </div>
+              <div class="card-block document-card" style="border-color: var(--line);">
+                <div class="flex items-center justify-between mb-2">
+                  <div>
+                    <p class="label-sm">Second Video</p>
+                    <p class="font-extrabold">Additional Video File</p>
+                  </div>
+                  <i class="fas fa-video text-pink-500 text-xl"></i>
+                </div>
+                {% if app.video_2 %}
+                  <video controls class="w-full rounded-lg" src="{{ app.video_2.url }}"></video>
+                {% else %}
+                  <p class="text-sm text-gray-500 italic">No second video uploaded</p>
+                {% endif %}
+                <div class="doc-actions">
+                  <form method="POST" enctype="multipart/form-data" class="upload-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="upload_document">
+                    <input type="hidden" name="document_field" value="video_2">
+                    <label class="upload-label" title="Upload second video" aria-label="Upload second video">
+                      <i class="fas fa-upload" aria-hidden="true"></i>
+                      <input type="file" name="document_file" accept=".mp4,video/mp4" class="upload-input" onchange="this.form.submit()">
+                    </label>
+                  </form>
+                </div>
               </div>
             </div>
 

@@ -235,6 +235,141 @@
             padding: clamp(1.5rem, 3vw, 3rem);
         }
 
+        .work-option {
+            display: block;
+            cursor: pointer;
+        }
+
+        .work-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .work-option-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            min-height: 5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 1rem;
+            background: #fff;
+            padding: 1rem;
+            box-shadow: 0 10px 22px rgba(44, 42, 120, 0.06);
+            transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+        }
+
+        .work-option:hover .work-option-card {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 26px rgba(44, 42, 120, 0.1);
+        }
+
+        .work-option-dot {
+            position: relative;
+            width: 1.3rem;
+            height: 1.3rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 999px;
+            flex: 0 0 auto;
+            background: #fff;
+        }
+
+        .work-option-dot::after {
+            content: '';
+            position: absolute;
+            inset: 0.24rem;
+            border-radius: inherit;
+            background: transparent;
+        }
+
+        .work-option.wfh input:checked + .work-option-card {
+            border-color: var(--gk-pink);
+            background: linear-gradient(135deg, #fff0f8, #fff);
+            box-shadow: 0 16px 30px rgba(244, 139, 193, 0.18);
+        }
+
+        .work-option.wfh input:checked + .work-option-card .work-option-dot {
+            border-color: var(--gk-pink);
+        }
+
+        .work-option.wfh input:checked + .work-option-card .work-option-dot::after {
+            background: var(--gk-pink);
+        }
+
+        .work-option.office input:checked + .work-option-card {
+            border-color: var(--gk-violet);
+            background: linear-gradient(135deg, #f3f0ff, #fff);
+            box-shadow: 0 16px 30px rgba(125, 107, 214, 0.18);
+        }
+
+        .work-option.office input:checked + .work-option-card .work-option-dot {
+            border-color: var(--gk-violet);
+        }
+
+        .work-option.office input:checked + .work-option-card .work-option-dot::after {
+            background: var(--gk-violet);
+        }
+
+        .wfh-requirements {
+            display: none;
+            margin-top: 0.9rem;
+            border: 1px solid rgba(244, 139, 193, 0.48);
+            border-radius: 0.85rem;
+            background: linear-gradient(135deg, rgba(255, 240, 248, 0.95), rgba(255, 255, 255, 0.96));
+            padding: 1rem;
+            box-shadow: 0 14px 30px rgba(244, 139, 193, 0.11);
+        }
+
+        .wfh-requirements.is-visible {
+            display: block;
+        }
+
+        .wfh-requirements-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.6rem 1rem;
+            margin-top: 0.8rem;
+        }
+
+        .wfh-requirements-list li {
+            display: flex;
+            gap: 0.5rem;
+            color: #334155;
+            font-size: 0.9rem;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .wfh-requirements-list li::before {
+            content: '✓';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.1rem;
+            height: 1.1rem;
+            margin-top: 0.05rem;
+            border-radius: 999px;
+            background: var(--gk-pink);
+            color: #fff;
+            font-size: 0.72rem;
+            flex: 0 0 auto;
+        }
+
+        .office-notice {
+            display: none;
+            margin-top: 0.9rem;
+            border: 1px solid rgba(125, 107, 214, 0.42);
+            border-radius: 0.85rem;
+            background: linear-gradient(135deg, rgba(243, 240, 255, 0.95), rgba(255, 255, 255, 0.96));
+            padding: 1rem;
+            box-shadow: 0 14px 30px rgba(125, 107, 214, 0.11);
+        }
+
+        .office-notice.is-visible {
+            display: block;
+        }
+
         @media (max-width: 900px) {
             .application-hero {
                 grid-template-columns: 1fr;
@@ -248,6 +383,7 @@
             .form-card {
                 margin: 0 0.75rem 0.75rem;
             }
+
         }
 
         @media (max-width: 520px) {
@@ -258,6 +394,10 @@
 
             .hero-blob {
                 width: 15rem;
+            }
+
+            .wfh-requirements-list {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -328,7 +468,7 @@
                                 </div>
                                 <div>
                                     <label for="phone" class="block text-sm font-medium mb-1">Phone <span class="font-semibold text-slate-500">(Optional)</span></label>
-                                    <input type="text" id="phone" name="phone" placeholder="+1 (555) 123-4567" pattern="[0-9+\-()\s]*" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                    <input type="tel" id="phone" name="phone" placeholder="+63 917 123 4567" inputmode="tel" pattern="(\+63|0)?\s?9\d{2}\s?\d{3}\s?\d{4}" value="" class="w-full px-4 py-2 border rounded-lg" />
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
@@ -336,7 +476,7 @@
                                     <label for="country" class="block text-sm font-medium mb-1">Country *</label>
                                     <select id="country" name="country" required class="w-full px-4 py-2 border rounded-lg">
                                         <option value="">Select Country</option>
-                                        <option value="Philippines" >Philippines</option>
+                                        <option value="Philippines" selected>Philippines</option>
                                         <option value="United States" >United States</option>
                                         <option value="Canada" >Canada</option>
                                         <option value="United Kingdom" >United Kingdom</option>
@@ -354,11 +494,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
                                 <div>
                                     <label for="city" class="block text-sm font-medium mb-1">City</label>
-                                    <input type="text" id="city" name="city" placeholder="City" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                    <select id="city" name="city" autocomplete="address-level2" class="w-full px-4 py-2 border rounded-lg" disabled>
+                                        <option value="">Select province first</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <label for="state" class="block text-sm font-medium mb-1">State/Province</label>
-                                    <input type="text" id="state" name="state" placeholder="State/Province" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                    <select id="state" name="state" autocomplete="address-level1" class="w-full px-4 py-2 border rounded-lg">
+                                        <option value="">Select Province</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <label for="zip_code" class="block text-sm font-medium mb-1">ZIP Code</label>
@@ -369,21 +513,66 @@
                                 <label for="referral" class="block text-sm font-medium mb-1">Referral <span class="font-semibold text-slate-500">(Optional)</span></label>
                                 <input type="text" id="referral" name="referral" placeholder="Referral name" value="" class="w-full px-4 py-2 border rounded-lg" />
                             </div>
+                            <div class="mb-4">
+                                <span class="block text-sm font-medium mb-2">Preferred Work Setup *</span>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <label class="work-option wfh">
+                                        <input type="radio" name="work_setup" value="WFH" required />
+                                        <span class="work-option-card">
+                                            <span>
+                                                <span class="block font-extrabold text-slate-900">WFH</span>
+                                                <span class="block text-xs font-semibold text-slate-500">Work from home</span>
+                                            </span>
+                                            <span class="work-option-dot"></span>
+                                        </span>
+                                    </label>
+                                    <label class="work-option office">
+                                        <input type="radio" name="work_setup" value="Office Based" required />
+                                        <span class="work-option-card">
+                                            <span>
+                                                <span class="block font-extrabold text-slate-900">Office Based</span>
+                                                <span class="block text-xs font-semibold text-slate-500">Onsite application</span>
+                                            </span>
+                                            <span class="work-option-dot"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div id="wfhRequirements" class="wfh-requirements" aria-live="polite">
+                                    <p class="text-sm font-extrabold text-slate-900">WFH requirements to prepare for initial screening:</p>
+                                    <ul class="wfh-requirements-list">
+                                        <li>At least Intel i3 or above</li>
+                                        <li>At least 10 Mbps internet speed</li>
+                                        <li>Ethernet connection only, no Wi-Fi</li>
+                                        <li>Backup internet connection</li>
+                                        <li>Power station or generator</li>
+                                        <li>Webcam</li>
+                                        <li>Laptop or desktop only, no iPad/tablet</li>
+                                        <li>Noise-cancelling headset</li>
+                                    </ul>
+                                    <p class="mt-3 text-xs font-extrabold text-pink-600">These will be checked during your initial screening interview.</p>
+                                </div>
+                                <div id="officeNotice" class="office-notice" aria-live="polite">
+                                    <p class="text-sm font-extrabold text-slate-900">Office Based instruction:</p>
+                                    <p class="mt-2 text-sm font-bold leading-6 text-slate-600">
+                                        Please proceed to the office on your designated schedule for the application process.
+                                    </p>
+                                </div>
+                            </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                                 <div>
                                     <label for="password" class="block text-sm font-medium mb-1">Create Password *</label>
                                     <div class="relative">
-                                        <input type="password" id="password" name="password" placeholder="Create Password" minlength="8" required class="w-full px-4 py-2 border rounded-lg pr-12" />
+                                        <input type="password" id="password" name="password" placeholder="Create Password" minlength="8" pattern="(?=.*[A-Z]).{8,}" required class="w-full px-4 py-2 border rounded-lg pr-12" />
                                         <button type="button" tabindex="-1" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-pink-500 focus:outline-none" onclick="togglePassword('password', this)">
                                             <svg id="eye-password" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 3.866-3.582 7-8 7s-8-3.134-8-7 3.582-7 8-7 8 3.134 8 7z" /></svg>
                                         </button>
                                     </div>
-                                    <p class="form-note text-xs mt-1">Minimum 8 characters</p>
+                                    <p class="form-note text-xs mt-1">Minimum 8 characters with at least one capital letter.</p>
                                 </div>
                                 <div>
                                     <label for="confirm_password" class="block text-sm font-medium mb-1">Confirm Password *</label>
                                     <div class="relative">
-                                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required class="w-full px-4 py-2 border rounded-lg pr-12" />
+                                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" minlength="8" required class="w-full px-4 py-2 border rounded-lg pr-12" />
                                         <button type="button" tabindex="-1" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-pink-500 focus:outline-none" onclick="togglePassword('confirm_password', this)">
                                             <svg id="eye-confirm_password" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 3.866-3.582 7-8 7s-8-3.134-8-7 3.582-7 8-7 8 3.134 8 7z" /></svg>
                                         </button>
@@ -392,12 +581,16 @@
                                 </div>
                             </div>
                             <div class="mb-4">
-                                <label for="resume" class="block text-sm font-medium mb-1">Resume (PDF, max 5MB) *</label>
-                                <input type="file" id="resume" name="resume" accept=".pdf" required class="w-full px-4 py-2 border rounded-lg" />
-                                <p class="form-note text-xs mt-1">PDF only, max 5MB</p>
+                                <label for="resume" class="block text-sm font-medium mb-1">Resume (PDF or Word, max 5MB) *</label>
+                                <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required class="w-full px-4 py-2 border rounded-lg" />
+                                <p class="form-note text-xs mt-1">PDF, DOC, or DOCX only, max 5MB</p>
                             </div>
                             <div class="mb-4">
                                 <label for="video" class="block text-sm font-medium mb-1">Video Introduction (MP4, max 100MB) *</label>
+                                <a href="{% url 'sample_intro_videos' %}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm font-extrabold text-pink-500 hover:text-[#2c2a78] transition mb-2">
+                                    View sample intro video here
+                                    <span aria-hidden="true">&rarr;</span>
+                                </a>
                                 <input type="file" id="video" name="video" accept=".mp4" required class="w-full px-4 py-2 border rounded-lg" />
                                 <p class="form-note text-xs mt-1">MP4 only, max 100MB</p>
                             </div>
@@ -427,11 +620,140 @@
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             const p1 = document.getElementById('password').value;
             const p2 = document.getElementById('confirm_password').value;
+            const hasCapital = /[A-Z]/.test(p1);
             if (p1 !== p2) {
                 e.preventDefault();
+                document.getElementById('passwordMatch').textContent = 'Passwords do not match';
+                document.getElementById('passwordMatch').classList.remove('hidden');
+            } else if (p1.length < 8 || !hasCapital) {
+                e.preventDefault();
+                document.getElementById('passwordMatch').textContent = 'Password must be at least 8 characters and include one capital letter';
                 document.getElementById('passwordMatch').classList.remove('hidden');
             }
         });
+
+        const workSetupInputs = document.querySelectorAll('input[name="work_setup"]');
+        const wfhRequirements = document.getElementById('wfhRequirements');
+        const officeNotice = document.getElementById('officeNotice');
+
+        function updateWfhRequirements() {
+            const selectedWorkSetup = document.querySelector('input[name="work_setup"]:checked');
+            if (wfhRequirements) {
+                wfhRequirements.classList.toggle('is-visible', selectedWorkSetup && selectedWorkSetup.value === 'WFH');
+            }
+            if (officeNotice) {
+                officeNotice.classList.toggle('is-visible', selectedWorkSetup && selectedWorkSetup.value === 'Office Based');
+            }
+        }
+
+        workSetupInputs.forEach(input => {
+            input.addEventListener('change', updateWfhRequirements);
+        });
+        updateWfhRequirements();
+
+        const cityInput = document.getElementById('city');
+        const stateInput = document.getElementById('state');
+        const fallbackLocations = {
+            'Metro Manila': ['Caloocan City', 'Las Pinas City', 'Makati City', 'Malabon City', 'Mandaluyong City', 'Manila City', 'Marikina City', 'Muntinlupa City', 'Navotas City', 'Paranaque City', 'Pasay City', 'Pasig City', 'Quezon City', 'San Juan City', 'Taguig City', 'Valenzuela City'],
+            'Batangas': ['Batangas City', 'Lipa City', 'Tanauan City', 'Santo Tomas City'],
+            'Cavite': ['Bacoor City', 'Cavite City', 'Dasmarinas City', 'General Trias City', 'Imus City', 'Tagaytay City', 'Trece Martires City'],
+            'Cebu': ['Cebu City', 'Lapu-Lapu City', 'Mandaue City', 'Talisay City'],
+            'Davao del Sur': ['Davao City', 'Digos City'],
+            'Iloilo': ['Iloilo City', 'Passi City'],
+            'Laguna': ['Binan City', 'Calamba City', 'San Pablo City', 'Santa Rosa City'],
+            'Pampanga': ['Angeles City', 'Mabalacat City', 'San Fernando City'],
+            'Pangasinan': ['Alaminos City', 'Dagupan City', 'San Carlos City', 'Urdaneta City'],
+            'Zamboanga del Sur': ['Pagadian City', 'Zamboanga City']
+        };
+        let psgcCities = [];
+
+        function resetCities(label) {
+            if (!cityInput) return;
+            cityInput.innerHTML = '';
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = label;
+            cityInput.appendChild(option);
+        }
+
+        function addOptions(select, items, valueKey, labelKey) {
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item[valueKey];
+                option.textContent = item[labelKey];
+                if (item.code) option.dataset.code = item.code;
+                select.appendChild(option);
+            });
+        }
+
+        function populateFallbackProvinces() {
+            if (!stateInput) return;
+            addOptions(
+                stateInput,
+                Object.keys(fallbackLocations).sort().map(name => ({ name })),
+                'name',
+                'name'
+            );
+        }
+
+        function populateCitiesForProvince(provinceName, provinceCode) {
+            resetCities('Select City / Municipality');
+            if (!provinceName) {
+                cityInput.disabled = true;
+                resetCities('Select province first');
+                return;
+            }
+
+            let matches = psgcCities.filter(city => city.provinceCode === provinceCode);
+            if (provinceName === 'Metro Manila') {
+                matches = psgcCities.filter(city => city.regionCode === '130000000');
+            }
+
+            const fallback = fallbackLocations[provinceName] || [];
+            const cityNames = matches.length
+                ? matches.map(city => city.name).sort((a, b) => a.localeCompare(b))
+                : fallback;
+
+            cityInput.disabled = false;
+            addOptions(cityInput, cityNames.map(name => ({ name })), 'name', 'name');
+        }
+
+        async function loadPhilippineLocations() {
+            if (!cityInput || !stateInput) return;
+            resetCities('Select province first');
+            populateFallbackProvinces();
+            try {
+                const [provinceResponse, cityResponse] = await Promise.all([
+                    fetch('https://psgc.gitlab.io/api/provinces/'),
+                    fetch('https://psgc.gitlab.io/api/cities-municipalities/')
+                ]);
+                if (!provinceResponse.ok || !cityResponse.ok) return;
+
+                const provinces = await provinceResponse.json();
+                psgcCities = await cityResponse.json();
+
+                stateInput.innerHTML = '<option value="">Select Province</option>';
+                addOptions(
+                    stateInput,
+                    [
+                        { name: 'Metro Manila', code: '130000000' },
+                        ...provinces.sort((a, b) => a.name.localeCompare(b.name))
+                    ],
+                    'name',
+                    'name'
+                );
+            } catch (error) {
+                resetCities('Select province first');
+            }
+        }
+
+        if (cityInput && stateInput) {
+            stateInput.addEventListener('change', () => {
+                const selected = stateInput.options[stateInput.selectedIndex];
+                populateCitiesForProvince(stateInput.value, selected ? selected.dataset.code : '');
+            });
+            loadPhilippineLocations();
+        }
     </script>
 </body>
 </html>

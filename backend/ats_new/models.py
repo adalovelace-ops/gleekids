@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Applicant(models.Model):
     NEXT_STEP_TEXT = {
         'Pending': 'Our team is currently reviewing your application. Please wait for an approval email to proceed.',
-        'Initial Screening': 'Your initial interview is being scheduled. Please check your email for the meeting invite.',
+        'Initial Screening': 'Our team is reviewing your screening result. Please check your email for the next step.',
         'Demo Evaluation': 'Prepare your teaching materials! Your demo evaluation session has been scheduled.',
         'Endorsement': 'You have passed the demo! We are now presenting your profile to our clients for final review.',
         'Training': 'Congratulations! You are now in the training phase. Please follow the instructions provided by your trainer.',
@@ -35,12 +35,19 @@ class Applicant(models.Model):
     zip_code = models.CharField(max_length=20, blank=True, null=True)
     referral = models.CharField(max_length=100, blank=True, null=True)
     password = models.CharField(max_length=128)
+
+    WORK_SETUP_CHOICES = [
+        ('WFH', 'Work from Home'),
+        ('Office Based', 'Office Based'),
+    ]
+    work_setup = models.CharField(max_length=20, choices=WORK_SETUP_CHOICES, default='WFH')
+    preferred_demo_time = models.TimeField(blank=True, null=True)
     
     # Placement
     ACCOUNT_CHOICES = [
         ('Vietnamese', 'Vietnamese Account'),
         ('Chinese', 'Chinese Account'),
-        ('Mongolian', 'Mongolian Account'),
+        ('Direct', 'Direct Account'),
     ]
     teaching_account = models.CharField(max_length=50, choices=ACCOUNT_CHOICES, blank=True, null=True)
     teaching_account_notes = models.TextField(blank=True, null=True)
@@ -48,15 +55,19 @@ class Applicant(models.Model):
     # Files
     resume = models.FileField(upload_to='resumes/')
     video = models.FileField(upload_to='videos/')
+    video_2 = models.FileField(upload_to='videos/', blank=True, null=True)
+    tefl_certificate = models.FileField(upload_to='certificates/', blank=True, null=True)
     
     # Process Meta
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('Initial Screening', 'Initial Screening'),
         ('Demo Evaluation', 'Demo Evaluation'),
+        ('Endorsement', 'Endorsement'),
         ('Training', 'Training'),
         ('Onboarding', 'Onboarding'),
         ('Approved', 'Approved'),
+        ('Resign', 'Resign'),
         ('Withdrawn', 'Withdrawn'),
     ]
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Pending')
@@ -109,10 +120,22 @@ class Applicant(models.Model):
             notes=f"Assigned to {self.teaching_account} account."
         )
 
+    def clear_teaching_account(self, notes=None):
+        old_account = self.teaching_account
+        self.teaching_account = None
+        self.teaching_account_notes = ''
+        self.save(update_fields=['teaching_account', 'teaching_account_notes', 'updated_at'])
+        StatusHistory.objects.create(
+            applicant=self,
+            status=self.status,
+            notes=notes or f"Removed teaching placement{f' from {old_account} account' if old_account else ''}."
+        )
+
 class Schedule(models.Model):
     STATUS_BY_TYPE = {
         'initial': 'Initial Screening',
         'demo': 'Demo Evaluation',
+        'endorsement': 'Endorsement',
         'training': 'Training',
         'onboarding': 'Approved',
     }
@@ -121,6 +144,7 @@ class Schedule(models.Model):
     TYPE_CHOICES = [
         ('initial', 'Initial Screening'),
         ('demo', 'Demo Session'),
+        ('endorsement', 'Client Final Interview'),
         ('training', 'Training'),
         ('onboarding', 'Onboarding'),
     ]
@@ -147,9 +171,19 @@ class Schedule(models.Model):
         )
 
 class Evaluation(models.Model):
+    EVALUATION_TYPE_CHOICES = [
+        ('demo', 'Demo Evaluation'),
+        ('client', 'Client Endorsement'),
+    ]
+    CLIENT_DECISION_CHOICES = [
+        ('Pass', 'Pass'),
+        ('Fail', 'Fail'),
+    ]
+
     evaluation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     applicant = models.ForeignKey(Applicant, on_delete=models.CASCADE, related_name='evaluations')
     evaluator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    evaluation_type = models.CharField(max_length=20, choices=EVALUATION_TYPE_CHOICES, default='demo')
     
     # Scores (1-5 as per the form)
     teaching_performance = models.IntegerField(default=0)
@@ -159,6 +193,7 @@ class Evaluation(models.Model):
     technical_proficiency = models.IntegerField(default=0)
     
     total_score = models.IntegerField(default=0)
+    client_decision = models.CharField(max_length=10, choices=CLIENT_DECISION_CHOICES, blank=True, null=True)
     comments = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -182,11 +217,13 @@ class Evaluation(models.Model):
     @classmethod
     def rating_defaults_from_request(cls, data):
         return {
+            'evaluation_type': 'demo',
             'teaching_performance': cls.normalize_rating(data.get('teaching_performance_rating')),
             'communication_skills': cls.normalize_rating(data.get('communication_skills_rating')),
             'curriculum_understanding': cls.normalize_rating(data.get('curriculum_understanding_rating')),
             'engagement_level': cls.normalize_rating(data.get('engagement_level_rating')),
             'technical_proficiency': cls.normalize_rating(data.get('technical_proficiency_rating')),
+            'client_decision': None,
             'comments': data.get('overall_comments'),
         }
 
@@ -194,11 +231,26 @@ class Evaluation(models.Model):
     def rating_defaults_from_room_payload(cls, ratings, comments_text):
         ratings = ratings or {}
         return {
+            'evaluation_type': 'demo',
             'teaching_performance': cls.normalize_rating(ratings.get('teaching_performance')),
             'communication_skills': cls.normalize_rating(ratings.get('communication_skills')),
             'curriculum_understanding': cls.normalize_rating(ratings.get('curriculum_understanding')),
             'engagement_level': cls.normalize_rating(ratings.get('engagement_level')),
             'technical_proficiency': cls.normalize_rating(ratings.get('technical_proficiency')),
+            'client_decision': None,
+            'comments': comments_text,
+        }
+
+    @classmethod
+    def client_defaults(cls, decision, comments_text):
+        return {
+            'evaluation_type': 'client',
+            'teaching_performance': 0,
+            'communication_skills': 0,
+            'curriculum_understanding': 0,
+            'engagement_level': 0,
+            'technical_proficiency': 0,
+            'client_decision': decision,
             'comments': comments_text,
         }
 

@@ -23,13 +23,16 @@ from ats_new.views import (
     demo_evaluation, evaluations, reports, training_schedule, onboarding,
     admin_calendar, schedule_action, client_endorsement,
     evaluate_applicant, save_evaluation, video_call,
-    new_video_room, video_landing, video_room, uploaded_media, save_room_evaluation
+    new_video_room, video_landing, video_room, uploaded_media, save_room_evaluation,
+    send_applicant_email, sample_intro_videos, teacher_stories
 )
 
 urlpatterns = [
     path('', home_page, name='home'),
+    path('teacher-stories/', teacher_stories, name='teacher_stories'),
     path('admin/', admin.site.urls),
     path('apply/', applicant_registration, name='applicant_registration'),
+    path('sample-intro-videos/', sample_intro_videos, name='sample_intro_videos'),
     path('login/', applicant_login, name='applicant_login'),
     path('portal/', applicant_portal, name='applicant_portal'),
     path('logout/', applicant_logout, name='applicant_logout'),
@@ -49,6 +52,7 @@ urlpatterns = [
     path('client-endorsement/', client_endorsement, name='client_endorsement'),
     path('evaluate/<uuid:applicant_id>/', evaluate_applicant, name='evaluate_applicant'),
     path('save-evaluation/', save_evaluation, name='save_evaluation'),
+    path('send-applicant-email/', send_applicant_email, name='send_applicant_email'),
     path('api/room-evaluation/', save_room_evaluation, name='save_room_evaluation'),
     path('video-conferencing/', video_landing, name='video_landing'),
     path('video-call/<uuid:schedule_id>/', video_call, name='video_call'),

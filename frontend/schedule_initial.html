@@ -3,103 +3,457 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Schedule Initial Screening</title>
+  <title>Initial Screening</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 92% 8%, rgba(238, 121, 174, 0.16) 0 10rem, transparent 10.2rem),
+        radial-gradient(circle at 4% 28%, rgba(139, 107, 232, 0.14) 0 12rem, transparent 12.2rem),
+        linear-gradient(135deg, #fffdfa 0%, #fbf8ff 46%, #f7fbff 100%);
+      color: #282064;
+      font-family: "Nunito", "Segoe UI", Arial, sans-serif;
+    }
+
+    .screening-shell {
+      min-height: 100vh;
+      padding: 1.25rem 1rem 2rem;
+    }
+
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+      align-items: stretch;
+    }
+
+    .top-link {
+      color: #8b6be8;
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .stage-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 1rem;
+    }
+
+    .stage-tab {
+      border: 1px solid #eadffb;
+      border-radius: 999px;
+      background: #fff;
+      color: #6d6896;
+      padding: 0.52rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 900;
+      box-shadow: 0 8px 18px rgba(40, 32, 100, 0.05);
+    }
+
+    .stage-tab.active {
+      border-color: #f5c2da;
+      background: #fff0f7;
+      color: #bf4f88;
+    }
+
+    .admin-avatar {
+      width: 3rem;
+      height: 3rem;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ee79ae, #8b6be8);
+      color: #fff;
+      font-weight: 900;
+      box-shadow: 0 14px 24px rgba(139, 107, 232, 0.24);
+    }
+
+    .review-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      border-radius: 999px;
+      background: #efe3ff;
+      color: #8956c8;
+      padding: 0.48rem 0.9rem;
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .list-panel {
+      margin-top: 1.4rem;
+      border: 1px solid #eadffb;
+      border-radius: 0.45rem;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 18px 42px rgba(40, 32, 100, 0.08);
+      overflow: hidden;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem;
+      border-bottom: 1px solid #eadffb;
+    }
+
+    .search-wrap {
+      position: relative;
+      width: min(20rem, 100%);
+    }
+
+    .search-wrap input {
+      width: 100%;
+      border: 1px solid #eadffb;
+      border-radius: 999px;
+      padding: 0.75rem 2.8rem 0.75rem 1.15rem;
+      color: #282064;
+      outline: none;
+    }
+
+    .search-wrap i {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9aa0aa;
+    }
+
+    .tool-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 0.55rem;
+    }
+
+    .tool-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      border: 0;
+      border-radius: 0.45rem;
+      background: #f3edff;
+      color: #282064;
+      padding: 0.58rem 0.78rem;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .tool-btn.disabled {
+      color: #a0a4ad;
+      cursor: not-allowed;
+      opacity: 0.78;
+    }
+
+    .filter-panel {
+      display: none;
+      gap: 0.75rem;
+      align-items: center;
+      border-top: 1px solid #eadffb;
+      background: #fbf8ff;
+      padding: 0.85rem 1rem;
+    }
+
+    .filter-panel.open {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      border: 1px solid #eadffb;
+      border-radius: 0.55rem;
+      background: #fff;
+      color: #282064;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .app-table {
+      width: 100%;
+      min-width: 90rem;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .app-table th,
+    .app-table td {
+      border-bottom: 1px solid #eee8fb;
+      padding: 0.95rem 1rem;
+      text-align: left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .app-table th {
+      color: #282064;
+      font-size: 0.78rem;
+      font-weight: 900;
+      background: #f6f0ff;
+    }
+
+    .app-table tbody tr:hover {
+      background: #fbf7ff;
+    }
+
+    .row-check {
+      width: 1rem;
+      height: 1rem;
+      border-radius: 0.18rem;
+    }
+
+    .resume-link {
+      color: #8b6be8;
+      font-weight: 900;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      border: 1px solid #f5c2da;
+      border-radius: 0.35rem;
+      color: #bf4f88;
+      background: #fff0f7;
+      padding: 0.22rem 0.48rem;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .approve-btn {
+      border-radius: 0.32rem;
+      background: linear-gradient(135deg, #ee79ae, #8b6be8);
+      color: #fff;
+      padding: 0.5rem 0.72rem;
+      font-size: 0.78rem;
+      font-weight: 900;
+      box-shadow: 0 8px 16px rgba(139, 107, 232, 0.24);
+    }
+
+    .email-trigger {
+      border-radius: 0.32rem;
+      background: #f3edff;
+      color: #8b6be8;
+      padding: 0.5rem 0.72rem;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .status-action-select {
+      min-width: 10.5rem;
+      border: 1px solid #eadffb;
+      border-radius: 0.42rem;
+      background: #fff;
+      color: #282064;
+      padding: 0.5rem 0.65rem;
+      font-size: 0.78rem;
+      font-weight: 900;
+      outline: none;
+    }
+
+    .status-action-select:focus {
+      border-color: #ee79ae;
+      box-shadow: 0 0 0 3px rgba(238, 121, 174, 0.14);
+    }
+
+    .table-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 4.7rem;
+      color: #30333b;
+      font-size: 0.86rem;
+    }
+
+    @media (max-width: 900px) {
+      .admin-layout {
+        display: block;
+      }
+
+      .toolbar,
+      .table-footer {
+        flex-direction: column;
+        align-items: stretch;
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .tool-actions {
+        justify-content: flex-start;
+      }
+    }
+  </style>
   <link rel="stylesheet" href="/static/css/system_palette.css">
 </head>
-<body class="min-h-screen bg-yellow-50">
-  <div class="max-w-5xl mx-auto p-8">
-    <div class="bg-white rounded-lg p-6 shadow">
-      <div class="flex items-center justify-between mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Schedule Interviews</h1>
-        <div class="flex gap-4">
-            <a href="/admin-calendar/" class="bg-amber-100 text-amber-800 px-4 py-2 rounded-lg font-semibold hover:bg-amber-200">
-                <i class="fas fa-calendar-alt mr-2"></i>View Calendar
-            </a>
-            <a href="/admin-dashboard/" class="text-sm text-yellow-700 hover:underline">← Back to dashboard</a>
-        </div>
+<body class="admin-page">
+  <div class="admin-layout">
+    {% include "partials/admin_sidebar.html" with active="actions" %}
+
+  <main class="screening-shell flex-1">
+    <header class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+      <div>
+        <a href="/admin-dashboard/" class="top-link"><i class="fas fa-arrow-left mr-2"></i>Back to dashboard</a>
+        <h1 class="mt-6 text-3xl font-black tracking-tight">{{ current_stage.label|default:"Initial Screening" }}</h1>
+        <p class="mt-2 text-base font-semibold text-gray-700">Approve applicants to move them to Demo Evaluation. Use email for updates.</p>
+        <nav class="stage-tabs" aria-label="Actions">
+          {% for tab in stage_tabs %}
+            <a href="/schedule-initial/?stage={{ tab.key }}" class="stage-tab {% if active_stage == tab.key %}active{% endif %}">{{ tab.label }}</a>
+          {% endfor %}
+        </nav>
       </div>
 
-      {% if not applicants %}
-        <div class="p-8 text-center border-2 border-dashed border-gray-200 rounded-2xl">
-            <p class="text-gray-500">No applicants currently in initial screening stage.</p>
-        </div>
-      {% else %}
-        <div class="space-y-6">
-          {% for app in applicants %}
-          <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-            <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-8">
-              <div class="flex-shrink-0">
-                <div class="flex items-center gap-3">
-                  <div class="font-bold text-xl text-gray-900">{{ app.first_name }} {{ app.last_name }}</div>
-                  <button type="button"
-                          class="email-trigger flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full hover:bg-blue-200"
-                          data-name="{{ app.first_name }}"
-                          data-email="{{ app.email }}">
-                    <i class="fas fa-envelope mr-1"></i> Email
-                  </button>
-                </div>
-                <div class="text-sm text-gray-600 mt-1">{{ app.email }}</div>
-                
-                {% if app.current_schedule %}
-                  <div class="mt-4 p-4 bg-white rounded-xl border border-green-200 shadow-sm">
-                    <div class="text-xs font-bold text-green-600 uppercase tracking-wider">
-                      <i class="fas fa-check-circle mr-1"></i>Scheduled
-                    </div>
-                    <div class="text-sm font-semibold text-gray-800 mt-1">
-                      {{ app.current_schedule.scheduled_at|date:"F d, Y @ h:i A" }}
-                    </div>
-                  </div>
-                {% endif %}
-              </div>
-
-              <div class="flex-1 bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
-                <form method="POST" action="/schedule-action/" class="space-y-4">
-                  {% csrf_token %}
-                  <input type="hidden" name="applicant_identifier" value="{{ app.applicant_id }}">
-                  <input type="hidden" name="redirect_to" value="/schedule-initial/">
-                  <input type="hidden" name="type" value="initial">
-                  <input type="hidden" name="title" value="Initial Screening Interview">
-                  
-                  <div class="grid grid-cols-1 gap-4">
-                    <div>
-                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Select Date & Time</label>
-                      <input type="datetime-local" 
-                             name="scheduled_at" 
-                             class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400" 
-                             value="{{ app.current_schedule.scheduled_at|date:'Y-m-dT00:00' }}"
-                             required>
-                    </div>
-                  </div>
-                  
-                  <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded-lg transition shadow-md">
-                    <i class="fas fa-calendar-check mr-2"></i>Update Schedule
-                  </button>
-                </form>
-              </div>
-            </div>
+      <div class="flex flex-col items-end gap-7">
+        <div class="flex items-start gap-4">
+          <span class="admin-avatar">AD</span>
+          <div class="min-w-0">
+            <p class="text-sm font-black uppercase tracking-wide">Admin</p>
+            <p class="text-sm font-bold text-gray-500">Email</p>
+            <p class="max-w-xs truncate text-sm font-semibold text-gray-700">{{ request.user.email|default:"admin@gleekids.com" }}</p>
           </div>
-          {% endfor %}
         </div>
-      {% endif %}
-    </div>
+        <span class="review-badge"><i class="fas fa-eye"></i> {{ current_stage.label|default:"Screening" }} review only</span>
+      </div>
+    </header>
+
+    <section class="list-panel">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <input id="applicantSearch" type="search" placeholder="Press enter to search" autocomplete="off">
+          <i class="fas fa-search"></i>
+        </div>
+        <div class="tool-actions">
+          <button type="button" id="arrangeBtn" class="tool-btn"><i class="fas fa-list"></i> Arrange</button>
+          <button type="button" id="filterBtn" class="tool-btn"><i class="fas fa-filter"></i> Filter</button>
+          <button type="button" id="downloadBtn" class="tool-btn"><i class="fas fa-cloud-download-alt"></i> Download</button>
+          <button type="button" class="tool-btn disabled" disabled><i class="fas fa-sliders-h"></i> Action</button>
+        </div>
+      </div>
+      <div id="filterPanel" class="filter-panel">
+        <label class="text-xs font-black uppercase tracking-wide text-gray-500" for="workSetupFilter">Work setup</label>
+        <select id="workSetupFilter" class="filter-select">
+          <option value="">All</option>
+          <option value="WFH">WFH</option>
+          <option value="Office Based">Office Based</option>
+        </select>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="app-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="selectAllApplicants" class="row-check" aria-label="Select all applicants"></th>
+              <th>Applicant ID</th>
+              <th>Applicant name</th>
+              <th>Email</th>
+              <th>Position applied</th>
+              <th>Date applied</th>
+              <th>Resume</th>
+              <th>Status</th>
+              <th>Work Setup</th>
+              <th>Video</th>
+              <th>Video 2</th>
+              <th>TEFL</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="applicantTableBody">
+            {% for app in applicants %}
+              <tr data-search="{{ app.first_name }} {{ app.last_name }} {{ app.email }}" data-name="{{ app.first_name }} {{ app.last_name }}" data-date="{{ app.created_at|date:'Y-m-d H:i:s' }}" data-work-setup="{{ app.work_setup }}">
+                <td><input type="checkbox" class="row-check" aria-label="Select {{ app.first_name }} {{ app.last_name }}"></td>
+                <td>APP-{{ forloop.counter|stringformat:"04d" }}</td>
+                <td>{{ app.first_name }} {{ app.last_name }}</td>
+                <td>{{ app.email }}</td>
+                <td>ESL Teacher</td>
+                <td>{{ app.created_at|date:"d/m/Y" }}</td>
+                <td>
+                  {% if app.resume %}
+                    <a href="{{ app.resume.url }}" target="_blank" rel="noopener" class="resume-link">View</a>
+                  {% else %}
+                    <span class="text-gray-400">-</span>
+                  {% endif %}
+                </td>
+                <td><span class="status-chip">{{ app.status }}</span></td>
+                <td>{{ app.work_setup }}</td>
+                <td>
+                  {% if app.video %}
+                    <a href="{{ app.video.url }}" target="_blank" rel="noopener" class="resume-link">View</a>
+                  {% else %}
+                    <span class="text-gray-400">-</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if app.video_2 %}
+                    <a href="{{ app.video_2.url }}" target="_blank" rel="noopener" class="resume-link">View</a>
+                  {% else %}
+                    <span class="text-gray-400">-</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if app.tefl_certificate %}
+                    <a href="{{ app.tefl_certificate.url }}" target="_blank" rel="noopener" class="resume-link">View</a>
+                  {% else %}
+                    <span class="text-gray-400">-</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="flex items-center gap-2">
+                    <button type="button"
+                            class="email-trigger"
+                            data-name="{{ app.first_name }}"
+                            data-email="{{ app.email }}">
+                      Email
+                    </button>
+                    <form method="POST" action="/update-status/" class="status-action-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="applicant_id" value="{{ app.applicant_id }}">
+                      <input type="hidden" name="redirect_to" value="/schedule-initial/?stage={{ active_stage }}">
+                      <input type="hidden" name="status_note" value="Status changed from {{ app.status }} from schedule action dropdown.">
+                      <select name="new_status" class="status-action-select" aria-label="Change status for {{ app.first_name }} {{ app.last_name }}">
+                        <option value="">Applicant status</option>
+                        {% for option in action_status_options %}
+                          <option value="{{ option.status }}" {% if app.status == option.status %}selected{% endif %}>{{ option.label }}</option>
+                        {% endfor %}
+                      </select>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="13" class="py-14 text-center font-bold text-gray-400">No applicants currently in {{ current_stage.label|default:"this" }} stage.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <span>Total : {{ applicants|length }}</span>
+        <span>Rows per page: 10&nbsp;&nbsp;&nbsp; 1-10 of {{ applicants|length }}</span>
+      </div>
+    </section>
+  </main>
   </div>
+
   <!-- Compose Email Modal -->
   <div id="emailModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/40 px-4">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-full max-w-xl">
       <div class="flex items-center justify-between px-6 py-4 border-b">
         <div class="flex items-center gap-2">
           <span class="inline-block w-2 h-2 rounded-full bg-red-400"></span>
-          <span class="inline-block w-2 h-2 rounded-full bg-yellow-400"></span>
+          <span class="inline-block w-2 h-2 rounded-full bg-pink-300"></span>
           <span class="inline-block w-2 h-2 rounded-full bg-green-400"></span>
           <h2 class="text-lg font-semibold text-gray-800 ml-3">Compose Email</h2>
         </div>
-        <button type="button" id="closeEmailModal" class="text-gray-400 hover:text-gray-600">×</button>
+        <button type="button" id="closeEmailModal" class="text-gray-400 hover:text-gray-600">x</button>
       </div>
-      <form id="emailForm" class="p-6 space-y-4">
+      <form id="emailForm" class="p-6 space-y-4" method="post" action="/send-applicant-email/">
+        {% csrf_token %}
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1" for="emailSubject">Subject</label>
-          <input id="emailSubject" name="subject" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400" required>
+          <input id="emailSubject" name="subject" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400 focus:border-blue-400" required>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1" for="emailRecipient">Recipient</label>
@@ -107,7 +461,7 @@
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1" for="emailMessage">Message</label>
-          <textarea id="emailMessage" name="message" rows="6" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400" required></textarea>
+          <textarea id="emailMessage" name="message" rows="6" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 focus:border-blue-400" required></textarea>
         </div>
         <div class="flex justify-end gap-3 pt-2">
           <button type="button" id="cancelEmail" class="px-6 py-2 rounded-full bg-red-100 text-red-600 font-semibold">Cancel</button>
@@ -180,7 +534,11 @@
       sendButton.textContent = 'Sending...';
 
       try {
-        const res = await fetch('#', { method: 'POST', body: payload });
+        const res = await fetch('/send-applicant-email/', {
+          method: 'POST',
+          body: payload,
+          headers: { 'X-CSRFToken': document.querySelector('#emailForm [name=csrfmiddlewaretoken]').value }
+        });
         const data = await res.json();
         if (res.ok && data.ok) {
           alert('Email sent successfully.');
@@ -195,6 +553,128 @@
         sendButton.textContent = originalText;
       }
     });
+
+    const applicantSearch = document.getElementById('applicantSearch');
+    const tableBody = document.getElementById('applicantTableBody');
+    const arrangeBtn = document.getElementById('arrangeBtn');
+    const filterBtn = document.getElementById('filterBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const filterPanel = document.getElementById('filterPanel');
+    const workSetupFilter = document.getElementById('workSetupFilter');
+    const selectAllApplicants = document.getElementById('selectAllApplicants');
+    let sortMode = 'newest';
+
+    function getRows() {
+      return tableBody ? Array.from(tableBody.querySelectorAll('tr[data-search]')) : [];
+    }
+
+    function applyTableState() {
+      if (!tableBody) return;
+      const query = applicantSearch ? applicantSearch.value.trim().toLowerCase() : '';
+      const setup = workSetupFilter ? workSetupFilter.value : '';
+      const rows = getRows();
+
+      rows.forEach(row => {
+        const matchesSearch = !query || row.dataset.search.toLowerCase().includes(query);
+        const matchesSetup = !setup || row.dataset.workSetup === setup;
+        row.style.display = matchesSearch && matchesSetup ? '' : 'none';
+      });
+      updateSelectAllState();
+    }
+
+    function visibleRows() {
+      return getRows().filter(row => row.style.display !== 'none');
+    }
+
+    function rowCheckboxes(rows) {
+      return rows
+        .map(row => row.querySelector('input.row-check'))
+        .filter(Boolean);
+    }
+
+    function updateSelectAllState() {
+      if (!selectAllApplicants) return;
+      const visibleCheckboxes = rowCheckboxes(visibleRows());
+      const checkedCount = visibleCheckboxes.filter(checkbox => checkbox.checked).length;
+      selectAllApplicants.checked = visibleCheckboxes.length > 0 && checkedCount === visibleCheckboxes.length;
+      selectAllApplicants.indeterminate = checkedCount > 0 && checkedCount < visibleCheckboxes.length;
+    }
+
+    function arrangeRows() {
+      if (!tableBody) return;
+      sortMode = sortMode === 'newest' ? 'name' : 'newest';
+      const rows = getRows();
+      rows.sort((a, b) => {
+        if (sortMode === 'name') {
+          return a.dataset.name.localeCompare(b.dataset.name);
+        }
+        return b.dataset.date.localeCompare(a.dataset.date);
+      });
+      rows.forEach(row => tableBody.appendChild(row));
+      if (arrangeBtn) {
+        arrangeBtn.innerHTML = sortMode === 'name'
+          ? '<i class="fas fa-sort-alpha-down"></i> Name'
+          : '<i class="fas fa-calendar-alt"></i> Newest';
+      }
+      applyTableState();
+    }
+
+    function csvEscape(value) {
+      return `"${String(value || '').replace(/"/g, '""').trim()}"`;
+    }
+
+    function downloadVisibleRows() {
+      const headers = ['Applicant ID', 'Applicant name', 'Email', 'Position applied', 'Date applied', 'Resume', 'Status', 'Work Setup', 'Video', 'Video 2', 'TEFL'];
+      const rows = getRows().filter(row => row.style.display !== 'none').map(row => {
+        const cells = Array.from(row.children).slice(1, 12);
+        return cells.map(cell => csvEscape(cell.innerText));
+      });
+      const csv = [headers.map(csvEscape), ...rows].map(row => row.join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'initial-screening-applicants.csv';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    if (applicantSearch && tableBody) {
+      applicantSearch.addEventListener('keydown', event => {
+        if (event.key !== 'Enter') return;
+        event.preventDefault();
+        applyTableState();
+      });
+    }
+
+    if (arrangeBtn) arrangeBtn.addEventListener('click', arrangeRows);
+    if (selectAllApplicants) {
+      selectAllApplicants.addEventListener('change', () => {
+        rowCheckboxes(visibleRows()).forEach(checkbox => {
+          checkbox.checked = selectAllApplicants.checked;
+        });
+        updateSelectAllState();
+      });
+    }
+    document.querySelectorAll('.status-action-select').forEach(select => {
+      select.addEventListener('change', () => {
+        if (!select.value) return;
+        select.form.submit();
+      });
+    });
+    document.querySelectorAll('#applicantTableBody input.row-check').forEach(checkbox => {
+      checkbox.addEventListener('change', updateSelectAllState);
+    });
+    if (filterBtn && filterPanel) {
+      filterBtn.addEventListener('click', () => {
+        filterPanel.classList.toggle('open');
+      });
+    }
+    if (workSetupFilter) workSetupFilter.addEventListener('change', applyTableState);
+    if (downloadBtn) downloadBtn.addEventListener('click', downloadVisibleRows);
+    updateSelectAllState();
   </script>
 </body>
 </html>

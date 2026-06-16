@@ -791,14 +791,69 @@
             filter: drop-shadow(0 6px 20px rgba(255, 193, 34, 0.3));
         }
 
+        .site-footer {
+            background: linear-gradient(135deg, #18143f 0%, #282064 48%, #342a73 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-footer::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 12% 16%, rgba(238, 121, 174, 0.18), transparent 16rem),
+                radial-gradient(circle at 88% 84%, rgba(108, 162, 239, 0.16), transparent 18rem);
+            pointer-events: none;
+        }
+
+        .footer-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-brand-logo {
+            height: 4.5rem;
+            width: auto;
+            border-radius: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0.55rem;
+            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18);
+        }
+
         .footer-heading {
-            color: #8A8AE2;
-            color: rgba(255, 255, 255, 0.7);
-            transition: color 0.3s ease;
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.78);
+            font-weight: 700;
+            transition: color 0.2s ease, transform 0.2s ease;
         }
 
         .footer-link:hover {
-            color: #FFC122;
+            color: #ee79ae;
+            transform: translateX(2px);
+        }
+
+        .footer-contact {
+            display: inline-flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            color: rgba(255, 255, 255, 0.82);
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .footer-contact svg {
+            flex: 0 0 auto;
+            color: #ee79ae;
+            margin-top: 0.15rem;
         }
 
         .footer-input {
@@ -807,10 +862,30 @@
             color: white;
         }
 
+        .footer-input::placeholder {
+            color: rgba(255, 255, 255, 0.52);
+        }
+
         .footer-input:focus {
             outline: none;
-            border-color: #FFC122;
-            box-shadow: 0 0 0 3px rgba(255, 193, 34, 0.2);
+            border-color: #ee79ae;
+            box-shadow: 0 0 0 3px rgba(238, 121, 174, 0.2);
+        }
+
+        .footer-social {
+            display: inline-grid;
+            place-items: center;
+            width: 2.4rem;
+            height: 2.4rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .footer-social:hover {
+            background: rgba(238, 121, 174, 0.28);
+            transform: translateY(-2px);
         }
 
         .applicant-section {
@@ -984,7 +1059,7 @@
         }
 
         .testimonial-card {
-            flex: 0 0 calc(33.333% - 1.35rem);
+            flex: 0 0 calc(25% - 1.5rem);
             background: #f9fafb;
             padding: 2.5rem 2rem;
             border-radius: 12px;
@@ -1064,9 +1139,383 @@
             transform: scale(1.1);
         }
 
+        .teacher-stories {
+            position: relative;
+            overflow: hidden;
+            border-radius: 30px;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 248, 224, 0.92)),
+                #fff;
+            border: 1px solid rgba(255, 193, 34, 0.24);
+            box-shadow: 0 24px 70px rgba(31, 41, 55, 0.08);
+            padding: clamp(1.5rem, 4vw, 3rem);
+        }
+
+        .teacher-stories::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(138, 138, 226, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(138, 138, 226, 0.08) 1px, transparent 1px);
+            background-size: 34px 34px;
+            opacity: 0.45;
+            pointer-events: none;
+        }
+
+        .teacher-stories-grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: clamp(1.5rem, 4vw, 3rem);
+            align-items: center;
+        }
+
+        .teacher-stories.is-expanded .teacher-stories-grid {
+            grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+        }
+
+        .teacher-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-radius: 999px;
+            background: #fff4d6;
+            color: #9a5b00;
+            padding: 0.55rem 0.9rem;
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .teacher-stories-title {
+            margin-top: 1rem;
+            max-width: 38rem;
+            font-size: clamp(2.15rem, 5vw, 4.35rem);
+            line-height: 0.95;
+            font-weight: 900;
+            color: #202454;
+        }
+
+        .teacher-stories-title span {
+            color: #8A8AE2;
+        }
+
+        .teacher-stories-copy {
+            max-width: 36rem;
+            margin-top: 1rem;
+            color: #5f6575;
+            font-size: 1.05rem;
+            line-height: 1.75;
+            font-weight: 700;
+        }
+
+        .teacher-story-list {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .teacher-story-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1rem;
+            align-items: start;
+            border-radius: 18px;
+            border: 1px solid rgba(138, 138, 226, 0.16);
+            background: rgba(255, 255, 255, 0.86);
+            padding: 1rem;
+            box-shadow: 0 12px 26px rgba(31, 41, 55, 0.05);
+        }
+
+        .teacher-story-card.is-extra {
+            display: none;
+        }
+
+        .teacher-story-card.is-extra.is-visible {
+            display: grid;
+        }
+
+        .teacher-story-avatar {
+            width: 3.7rem;
+            height: 3.7rem;
+            border-radius: 16px;
+            object-fit: cover;
+            box-shadow: 0 10px 22px rgba(138, 138, 226, 0.16);
+        }
+
+        .teacher-story-card p {
+            color: #3f4658;
+            line-height: 1.55;
+            font-weight: 700;
+        }
+
+        .teacher-story-card strong {
+            display: block;
+            margin-top: 0.5rem;
+            color: #202454;
+        }
+
+        .teacher-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .teacher-more-btn,
+        .teacher-apply-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border-radius: 999px;
+            border: 0;
+            padding: 0.9rem 1.25rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .teacher-more-btn {
+            background: #202454;
+            color: #fff;
+            box-shadow: 0 14px 28px rgba(32, 36, 84, 0.18);
+        }
+
+        .teacher-apply-btn {
+            background: #fff;
+            color: #8A8AE2;
+            border: 1px solid rgba(138, 138, 226, 0.2);
+        }
+
+        .teacher-more-btn:hover,
+        .teacher-apply-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .teacher-video-feature {
+            justify-self: center;
+            width: min(100%, 20rem);
+        }
+
+        .teacher-video-feature.is-extra {
+            display: none;
+        }
+
+        .teacher-stories.is-expanded .teacher-video-feature.is-extra {
+            display: block;
+        }
+
+        .teacher-video-shell {
+            position: relative;
+            border-radius: 28px;
+            background: #16182c;
+            padding: 0.85rem;
+            box-shadow: 0 28px 60px rgba(32, 36, 84, 0.2);
+        }
+
+        .teacher-video-shell::before {
+            content: '';
+            display: block;
+            width: 4rem;
+            height: 0.28rem;
+            margin: 0 auto 0.7rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.26);
+        }
+
+        .teacher-video-shell iframe {
+            display: block;
+            width: 100%;
+            aspect-ratio: 267 / 476;
+            height: auto;
+            border: 0;
+            border-radius: 20px;
+            background: #000;
+        }
+
+        .teacher-video-caption {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 0.85rem;
+            color: #fff;
+            font-weight: 900;
+            font-size: 0.9rem;
+        }
+
+        .teacher-video-caption span:last-child {
+            color: #FFC122;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .teacher-stories {
+            display: none;
+        }
+
+        .legacy-testimonials {
+            display: block;
+        }
+
+        .legacy-testimonials.carousel-controls {
+            display: flex;
+        }
+
+        .teacher-reel-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 0.85rem;
+            border: 0;
+            border-radius: 999px;
+            background: #202454;
+            color: #fff;
+            padding: 0.55rem 0.9rem;
+            font-size: 0.78rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            box-shadow: 0 12px 24px rgba(32, 36, 84, 0.18);
+        }
+
+        .teacher-reel-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 28px rgba(32, 36, 84, 0.22);
+        }
+
+        .teacher-reel-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: none;
+            place-items: center;
+            padding: 1rem;
+            background: rgba(12, 16, 36, 0.72);
+            backdrop-filter: blur(14px);
+        }
+
+        .teacher-reel-modal.is-open {
+            display: grid;
+        }
+
+        .teacher-reel-panel {
+            position: relative;
+            width: min(100%, 58rem);
+            max-height: 92vh;
+            overflow: auto;
+            border-radius: 28px;
+            background:
+                radial-gradient(circle at 18% 12%, rgba(255, 193, 34, 0.2), transparent 34%),
+                linear-gradient(135deg, #fffefa, #f6f4ff);
+            box-shadow: 0 36px 110px rgba(0, 0, 0, 0.32);
+            padding: clamp(1.25rem, 3vw, 2.4rem);
+        }
+
+        .teacher-reel-close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            display: grid;
+            place-items: center;
+            width: 2.4rem;
+            height: 2.4rem;
+            border: 0;
+            border-radius: 999px;
+            background: #202454;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+
+        .teacher-reel-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(250px, 21rem);
+            gap: clamp(1.5rem, 4vw, 3rem);
+            align-items: center;
+        }
+
+        .teacher-reel-kicker {
+            display: inline-flex;
+            width: fit-content;
+            border-radius: 999px;
+            background: #fff4d6;
+            color: #9a5b00;
+            padding: 0.55rem 0.9rem;
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .teacher-reel-title {
+            margin-top: 1rem;
+            color: #202454;
+            font-size: clamp(2.3rem, 5vw, 4.4rem);
+            font-weight: 900;
+            line-height: 0.95;
+        }
+
+        .teacher-reel-copy {
+            max-width: 34rem;
+            margin-top: 1rem;
+            color: #5f6575;
+            font-weight: 800;
+            line-height: 1.75;
+        }
+
+        .teacher-reel-frame {
+            position: relative;
+            width: min(100%, 21rem);
+            margin-inline: auto;
+            border-radius: 32px;
+            background: #15172d;
+            padding: 0.9rem;
+            box-shadow: 0 28px 64px rgba(32, 36, 84, 0.24);
+        }
+
+        .teacher-reel-frame::before {
+            content: '';
+            display: block;
+            width: 4.5rem;
+            height: 0.3rem;
+            margin: 0 auto 0.8rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.28);
+        }
+
+        .teacher-reel-frame iframe {
+            display: block;
+            width: 100%;
+            aspect-ratio: 267 / 476;
+            height: auto;
+            border: 0;
+            border-radius: 22px;
+            background: #000;
+        }
+
         @media (max-width: 768px) {
             .testimonial-card {
                 flex: 0 0 100%;
+            }
+
+            .teacher-stories-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .teacher-video-feature {
+                justify-self: stretch;
+                width: min(100%, 18rem);
+                margin: 0 auto;
+            }
+
+            .teacher-reel-layout {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -3836,13 +4285,73 @@
             <div class="container mx-auto px-4">
                 <!-- Testimonials Section -->
                 <div class="mb-20">
-                    <div class="text-center mb-12">
+                    <div class="teacher-stories" id="teacherStories">
+                        <div class="teacher-stories-grid">
+                            <div>
+                                <div class="teacher-kicker">Here in Gleekids</div>
+                                <h2 class="teacher-stories-title">Hear from Our <span>Teachers</span></h2>
+                                <p class="teacher-stories-copy">
+                                    Meet the educators who make online lessons warm, clear, and full of student energy.
+                                    Their stories show what support, coaching, and a strong teaching community feel like.
+                                </p>
+
+                                <div class="teacher-story-list" id="teacherStoryList">
+                                    <article class="teacher-story-card">
+                                        <img class="teacher-story-avatar" src="/media/joy.jpg" alt="Teach Joylyn profile photo">
+                                        <div>
+                                            <p>Working with Gleekids helped me grow with a team that checks in, guides, and celebrates teacher progress.</p>
+                                            <strong>Teach Joylyn</strong>
+                                        </div>
+                                    </article>
+                                    <article class="teacher-story-card">
+                                        <img class="teacher-story-avatar" src="/media/cla.jpg" alt="Teach Clarence profile photo">
+                                        <div>
+                                            <p>The teaching flow is organized, and the support makes every class feel easier to prepare for.</p>
+                                            <strong>Teach Clarence</strong>
+                                        </div>
+                                    </article>
+                                    <article class="teacher-story-card is-extra">
+                                        <img class="teacher-story-avatar" src="/media/rea.jpg" alt="Teach Rea profile photo">
+                                        <div>
+                                            <p>I love the curriculum and the positive environment. Gleekids invests in teacher development.</p>
+                                            <strong>Teach Rea</strong>
+                                        </div>
+                                    </article>
+                                    <article class="teacher-story-card is-extra">
+                                        <img class="teacher-story-avatar" src="/media/tes.jpg" alt="Teach Ver profile photo">
+                                        <div>
+                                            <p>From day one, I felt welcomed by the Gleekids family and supported by people who care.</p>
+                                            <strong>Teach Ver</strong>
+                                        </div>
+                                    </article>
+                                </div>
+
+                                <div class="teacher-actions">
+                                    <button type="button" class="teacher-more-btn" id="teacherMoreBtn" onclick="toggleTeacherStories()" aria-expanded="false">
+                                        See more
+                                    </button>
+                                    <a href="/apply/" class="teacher-apply-btn">Apply to teach</a>
+                                </div>
+                            </div>
+
+                            <div class="teacher-video-feature is-extra" aria-label="Here in Gleekids teacher reel">
+                                <div class="teacher-video-shell">
+                                    <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F26110375698603207%2F&show_text=false&width=267&t=0" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids teacher reel"></iframe>
+                                    <div class="teacher-video-caption">
+                                        <span>Inside the classroom culture</span>
+                                        <span>Watch reel</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="legacy-testimonials text-center mb-12">
                         <h2 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">Hear from Our Teachers</h2>
                         <p class="text-lg text-gray-600">Discover what our educators love about working with Gleekids
                         </p>
                     </div>
 
-                    <div class="testimonial-carousel">
+                    <div class="legacy-testimonials testimonial-carousel">
                         <div class="testimonial-track" id="testimonialTrack">
                             <div class="testimonial-card">
                                 <div class="testimonial-quote">"</div>
@@ -3905,13 +4414,36 @@
                             </div>
                         </div>
                     </div>
+                    <div class="legacy-testimonials mt-5 flex justify-end">
+                        <a href="/teacher-stories/" class="teacher-reel-link">
+                            See more
+                        </a>
+                    </div>
 
-                    <div class="carousel-controls">
+                    <div class="legacy-testimonials carousel-controls">
                         <button onclick="prevTestimonial()" class="carousel-btn">‹</button>
                         <button onclick="nextTestimonial()" class="carousel-btn">›</button>
                     </div>
                 </div>
 
+                    <div id="teacherReelModal" class="teacher-reel-modal" aria-hidden="true">
+                        <section class="teacher-reel-panel" role="dialog" aria-modal="true" aria-labelledby="teacherReelTitle">
+                            <button type="button" class="teacher-reel-close" onclick="closeTeacherReel()" aria-label="Close teacher video">&times;</button>
+                            <div class="teacher-reel-layout">
+                                <div>
+                                    <div class="teacher-reel-kicker">Here in Gleekids</div>
+                                    <h3 id="teacherReelTitle" class="teacher-reel-title">More teacher moments from our classrooms.</h3>
+                                    <p class="teacher-reel-copy">
+                                        Watch a quick look at the energy, care, and community our teachers bring into every lesson.
+                                    </p>
+                                    <a href="/apply/" class="teacher-apply-btn mt-6">Apply to teach</a>
+                                </div>
+                                <div class="teacher-reel-frame">
+                                    <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F26110375698603207%2F&show_text=false&width=267&t=0" width="267" height="476" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Here in Gleekids teacher reel"></iframe>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
                 <!-- Hiring Section -->
                 <div>
                     <div class="text-center mb-12">
@@ -4023,7 +4555,7 @@
                     </div>
                 </div>
                 <div class="text-center mt-12">
-                    <a href="applicant_form.html"
+                    <a href="/apply/"
                         class="btn-primary px-8 py-4 text-white rounded-full text-lg font-semibold">
                         Start Your Application Today →
                     </a>
@@ -4150,9 +4682,9 @@
 
                         <!-- CTA Button -->
                         <div>
-                            <a href="applicant_form.html"
+                            <a href="/apply/"
                                 class="btn-primary px-8 py-4 text-white rounded-lg text-lg font-semibold inline-block">
-                                Apply Now →
+                                Apply Now
                             </a>
                         </div>
                     </div>
@@ -4162,100 +4694,116 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-12">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div>
-                <a href="hero.html" class="flex items-center space-x-2 mb-4" aria-label="Gleekids Homepage">
-                    <img src="/media/gleelogo.png" alt="Gleekids Logo" class="w-60 h-50 rounded-full object-cover">
-                </a>
-                <p class="text-gray-400 text-sm">Empowering educators, connecting opportunities.</p>
-                <div class="flex space-x-4 mt-6">
-                    <a href="https://www.facebook.com" class="social-icon" aria-label="Facebook" target="_blank"
-                        rel="noopener">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                        </svg>
+    <footer class="site-footer">
+        <div class="footer-content container mx-auto px-4 py-14">
+            <div class="grid gap-10 lg:grid-cols-[1.25fr_0.7fr_0.7fr_1fr]">
+                <div>
+                    <a href="/" class="inline-flex items-center gap-4" aria-label="Gleekids Homepage">
+                        <img src="/media/gleelogo.png" alt="Gleekids Logo" class="footer-brand-logo">
                     </a>
-                    <a href="https://www.linkedin.com" class="social-icon" aria-label="LinkedIn" target="_blank"
-                        rel="noopener">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z">
-                            </path>
-                            <rect width="4" height="12" x="2" y="9"></rect>
-                            <circle cx="4" cy="4" r="2"></circle>
-                        </svg>
-                    </a>
-                    <a href="https://www.twitter.com" class="social-icon" aria-label="Twitter" target="_blank"
-                        rel="noopener">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path
-                                d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z">
-                            </path>
-                        </svg>
-                    </a>
+                    <p class="mt-5 max-w-sm text-sm font-semibold leading-6 text-white/72">
+                        Connecting ESL educators with supported opportunities, clear hiring steps, and a team that helps them grow.
+                    </p>
+                    <div class="mt-6 flex gap-3">
+                        <a href="https://www.facebook.com" class="footer-social" aria-label="Facebook" target="_blank" rel="noopener">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                        </a>
+                        <a href="mailto:gleekidsesl6115@gmail.com" class="footer-social" aria-label="Email Gleekids">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <nav aria-label="Footer quick links">
+                    <h3 class="footer-heading mb-4">Explore</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#about" class="footer-link inline-block">About Us</a></li>
+                        <li><a href="#resources" class="footer-link inline-block">Resources</a></li>
+                        <li><a href="#process" class="footer-link inline-block">Application Process</a></li>
+                        <li><a href="/apply/" class="footer-link inline-block">Apply Online</a></li>
+                    </ul>
+                </nav>
+
+                <nav aria-label="Footer support links">
+                    <h3 class="footer-heading mb-4">Support</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#faq" class="footer-link inline-block">FAQs</a></li>
+                        <li><a href="#contact" class="footer-link inline-block">Contact Us</a></li>
+                        <li><a href="/login/" class="footer-link inline-block">Applicant Login</a></li>
+                        <li><a href="/admin-login/" class="footer-link inline-block">Admin Login</a></li>
+                    </ul>
+                </nav>
+
+                <div>
+                    <h3 class="footer-heading mb-4">Contact</h3>
+                    <div class="space-y-4 text-sm">
+                        <a href="mailto:gleekidsesl6115@gmail.com" class="footer-contact">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            <span>gleekidsesl6115@gmail.com</span>
+                        </a>
+                        <a href="https://www.google.com/maps/place/Gleekids+ESL/@10.7398551,122.9675878,93m/data=!3m1!1e3!4m9!1m2!2m1!1s2nd+floor,+Enrica+Building,+Talisay+City,+Negros+Occidental!3m5!1s0x33aed7bfffa8645f:0x7582471b2044e429!8m2!3d10.7401238!4d122.967686!16s%2Fg%2F11scsvt85m!5m2!1e2!1e4?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D" class="footer-contact" target="_blank" rel="noopener">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 13 8 13s8-7.75 8-13c0-4.42-3.58-8-8-8zm0 11c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"></path></svg>
+                            <span>2nd floor, Enrica Building,<br>Talisay City, Negros Occidental</span>
+                        </a>
+                    </div>
+                    <form onsubmit="handleNewsletterSubmit(event)" class="mt-6 flex">
+                        <label for="newsletter-email" class="sr-only">Email address</label>
+                        <input type="email" id="newsletter-email" placeholder="Your email" class="footer-input min-w-0 flex-1 rounded-l-xl p-3 text-sm font-semibold">
+                        <button type="submit" class="btn-primary rounded-r-xl px-4" aria-label="Subscribe">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </button>
+                    </form>
                 </div>
             </div>
-            <div>
-                <h3 class="text-lg font-semibold mb-4 footer-heading">Quick Links</h3>
-                <ul class="space-y-2">
-                    <li><a href="#about" class="footer-link">About Us</a></li>
-                    <li><a href="#resources" class="footer-link">Resources & Opportunities</a></li>
-                    <li><a href="#process" class="footer-link">Application Process</a></li>
-                </ul>
+
+            <div class="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm font-semibold text-white/55 md:flex-row md:items-center md:justify-between">
+                <p>&copy; 2026 Gleekids ESL. All rights reserved.</p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="https://www.gleekids.com/privacy" class="footer-link" target="_blank" rel="noopener">Privacy Policy</a>
+                    <a href="https://www.gleekids.com/terms" class="footer-link" target="_blank" rel="noopener">Terms of Service</a>
+                </div>
             </div>
-            <div>
-                <h3 class="text-lg font-semibold mb-4 footer-heading">Support</h3>
-                <ul class="space-y-2">
-                    <li><a href="#faq" class="footer-link">FAQs</a></li>
-                    <li><a href="#contact" class="footer-link">Contact Us</a></li>
-                    <li><a href="/admin-login/" class="footer-link font-semibold text-yellow-500 hover:text-yellow-400">Admin Login</a></li>
-                    <li><a href="https://www.gleekids.com/privacy" class="footer-link" target="_blank"
-                            rel="noopener">Privacy Policy</a></li>
-                    <li><a href="https://www.gleekids.com/terms" class="footer-link" target="_blank"
-                            rel="noopener">Terms of Service</a></li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-lg font-semibold mb-4 footer-heading">Stay Connected</h3>
-                <p class="text-gray-400 mb-4">Subscribe to our newsletter for updates and new opportunities.</p>
-                <form onsubmit="handleNewsletterSubmit(event)" class="flex">
-                    <label for="newsletter-email" class="sr-only">Email address</label>
-                    <input type="email" id="newsletter-email" placeholder="Your email"
-                        class="footer-input p-3 rounded-l-md w-full">
-                    <button type="submit" class="btn-primary rounded-r-md p-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                        </svg>
-                    </button>
-                </form>
-            </div>
-        </div>
-        <div class="text-center text-gray-500 text-sm mt-12 border-t border-gray-700 pt-8">
-            © 2024 Gleekids. All rights reserved.
         </div>
     </footer>
-
     <script>
-        // Testimonial carousel
-        let currentSlide = 0;
-        const totalSlides = document.querySelectorAll('.testimonial-card').length;
+        function toggleTeacherStories() {
+            const teacherStories = document.getElementById('teacherStories');
+            const extraStories = document.querySelectorAll('.teacher-story-card.is-extra');
+            const button = document.getElementById('teacherMoreBtn');
+            const shouldShow = Array.from(extraStories).some(card => !card.classList.contains('is-visible'));
 
-        function updateCarousel() {
-            const track = document.getElementById('testimonialTrack');
-            const offset = -currentSlide * (33.333 + 1.35);
-            track.style.transform = `translateX(${offset}%)`;
+            extraStories.forEach(card => card.classList.toggle('is-visible', shouldShow));
+            if (teacherStories) teacherStories.classList.toggle('is-expanded', shouldShow);
+            if (button) {
+                button.textContent = shouldShow ? 'Show less' : 'See more';
+                button.setAttribute('aria-expanded', shouldShow ? 'true' : 'false');
+            }
         }
 
-        function nextTestimonial() {
-            currentSlide = (currentSlide + 1) % totalSlides;
-            updateCarousel();
+        function openTeacherReel() {
+            const modal = document.getElementById('teacherReelModal');
+            if (!modal) return;
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
         }
 
-        function prevTestimonial() {
-            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-            updateCarousel();
+        function closeTeacherReel() {
+            const modal = document.getElementById('teacherReelModal');
+            if (!modal) return;
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
         }
+
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('teacherReelModal');
+            if (modal && event.target === modal) closeTeacherReel();
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') closeTeacherReel();
+        });
 
         // Mobile menu toggle
         document.getElementById('mobileMenuBtn').addEventListener('click', function () {
@@ -4363,3 +4911,5 @@
 </body>
 
 </html>
+
+

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sample Intro Videos - Gleekids</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --gk-blue: #2c2a78;
+            --gk-pink: #f48bc1;
+            --gk-violet: #7d6bd6;
+            --gk-ink: #27265f;
+            --gk-muted: #737894;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--gk-ink);
+            font-family: 'Nunito', sans-serif;
+            background:
+                radial-gradient(circle at 82% 4%, rgba(244, 139, 193, 0.32) 0 10rem, transparent 10.2rem),
+                radial-gradient(circle at 4% 26%, rgba(125, 107, 214, 0.18) 0 12rem, transparent 12.2rem),
+                linear-gradient(135deg, #fffdfa 0%, #f7f8ff 48%, #fff1f8 100%);
+        }
+
+        h1,
+        h2,
+        .brand-wordmark {
+            font-family: 'Baloo 2', cursive;
+            letter-spacing: 0;
+        }
+
+        .video-shell {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(217, 222, 242, 0.86);
+            border-radius: 1.25rem;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 28px 70px rgba(44, 42, 120, 0.13);
+        }
+
+        .video-shell::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image: radial-gradient(var(--gk-pink) 1px, transparent 1px);
+            background-size: 16px 16px;
+            background-position: right 1rem top 1rem;
+            opacity: 0.12;
+        }
+
+        .video-frame {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 0.9rem;
+            background: #171640;
+            box-shadow: 0 18px 40px rgba(44, 42, 120, 0.14);
+        }
+
+        .video-frame iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .sample-card {
+            border: 1px solid rgba(217, 222, 242, 0.86);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.88);
+        }
+
+        .back-link {
+            color: var(--gk-blue);
+            transition: transform 160ms ease, color 160ms ease;
+        }
+
+        .back-link:hover {
+            color: var(--gk-pink);
+            transform: translateX(-2px);
+        }
+    </style>
+</head>
+<body>
+    <main class="relative z-10 mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <section class="video-shell p-5 sm:p-8 lg:p-10">
+            <div class="relative z-10 mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <a href="{% url 'applicant_registration' %}" class="back-link inline-flex items-center gap-2 text-sm font-extrabold">
+                        <span aria-hidden="true">&larr;</span>
+                        Back to application form
+                    </a>
+                    <p class="brand-wordmark mt-6 text-xl font-extrabold" style="color: var(--gk-pink);">Gleekids ESL</p>
+                    <h1 class="mt-2 max-w-3xl text-4xl font-extrabold leading-none sm:text-5xl" style="color: var(--gk-blue);">
+                        Sample Intro Videos
+                    </h1>
+                    <p class="mt-4 max-w-2xl text-base font-bold leading-7" style="color: var(--gk-muted);">
+                        Watch these examples before uploading your MP4 introduction. Keep your video clear, friendly, and easy to understand.
+                    </p>
+                </div>
+            </div>
+
+            <div class="relative z-10 grid gap-6 lg:grid-cols-3">
+                <article class="sample-card p-4">
+                    <h2 class="mb-3 text-2xl font-extrabold" style="color: var(--gk-blue);">Teach Nina</h2>
+                    <div class="video-frame">
+                        <iframe src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F1441007940541101%2F&show_text=false&width=560&t=0" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>
+                    </div>
+                </article>
+
+                <article class="sample-card p-4">
+                    <h2 class="mb-3 text-2xl font-extrabold" style="color: var(--gk-blue);">Teach Jun</h2>
+                    <div class="video-frame">
+                        <iframe src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F600860689631195%2F&show_text=false&width=560&t=0" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>
+                    </div>
+                </article>
+
+                <article class="sample-card p-4">
+                    <h2 class="mb-3 text-2xl font-extrabold" style="color: var(--gk-blue);">Teach Kyna</h2>
+                    <div class="video-frame">
+                        <iframe src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F1802712054460430%2F&show_text=false&width=560&t=0" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>
+                    </div>
+                </article>
+
+                <article class="sample-card p-4">
+                    <h2 class="mb-3 text-2xl font-extrabold" style="color: var(--gk-blue);">Teach Rea</h2>
+                    <div class="video-frame">
+                        <iframe src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F2169090536823636%2F&show_text=false&width=560&t=0" width="560" height="314" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Sample intro video 4"></iframe>
+                    </div>
+                </article>
+
+                <article class="sample-card p-4">
+                    <h2 class="mb-3 text-2xl font-extrabold" style="color: var(--gk-blue);">Teacher Ver</h2>
+                    <div class="video-frame">
+                        <iframe src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F917879343431460%2F&show_text=false&width=560&t=0" width="560" height="314" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Sample intro video 5"></iframe>
+                    </div>
+                </article>
+
+                <article class="sample-card p-4">
+                    <h2 class="mb-3 text-2xl font-extrabold" style="color: var(--gk-blue);">Teach Josh</h2>
+                    <div class="video-frame">
+                        <iframe src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F1171358720775417%2F&show_text=false&width=560&t=0" width="560" height="314" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Sample intro video 6"></iframe>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

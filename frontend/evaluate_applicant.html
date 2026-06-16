@@ -26,9 +26,16 @@
         <a href="/demo-evaluation/" class="text-sm text-yellow-700 hover:underline">← Back to list</a>
       </div>
 
+      <div class="mb-6">
+        <a href="{{ app.demo_room_url }}" target="_blank" rel="noopener" class="inline-flex items-center rounded-xl bg-emerald-600 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-emerald-100 transition hover:bg-emerald-700">
+          <i class="fas fa-video mr-2"></i>Open Demo Class Room
+        </a>
+      </div>
+
       <form method="POST" action="/save-evaluation/" id="evalForm">
         {% csrf_token %}
         <input type="hidden" name="applicant_identifier" value="{{ app.applicant_id }}">
+        <input type="hidden" name="evaluation_type" value="demo">
         
         <div class="mb-6 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-100 shadow-sm">
           <h3 class="font-bold text-gray-900 mb-2">
@@ -52,7 +59,7 @@
                       <input type="radio" 
                              name="{{ item.key }}_rating" 
                              value="{{ i }}" 
-                             {% if i == eval|get_attr:item.key|stringformat:"i" %}checked{% endif %}
+                             {% if i == item.value %}checked{% endif %}
                              required
                              class="peer sr-only">
                       <div class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 text-sm font-bold text-gray-400 peer-checked:bg-amber-500 peer-checked:border-amber-500 peer-checked:text-white group-hover:border-amber-300 transition">

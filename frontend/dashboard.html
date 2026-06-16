@@ -86,6 +86,78 @@
       box-shadow: 0 10px 22px rgba(139, 107, 232, 0.12);
     }
 
+    .dash-shell {
+      min-height: 100vh;
+      align-items: stretch;
+    }
+
+    .system-sidebar {
+      width: 16rem;
+      min-height: 100vh;
+      position: sticky;
+      top: 0;
+      flex: 0 0 16rem;
+      border-right: 1px solid rgba(238, 121, 174, 0.34);
+      background: linear-gradient(180deg, #fff0f7 0%, #f3edff 48%, #fef7fb 100%);
+      box-shadow: 0 18px 48px rgba(139, 107, 232, 0.14);
+      transition: margin-left 0.22s ease, opacity 0.22s ease;
+      z-index: 5;
+    }
+
+    .dash-shell.sidebar-collapsed .system-sidebar {
+      margin-left: -16rem;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .dash-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-radius: 0.9rem;
+      padding: 0.78rem 1rem;
+      color: #625d86;
+      font-weight: 850;
+      transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
+    }
+
+    .dash-nav-link:hover {
+      background: var(--dash-violet-soft);
+      color: var(--dash-ink);
+      transform: translateX(2px);
+    }
+
+    .dash-nav-link i {
+      color: var(--dash-pink);
+    }
+
+    .dash-nav-active {
+      background: linear-gradient(135deg, var(--dash-violet), #7655d9);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(139, 107, 232, 0.26);
+    }
+
+    .dash-nav-active i {
+      color: #fff;
+    }
+
+    .dash-nav-badge {
+      margin-left: auto;
+      min-width: 1.75rem;
+      border-radius: 999px;
+      background: #fff0f7;
+      color: #bf4f88;
+      padding: 0.15rem 0.45rem;
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .dash-nav-active .dash-nav-badge {
+      background: rgba(255, 255, 255, 0.22);
+      color: #fff;
+    }
+
     .stat-card {
       min-height: 14.25rem;
       border-radius: 1.15rem;
@@ -137,9 +209,11 @@
       place-items: center;
       flex: 0 0 auto;
       border-radius: 999px;
+      background: #f5efff;
       background: color-mix(in srgb, var(--card-accent) 32%, white);
       color: var(--card-accent);
       font-size: 2rem;
+      box-shadow: inset 0 0 0 1px rgba(139, 107, 232, 0.18);
       box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--card-accent) 22%, white);
     }
 
@@ -161,6 +235,7 @@
       justify-content: center;
       gap: 0.45rem;
       border-radius: 0.8rem;
+      border: 1px solid rgba(139, 107, 232, 0.24);
       border: 1px solid color-mix(in srgb, var(--card-accent) 38%, white);
       color: var(--card-accent);
       background: rgba(255, 255, 255, 0.72);
@@ -179,6 +254,7 @@
     }
 
     .dash-btn-fill {
+      background: #f6f0ff;
       background: color-mix(in srgb, var(--card-accent) 15%, white);
     }
 
@@ -293,9 +369,9 @@
     }
 
     .sidebar-group {
-      border: 1px solid #f7e1a2;
+      border: 1px solid rgba(139, 107, 232, 0.16);
       border-radius: 1rem;
-      background: linear-gradient(145deg, #fffdf7, #fff8d8);
+      background: linear-gradient(145deg, #fff, #f8f3ff);
       padding: 0.55rem;
     }
 
@@ -306,7 +382,7 @@
       gap: 0.75rem;
       border-radius: 0.8rem;
       padding: 0.58rem 0.7rem;
-      color: #6b5b29;
+      color: #625d86;
       font-size: 0.82rem;
       font-weight: 800;
       transition: background 0.15s ease, color 0.15s ease;
@@ -321,11 +397,41 @@
       min-width: 1.6rem;
       border-radius: 999px;
       background: #fff;
-      color: #b45309;
+      color: var(--dash-violet);
       padding: 0.12rem 0.42rem;
       text-align: center;
       font-size: 0.72rem;
       font-weight: 900;
+    }
+
+    @media (max-width: 900px) {
+      .dash-shell {
+        display: block;
+      }
+
+      .system-sidebar {
+        width: 100%;
+        min-height: auto;
+        position: relative;
+        top: auto;
+        flex-basis: auto;
+        border-right: 0;
+        border-bottom: 1px solid rgba(139, 107, 232, 0.18);
+      }
+
+      .dash-shell.sidebar-collapsed .system-sidebar {
+        margin-left: 0;
+        display: none;
+      }
+
+      .dashboard-main {
+        padding: 1.25rem !important;
+      }
+
+      .dashboard-main::before,
+      .dashboard-main::after {
+        display: none;
+      }
     }
 
     .mini-calendar {
@@ -448,6 +554,7 @@
       height: 0.48rem;
       margin-top: 0.35rem;
       border-radius: 999px;
+      background: var(--event-color, var(--dash-pink));
     }
 
     .mini-event-time {
@@ -514,7 +621,8 @@
 
     .dash-panel-title i,
     .pipeline-icon,
-    .referral-icon {
+    .referral-icon,
+    .setup-icon {
       color: var(--dash-pink);
     }
 
@@ -550,7 +658,8 @@
 
     .today-title,
     .pipeline-label,
-    .referral-title {
+    .referral-title,
+    .setup-title {
       color: var(--dash-ink);
       font-size: 0.88rem;
       font-weight: 900;
@@ -558,7 +667,8 @@
     }
 
     .today-subtitle,
-    .referral-subtitle {
+    .referral-subtitle,
+    .setup-subtitle {
       color: #7a7498;
       font-size: 0.76rem;
       font-weight: 800;
@@ -609,6 +719,7 @@
     }
 
     .pipeline-fill {
+      width: var(--pipeline-percent, 0%);
       height: 100%;
       border-radius: inherit;
       background: linear-gradient(90deg, var(--dash-pink), var(--dash-violet));
@@ -670,48 +781,95 @@
     .referral-meta strong {
       color: var(--dash-pink);
     }
+
+    .referral-separator {
+      width: 0.32rem;
+      height: 0.32rem;
+      border-radius: 999px;
+      background: #d8cce8;
+      flex: 0 0 auto;
+    }
+
+    .setup-table-card {
+      border: 1px solid #f0e7f7;
+      border-radius: 1rem;
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: 0 12px 24px rgba(40, 32, 100, 0.06);
+      overflow: hidden;
+    }
+
+    .setup-table-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem;
+      background: linear-gradient(135deg, #fff, #fbf7ff);
+      border-bottom: 1px solid #f0e7f7;
+    }
+
+    .setup-heading {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      min-width: 0;
+    }
+
+    .setup-icon {
+      display: grid;
+      place-items: center;
+      width: 2.35rem;
+      height: 2.35rem;
+      border-radius: 0.8rem;
+      background: #fff0f7;
+      flex: 0 0 auto;
+    }
+
+    .setup-total {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 2.4rem;
+      height: 2.4rem;
+      border-radius: 999px;
+      background: var(--dash-violet-soft);
+      color: var(--dash-violet);
+      font-weight: 900;
+    }
+
+    .setup-table {
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    .setup-table th,
+    .setup-table td {
+      padding: 0.78rem 1rem !important;
+      font-size: 0.78rem;
+      vertical-align: middle;
+    }
+
+    .setup-table th {
+      background: #fff;
+      color: #7a7498;
+      font-weight: 900;
+    }
+
+    .setup-table td {
+      color: var(--dash-ink);
+      border-bottom: 1px solid #f3edf8;
+    }
+
+    .setup-table tr:last-child td {
+      border-bottom: 0;
+    }
   </style>
   <link rel="stylesheet" href="/static/css/system_palette.css">
 </head>
-<body class="min-h-screen">
-  <div class="flex">
+<body class="admin-page min-h-screen">
+  <div id="dashboardShell" class="dash-shell flex">
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 min-h-screen bg-white shadow-xl border-r border-yellow-200 sticky top-0">
-      <div class="p-6">
-        <img src="/media/gleelogo.png" alt="Gleekids Logo" class="h-12 w-auto mb-8 mx-auto">
-        <nav class="space-y-2">
-          <a href="/admin-dashboard/" class="flex items-center gap-3 px-4 py-3 bg-yellow-500 text-white rounded-xl font-semibold shadow-md">
-            <i class="fas fa-home"></i> Dashboard
-          </a>
-          <div class="sidebar-group">
-            <a href="/applicants/" class="flex items-center justify-between gap-3 px-3 py-3 text-gray-800 rounded-xl font-extrabold">
-              <span class="flex items-center gap-3"><i class="fas fa-users text-yellow-600"></i> Applicants</span>
-              <span class="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-bold text-yellow-800">{{ all_applicants_count }}</span>
-            </a>
-          </div>
-          <a href="/admin-calendar/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
-            <i class="fas fa-calendar-alt"></i> Schedules
-          </a>
-          <a href="/video-conferencing/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
-            <i class="fas fa-video"></i> Video Conferencing
-          </a>
-          <a href="/evaluations/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
-            <i class="fas fa-star"></i> Evaluations
-          </a>
-          <a href="/reports/" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
-            <i class="fas fa-chart-line"></i> Reports
-          </a>
-          <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-yellow-50 rounded-xl transition-colors font-medium">
-            <i class="fas fa-cog"></i> Settings
-          </a>
-          <div class="pt-10">
-            <a href="/logout/" class="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-semibold">
-              <i class="fas fa-sign-out-alt"></i> Sign Out
-            </a>
-          </div>
-        </nav>
-      </div>
-    </aside>
+    {% include "partials/admin_sidebar.html" with active="dashboard" %}
     <main class="dashboard-main flex-1 p-8">
       <div class="dashboard-wrap mx-auto">
         <div class="flex items-start justify-between gap-6">
@@ -719,9 +877,9 @@
             <h1 class="dash-title text-5xl font-extrabold">Admin Overview</h1>
             <p class="mt-3 text-xl font-bold" style="color: var(--dash-ink);">Welcome back.</p>
           </div>
-          <button id="toggleSidebar" class="sidebar-toggle inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-extrabold">
+          <button id="toggleSidebar" class="sidebar-toggle inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-extrabold" type="button" aria-controls="sidebar" aria-expanded="true">
             <i class="fas fa-chevron-left"></i>
-            Hide sidebar
+            <span data-sidebar-label>Hide sidebar</span>
           </button>
         </div>
 
@@ -753,7 +911,7 @@
                 </div>
                 <div class="mt-auto pt-6 grid gap-3">
                   {% if stat.key == 'Initial Screening' %}
-                    <a href="/schedule-initial/" class="dash-btn dash-btn-fill">Schedules</a>
+                    <a href="/schedule-initial/" class="dash-btn dash-btn-fill">Approve</a>
                   {% elif stat.key == 'Demo Evaluation' %}
                     <a href="/demo-evaluation/" class="dash-btn dash-btn-fill">Demos</a>
                   {% elif stat.key == 'Endorsement' %}
@@ -795,7 +953,7 @@
               <div class="mini-calendar-events">
                 {% for event in mini_calendar.upcoming_events %}
                   <div class="mini-calendar-event">
-                    <span class="mini-event-dot" style="background: {{ event.color }}"></span>
+                    <span class="mini-event-dot" style="--event-color: {{ event.color }}"></span>
                     <span class="mini-event-time">{{ event.time }}</span>
                     <span>
                       <span class="mini-event-title block">{{ event.title }}</span>
@@ -832,7 +990,7 @@
                   </span>
                   <span>
                     <span class="pipeline-label block">{{ item.label }}</span>
-                    <span class="pipeline-track block mt-2"><span class="pipeline-fill block" style="width: {{ item.percent }}%"></span></span>
+                    <span class="pipeline-track block mt-2"><span class="pipeline-fill block" style="--pipeline-percent: {{ item.percent }}%"></span></span>
                   </span>
                   <span class="pipeline-total">{{ item.total }}</span>
                 </div>
@@ -853,12 +1011,68 @@
                     <span class="referral-icon"><i class="fas fa-user-plus"></i></span>
                     <div class="referral-row-copy">
                       <span class="referral-title block">{{ item.label }}</span>
-                      <span class="referral-subtitle block">{{ item.total }} applicant{{ item.total|pluralize }} &middot; {{ item.approved }} approved</span>
+                      <span class="referral-subtitle referral-meta">
+                        <span>{{ item.total }} applicant{{ item.total|pluralize }}</span>
+                        <span class="referral-separator" aria-hidden="true"></span>
+                        <span>{{ item.approved }} approved</span>
+                      </span>
                     </div>
                     <span class="referral-total">{{ item.total }}</span>
                   </div>
               {% empty %}
                   <p class="py-8 text-sm font-bold text-gray-400">No referral data yet.</p>
+                {% endfor %}
+              </div>
+            </section>
+
+            <section class="dash-panel xl:col-span-6" aria-label="Application type separation">
+              <div class="dash-panel-head">
+                <h2 class="dash-panel-title"><i class="fas fa-briefcase"></i> Application Setup</h2>
+                <a href="/applicants/" class="dash-panel-link">Open applicants</a>
+              </div>
+              <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                {% for table in application_tables %}
+                  <article class="setup-table-card">
+                    <div class="setup-table-head">
+                      <div class="setup-heading">
+                        <span class="setup-icon"><i class="fas {{ table.icon }}"></i></span>
+                        <span>
+                          <span class="setup-title block">{{ table.label }}</span>
+                          <span class="setup-subtitle block">{{ table.subtitle }}</span>
+                        </span>
+                      </div>
+                      <span class="setup-total">{{ table.total }}</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                      <table class="setup-table">
+                        <thead>
+                          <tr>
+                            <th class="text-left">Applicant</th>
+                            <th class="text-left">Status</th>
+                            <th class="text-left">Applied</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for app in table.applicants %}
+                            <tr>
+                              <td>
+                                <a href="/applicant-details/{{ app.applicant_id }}/" class="font-extrabold text-gray-900 hover:text-pink-600">
+                                  {{ app.first_name }} {{ app.last_name }}
+                                </a>
+                                <span class="block text-xs font-bold text-gray-400">{{ app.email }}</span>
+                              </td>
+                              <td><span class="status-pill">{{ app.status }}</span></td>
+                              <td class="font-bold text-gray-500">{{ app.created_at|date:"M d" }}</td>
+                            </tr>
+                          {% empty %}
+                            <tr>
+                              <td colspan="3" class="py-8 text-center font-bold text-gray-400">No {{ table.label }} applications yet.</td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </article>
                 {% endfor %}
               </div>
             </section>
@@ -868,26 +1082,27 @@
       </div>
     </main>
   </div>
-</body>
-</html>
 <script>
   // Sidebar toggle: remembers state in localStorage
   (function(){
     var btn = document.getElementById('toggleSidebar');
-    var sidebar = document.getElementById('sidebar');
-    if (!btn || !sidebar) return;
+    var shell = document.getElementById('dashboardShell');
+    var label = btn ? btn.querySelector('[data-sidebar-label]') : null;
+    var icon = btn ? btn.querySelector('i') : null;
+    if (!btn || !shell) return;
     function setState(collapsed){
+      shell.classList.toggle('sidebar-collapsed', collapsed);
       if (collapsed) {
-        sidebar.style.display = 'none';
-        btn.textContent = 'Show sidebar';
+        if (label) label.textContent = 'Show sidebar';
+        if (icon) icon.className = 'fas fa-chevron-right';
+        btn.setAttribute('aria-expanded', 'false');
         localStorage.setItem('sidebarCollapsed','1');
       } else {
-        sidebar.style.display = '';
-        btn.textContent = 'Hide sidebar';
+        if (label) label.textContent = 'Hide sidebar';
+        if (icon) icon.className = 'fas fa-chevron-left';
+        btn.setAttribute('aria-expanded', 'true');
         localStorage.removeItem('sidebarCollapsed');
       }
-      // adjust main padding for small screens
-      document.querySelector('main').style.paddingLeft = collapsed ? '2rem' : '';
     }
     btn.addEventListener('click', function(){
       var collapsed = !!localStorage.getItem('sidebarCollapsed');
@@ -897,3 +1112,5 @@
     setState(!!localStorage.getItem('sidebarCollapsed'));
   })();
 </script>
+</body>
+</html>

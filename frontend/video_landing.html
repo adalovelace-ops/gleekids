@@ -282,6 +282,19 @@
       font-weight: 900;
     }
 
+    .preview-control {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.4rem;
+      height: 2.4rem;
+      border-radius: 999px;
+      color: var(--pink);
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(8, 24, 74, 0.08);
+    }
+
     .divider {
       width: 1px;
       height: 1.2rem;
@@ -385,6 +398,50 @@
       margin-top: 2rem;
       align-items: flex-start;
       background: linear-gradient(135deg, #fff8fb, #fff0f5);
+    }
+
+    .room-directory {
+      margin-top: 2rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .room-group {
+      border: 1px solid var(--line);
+      border-radius: 1.1rem;
+      background: rgba(255,255,255,0.78);
+      padding: 1.15rem;
+    }
+
+    .room-group h2 {
+      margin: 0 0 0.9rem;
+      font-size: 0.95rem;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    .room-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.8rem 0;
+      border-top: 1px dashed var(--line);
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 900;
+    }
+
+    .room-link span {
+      display: block;
+      min-width: 0;
+    }
+
+    .room-link small {
+      display: block;
+      margin-top: 0.2rem;
+      color: var(--muted);
+      font-weight: 700;
     }
 
     .calendar {
@@ -509,25 +566,6 @@
       text-decoration: none;
     }
 
-    .sticker {
-      position: absolute;
-      display: grid;
-      place-items: center;
-      width: 4.6rem;
-      height: 4.6rem;
-      border-radius: 1.2rem;
-      background: rgba(255, 255, 255, 0.86);
-      border: 1px solid var(--line);
-      color: var(--pink);
-      font-size: 2.1rem;
-      filter: drop-shadow(0 10px 12px rgba(8, 24, 74, 0.12));
-      pointer-events: none;
-    }
-
-    .globe { left: 1.4rem; bottom: 2.5rem; }
-    .pencil { right: 2.2rem; bottom: 5rem; }
-    .books { left: 6rem; bottom: 1.15rem; }
-
     @media (max-width: 1180px) {
       .layout { grid-template-columns: 1fr; }
       .main-card { padding-top: 0; }
@@ -545,12 +583,14 @@
       .primary, .secondary { width: 100%; }
       .calendar { padding: 1rem; }
       .event { grid-template-columns: 0.5rem 4rem minmax(0, 1fr); }
-      .sticker { display: none; }
     }
   </style>
+  <link rel="stylesheet" href="/static/css/system_palette.css">
 </head>
-<body>
-  <main class="page">
+<body class="admin-page">
+  <div class="flex min-h-screen">
+    {% include "partials/admin_sidebar.html" with active="video" %}
+  <main class="page flex-1">
     <header class="topbar">
       <a href="/admin-dashboard/" class="brand" aria-label="GleeConnect">
         <span class="camera"><i class="fas fa-video"></i></span>
@@ -580,11 +620,11 @@
             <span class="plant"></span>
           </div>
           <div class="preview-controls" aria-label="Device preview controls">
-            <span><i class="fas fa-microphone mr-2"></i>Mic</span>
+            <span class="preview-control" aria-label="Mic"><i class="fas fa-microphone"></i></span>
             <span class="divider"></span>
-            <span><i class="fas fa-volume-up mr-2"></i>Headphone</span>
+            <span class="preview-control" aria-label="Headphone"><i class="fas fa-volume-up"></i></span>
             <span class="divider"></span>
-            <span><i class="fas fa-video mr-2"></i>Front Camera</span>
+            <span class="preview-control" aria-label="Front Camera"><i class="fas fa-video"></i></span>
           </div>
         </section>
 
@@ -608,6 +648,32 @@
             <div class="tip">
               <i class="far fa-lightbulb mt-1" style="color: var(--pink);"></i>
               <span><strong style="color: var(--pink);">Tip:</strong> Join a few minutes early to test your audio and video for the best experience.</span>
+            </div>
+
+            <div class="room-directory">
+              <div class="room-group">
+                <h2><i class="fas fa-chalkboard-teacher mr-2" style="color: var(--pink);"></i>Demo/Class Rooms</h2>
+                {% for applicant in demo_room_applicants %}
+                  <a href="{{ applicant.demo_room_url }}" target="_blank" rel="noopener" class="room-link">
+                    <span>{{ applicant.first_name }} {{ applicant.last_name }}<small>{{ applicant.email }}</small></span>
+                    <i class="fas fa-video" style="color: var(--pink);"></i>
+                  </a>
+                {% empty %}
+                  <p class="text-sm font-bold" style="color: var(--muted);">No demo applicants waiting.</p>
+                {% endfor %}
+              </div>
+
+              <div class="room-group">
+                <h2><i class="fas fa-user-check mr-2" style="color: var(--blue);"></i>Client Evaluation Rooms</h2>
+                {% for applicant in client_room_applicants %}
+                  <a href="{{ applicant.client_room_url }}" target="_blank" rel="noopener" class="room-link">
+                    <span>{{ applicant.first_name }} {{ applicant.last_name }}<small>{{ applicant.email }}</small></span>
+                    <i class="fas fa-video" style="color: var(--blue);"></i>
+                  </a>
+                {% empty %}
+                  <p class="text-sm font-bold" style="color: var(--muted);">No client endorsement applicants waiting.</p>
+                {% endfor %}
+              </div>
             </div>
           </div>
         </section>
@@ -651,10 +717,8 @@
           </div>
         </aside>
       </div>
-      <span class="sticker globe"><i class="fas fa-globe-americas"></i></span>
-      <span class="sticker books"><i class="fas fa-book-open"></i></span>
-      <span class="sticker pencil"><i class="fas fa-pencil-alt"></i></span>
     </section>
   </main>
+  </div>
 </body>
 </html>

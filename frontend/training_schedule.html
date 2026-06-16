@@ -8,8 +8,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <link rel="stylesheet" href="/static/css/system_palette.css">
 </head>
-<body class="min-h-screen bg-yellow-50">
-  <div class="max-w-5xl mx-auto p-8">
+<body class="admin-page min-h-screen">
+  <div class="min-h-screen flex">
+    {% include "partials/admin_sidebar.html" with active="actions" %}
+  <main class="max-w-5xl mx-auto p-8 flex-1">
     <div class="bg-white rounded-lg p-6 shadow">
       <div class="flex items-center justify-between mb-8">
         <h1 class="text-3xl font-bold text-gray-900">Training Schedule</h1>
@@ -17,7 +19,7 @@
             <a href="/admin-calendar/" class="bg-amber-100 text-amber-800 px-4 py-2 rounded-lg font-semibold hover:bg-amber-200 transition">
                 <i class="fas fa-calendar-alt mr-2"></i>View Calendar
             </a>
-            <a href="/admin-dashboard/" class="text-sm text-yellow-700 hover:underline">← Back to dashboard</a>
+            <a href="/admin-dashboard/" class="text-sm font-bold text-violet-700 hover:underline">&larr; Back to dashboard</a>
         </div>
       </div>
 
@@ -79,9 +81,18 @@
                       <input type="datetime-local" 
                              name="scheduled_at" 
                              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400" 
-                             value="{{ app.current_schedule.scheduled_at|date:'Y-m-dT00:00' }}"
+                             value="{{ app.current_schedule.scheduled_at|date:'Y-m-d\TH:i' }}"
                              required>
                     </div>
+                    {% if app.current_schedule %}
+                    <div class="rounded-xl border border-amber-100 bg-amber-50/60 p-3">
+                      <label class="flex items-center gap-2 text-xs font-bold text-amber-800">
+                        <input type="checkbox" name="applicant_unavailable" value="1" class="rounded border-amber-300 text-amber-600 focus:ring-amber-500">
+                        Applicant was not available at the previous time
+                      </label>
+                      <textarea name="reschedule_reason" rows="2" class="mt-2 w-full rounded-lg border border-amber-100 px-3 py-2 text-xs focus:ring-2 focus:ring-amber-300" placeholder="Optional reschedule note"></textarea>
+                    </div>
+                    {% endif %}
                   </div>
                   
                   <div class="flex gap-3">
@@ -100,6 +111,7 @@
         </div>
       {% endif %}
     </div>
+  </main>
   </div>
 </body>
 </html>

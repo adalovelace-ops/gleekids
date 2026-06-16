@@ -25,6 +25,13 @@ body:not(.landing-page) {
     linear-gradient(135deg, #fffdfa 0%, var(--esl-page) 46%, #f7fbff 100%) !important;
 }
 
+.admin-page {
+  background:
+    radial-gradient(circle at 92% 8%, rgba(238, 121, 174, 0.16) 0 10rem, transparent 10.2rem),
+    radial-gradient(circle at 4% 28%, rgba(139, 107, 232, 0.14) 0 12rem, transparent 12.2rem),
+    linear-gradient(135deg, #fffdfa 0%, #fbf8ff 46%, #f7fbff 100%) !important;
+}
+
 h1,
 h2,
 h3 {
@@ -172,30 +179,227 @@ section.bg-white,
   border-color: rgba(234, 223, 251, 0.9) !important;
 }
 
-aside .bg-yellow-500,
-aside .hover\:bg-yellow-50:hover,
-aside .bg-yellow-100,
-aside .text-yellow-800,
-aside .border-yellow-200 {
-  /* Sidebar colors are intentionally restored to their local template rules. */
+aside {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: rgba(139, 107, 232, 0.18) !important;
+  box-shadow: 0 18px 48px rgba(40, 32, 100, 0.08) !important;
 }
 
-aside .bg-yellow-500 {
-  background-color: #eab308 !important;
+aside nav a {
+  color: #625d86 !important;
+  font-weight: 850 !important;
+}
+
+aside nav a:hover {
+  background-color: var(--esl-violet-soft) !important;
+  color: var(--esl-ink) !important;
+}
+
+aside nav a i {
+  color: var(--esl-pink) !important;
+}
+
+aside .bg-yellow-500,
+aside .bg-amber-500 {
+  background: linear-gradient(135deg, var(--esl-pink), var(--esl-violet)) !important;
+  color: #fff !important;
+  box-shadow: 0 14px 28px rgba(139, 107, 232, 0.26) !important;
+}
+
+aside .bg-yellow-500 i,
+aside .bg-amber-500 i {
+  color: #fff !important;
 }
 
 aside .hover\:bg-yellow-50:hover {
-  background-color: #fefce8 !important;
+  background-color: var(--esl-violet-soft) !important;
 }
 
 aside .bg-yellow-100 {
-  background-color: #fef9c3 !important;
+  background-color: var(--esl-pink-soft) !important;
 }
 
 aside .text-yellow-800 {
-  color: #854d0e !important;
+  color: var(--esl-violet) !important;
 }
 
 aside .border-yellow-200 {
-  border-color: #fef08a !important;
+  border-color: var(--esl-line) !important;
+}
+
+.system-sidebar {
+  position: sticky;
+  top: 0;
+  width: 16rem;
+  min-height: 100vh;
+  flex: 0 0 16rem;
+  background:
+    linear-gradient(180deg, #fff0f7 0%, #f3edff 48%, #fef7fb 100%) !important;
+  border-right: 1px solid rgba(238, 121, 174, 0.34) !important;
+  box-shadow: 0 18px 48px rgba(139, 107, 232, 0.14) !important;
+  z-index: 20;
+  transition: margin-left 0.22s ease, opacity 0.22s ease;
+}
+
+.system-sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  width: 7.5rem;
+  min-height: 4.25rem;
+  border: 1px solid rgba(245, 194, 218, 0.8);
+  border-radius: 1.15rem;
+  background:
+    linear-gradient(135deg, #fff, rgba(255, 240, 247, 0.96));
+  box-shadow: 0 14px 28px rgba(139, 107, 232, 0.12);
+}
+
+.system-sidebar-brand img {
+  max-height: 3rem;
+  width: auto;
+  object-fit: contain;
+}
+
+.admin-page > .min-h-screen.flex {
+  align-items: stretch;
+}
+
+.system-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0.85rem;
+  padding: 0.78rem 1rem;
+  color: #514674 !important;
+  font-size: 0.9rem;
+  font-weight: 850 !important;
+  transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.system-nav-link:hover {
+  background: rgba(255, 255, 255, 0.7) !important;
+  color: var(--esl-ink) !important;
+  transform: translateX(2px);
+}
+
+.system-nav-link i {
+  width: 1.1rem;
+  color: var(--esl-pink) !important;
+  text-align: center;
+}
+
+.system-nav-link.active {
+  background: linear-gradient(135deg, #ee79ae, #8b6be8) !important;
+  color: #fff !important;
+  box-shadow: 0 14px 28px rgba(238, 121, 174, 0.32) !important;
+}
+
+.system-nav-link.active i {
+  color: #fff !important;
+}
+
+.system-nav-badge {
+  margin-left: auto;
+  min-width: 1.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #bf4f88;
+  padding: 0.15rem 0.45rem;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.system-nav-link.active .system-nav-badge {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.system-signout-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0.85rem;
+  padding: 0.78rem 1rem;
+  color: #dc2626 !important;
+  font-size: 0.9rem;
+  font-weight: 900 !important;
+  transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.system-signout-link:hover {
+  background: #fff1f2 !important;
+  color: #b91c1c !important;
+  transform: translateX(2px);
+}
+
+.system-signout-link i {
+  width: 1.1rem;
+  color: #ef4444 !important;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .system-sidebar {
+    position: relative;
+    width: 100%;
+    min-height: auto;
+    flex-basis: auto;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(139, 107, 232, 0.18) !important;
+  }
+
+  .system-sidebar nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-page > .min-h-screen.flex {
+    display: block;
+  }
+}
+
+.fc-toolbar-title {
+  color: var(--esl-ink) !important;
+}
+
+.fc-button-primary {
+  background: linear-gradient(135deg, var(--esl-pink), var(--esl-violet)) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: 0 10px 22px rgba(139, 107, 232, 0.18) !important;
+}
+
+.fc-button-primary:hover,
+.fc-button-primary:focus,
+.fc-button-primary:not(:disabled).fc-button-active {
+  background: linear-gradient(135deg, #e967a4, #7655d9) !important;
+  border-color: transparent !important;
+}
+
+.fc-daygrid-day.fc-day-today {
+  background-color: var(--esl-violet-soft) !important;
+}
+
+.fc-event {
+  border-color: transparent !important;
+  box-shadow: 0 8px 18px rgba(40, 32, 100, 0.12);
+}
+
+/* Final sidebar override: keep the shared admin sidebar pink even when page CSS loads stale/old rules. */
+#sidebar.system-sidebar {
+  background: linear-gradient(180deg, #fff0f7 0%, #f3edff 48%, #fef7fb 100%) !important;
+  border-right-color: rgba(238, 121, 174, 0.34) !important;
+  box-shadow: 0 18px 48px rgba(139, 107, 232, 0.14) !important;
+}
+
+#sidebar .system-nav-link.active {
+  background: linear-gradient(135deg, #ee79ae, #8b6be8) !important;
+  color: #fff !important;
+}
+
+#sidebar .system-nav-link.active i,
+#sidebar .system-nav-link.active span {
+  color: #fff !important;
 }

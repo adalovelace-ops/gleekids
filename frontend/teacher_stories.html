@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Here in Gleekids | Teach Ver</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #2e2f36;
+      --blue: #a52b77;
+      --red: #ff4fa3;
+      --paper: #fffdf8;
+      --muted: #706f77;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #fffdf8;
+      color: var(--ink);
+      font-family: 'Nunito', sans-serif;
+    }
+
+    h1, h2, .brand {
+      font-family: 'Baloo 2', cursive;
+      letter-spacing: 0;
+    }
+
+    .page {
+      width: 100%;
+      background: #fffdf8;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      padding: 1.8rem clamp(1.5rem, 5vw, 4rem);
+      background: rgba(255, 253, 248, 0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--ink);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .logo-mark {
+      display: grid;
+      place-items: center;
+      width: 2.1rem;
+      height: 2.1rem;
+      border: 3px solid var(--red);
+      border-radius: 0.45rem;
+      color: var(--red);
+      font-size: 0.8rem;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.65rem;
+      color: #4b4d55;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .socials {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .socials span {
+      display: grid;
+      place-items: center;
+      width: 1.15rem;
+      height: 1.15rem;
+      background: var(--blue);
+      color: #fff;
+      font-size: 0.62rem;
+    }
+
+    .hero {
+      position: relative;
+      min-height: calc(100vh - 5.9rem);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: center;
+      padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem);
+      background: url('/media/sipalay.jpg') center / cover no-repeat;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      display: none;
+    }
+
+    .hero::after {
+      display: none;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 2;
+      max-width: 36rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(3.4rem, 7vw, 5.7rem);
+      line-height: 0.9;
+      color: #ffffff;
+      font-weight: 800;
+      text-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero h1 span { color: var(--red); }
+
+    .hero p {
+      margin: 2rem 0 1.4rem;
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.48);
+    }
+
+    .primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 9.5rem;
+      padding: 1rem 1.4rem;
+      background: var(--blue);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      box-shadow: 0 10px 20px rgba(165, 43, 119, 0.28);
+    }
+
+    .hero-photo {
+      display: none;
+    }
+
+    .hero-photo img {
+      width: min(100%, 52rem);
+      height: calc(100vh - 8rem);
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .marks {
+      position: absolute;
+      z-index: 3;
+      color: var(--red);
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: 0.3rem;
+    }
+
+    .marks.one { left: 48%; bottom: 6rem; }
+    .marks.two { right: 2rem; top: 12rem; writing-mode: vertical-rl; }
+
+    .content {
+      padding: clamp(3rem, 7vw, 5.5rem) 0;
+      background: #fffdf8;
+    }
+
+    .video-card {
+      position: relative;
+      width: min(100%, 92rem);
+      margin: 0 auto;
+      padding: 0 clamp(1rem, 4vw, 3rem);
+      overflow: hidden;
+      background: #fffdf8;
+    }
+
+    .video-card iframe {
+      display: block;
+      width: 100%;
+      aspect-ratio: 560 / 314;
+      height: auto;
+      min-height: 0;
+      border: 0;
+      background: transparent;
+      border-radius: 8px;
+    }
+
+    .play-dot {
+      display: none;
+    }
+
+    .embed-stream {
+      width: min(100%, 92rem);
+      margin: 0 auto;
+      padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
+      background: #fffdf8;
+    }
+
+    .stories-heading {
+      margin: 0 0 0.25rem;
+      color: #33343a;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .stories-line {
+      width: 4.2rem;
+      height: 0.18rem;
+      margin: 0 auto 2.2rem;
+      border-radius: 999px;
+      background: #d8d5cf;
+    }
+
+    .stories-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      align-items: start;
+      gap: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    .story-embed {
+      min-width: 0;
+    }
+
+    .story-frame {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid rgba(46, 47, 54, 0.1);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 14px 30px rgba(46, 47, 54, 0.08);
+    }
+
+    .story-frame iframe {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      border: 0;
+    }
+
+    .story-embed.video iframe,
+    .story-embed.post iframe {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      height: 100%;
+      min-height: 100%;
+      background: #000;
+    }
+
+    .story-embed.tall .story-frame {
+      aspect-ratio: 560 / 429;
+    }
+
+    .story-embed.tall iframe {
+      aspect-ratio: 560 / 429;
+    }
+
+    .story-embed.portrait .story-frame {
+      aspect-ratio: 16 / 9;
+      background: #111;
+    }
+
+    .story-embed.portrait iframe {
+      width: 100%;
+      max-width: 100%;
+      aspect-ratio: 267 / 476;
+      height: 100%;
+      min-height: 100%;
+      background: #000;
+    }
+
+    .story-caption {
+      margin: 0.8rem 0 0;
+      color: #33343a;
+      font-size: 0.88rem;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .about {
+      max-width: 45rem;
+      margin: 4rem auto 0;
+      padding: 0 1.5rem;
+      text-align: center;
+    }
+
+    .about h2 {
+      margin: 0;
+      color: #33343a;
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 800;
+    }
+
+    .squiggle {
+      width: 7rem;
+      margin: 1rem auto 1.5rem;
+    }
+
+    .about p {
+      color: var(--muted);
+      font-size: 0.98rem;
+      font-weight: 800;
+      line-height: 1.75;
+    }
+
+    @media (max-width: 900px) {
+      .nav { align-items: flex-start; flex-direction: column; }
+      .nav-links { flex-wrap: wrap; gap: 1rem; }
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: 34rem;
+        padding-top: 4rem;
+        background-position: center bottom;
+      }
+      .hero::after { height: 42%; }
+      .stories-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .stories-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+  <link rel="stylesheet" href="/static/css/system_palette.css">
+</head>
+<body>
+  <div class="page">
+    <nav class="nav" aria-label="Teacher stories navigation">
+      <a href="/" class="logo">
+        <span class="logo-mark"><i class="fas fa-play"></i></span>
+        <span>Gleekids<br>Stories</span>
+      </a>
+      <div class="nav-links">
+        <a href="/#about">About Us</a>
+        <a href="/#resources">Teachers</a>
+        <a href="/apply/">Apply</a>
+        <a href="/#contact">Contacts</a>
+        <div class="socials" aria-hidden="true">
+          <span>f</span>
+          <span><i class="fab fa-instagram"></i></span>
+          <span><i class="fab fa-youtube"></i></span>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="hero-copy">
+        <h1>Here in<br>Gleekids<span>.</span></h1>
+        <p>Teach. Grow. Belong.</p>
+        <a href="/apply/" class="primary">Apply to teach</a>
+      </div>
+      <div class="hero-photo">
+        <img src="/media/gleeglee.jpg" alt="Gleekids teachers together at the beach">
+      </div>
+      <span class="marks one">+++</span>
+      <span class="marks two">••••••</span>
+    </header>
+
+    <main class="content">
+      <section class="video-card" aria-label="Teach Ver teacher story video">
+        <iframe src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1918833952012989%2F&show_text=false&width=560&t=0" width="560" height="314" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Here in Gleekids Teacher Moments reel"></iframe>
+      </section>
+
+      <section class="embed-stream" aria-label="More Gleekids teacher stories">
+        <h2 class="stories-heading">Gleekids Highlights</h2>
+        <div class="stories-line"></div>
+        <div class="stories-grid">
+          <article class="story-embed video">
+            <div class="story-frame">
+              <iframe src="https://www.facebook.com/plugins/video.php?height=280&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1546022193491561%2F&show_text=false&width=560&t=0" width="560" height="280" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids Facebook community updates reel"></iframe>
+            </div>
+            <h3 class="story-caption">Sing with Gleekids</h3>
+          </article>
+          <article class="story-embed portrait">
+            <div class="story-frame">
+              <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F26110375698603207%2F&show_text=false&width=267&t=0" width="267" height="476" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids Facebook teacher moments reel"></iframe>
+            </div>
+            <h3 class="story-caption">Teacher Moments</h3>
+          </article>
+          <article class="story-embed video">
+            <div class="story-frame">
+              <iframe src="https://www.facebook.com/plugins/video.php?height=322&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F472940231804482%2F&show_text=false&width=560&t=0" width="560" height="322" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids Facebook services video"></iframe>
+            </div>
+            <h3 class="story-caption">Gleek Fam Spring Party</h3>
+          </article>
+          <article class="story-embed portrait">
+            <div class="story-frame">
+              <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F4073082706290015%2F&show_text=false&width=267&t=0" width="267" height="476" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids Facebook vertical video"></iframe>
+            </div>
+            <h3 class="story-caption">Gleekids Behind the Scenes</h3>
+          </article>
+        </div>
+      </section>
+
+      <section class="about">
+        <h2>About Us<span style="color: var(--blue);">.</span></h2>
+        <svg class="squiggle" viewBox="0 0 120 12" fill="none" aria-hidden="true">
+          <path d="M2 6C8 1 14 1 20 6C26 11 32 11 38 6C44 1 50 1 56 6C62 11 68 11 74 6C80 1 86 1 92 6C98 11 104 11 110 6C114 3 117 3 119 5" stroke="#ff4fa3" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <p>
+          Gleekids supports online ESL teachers with organized lessons, coaching, and a community that makes every class feel prepared. These teacher stories show the warmth, growth, and teamwork behind the classroom.
+        </p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
