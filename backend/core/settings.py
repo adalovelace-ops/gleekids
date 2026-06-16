@@ -43,14 +43,21 @@ ALLOWED_HOSTS = list(dict.fromkeys(
     env.list('ALLOWED_HOSTS', default=[]) + DEFAULT_ALLOWED_HOSTS
 ))
 
-CSRF_TRUSTED_ORIGINS = env.list(
-    'CSRF_TRUSTED_ORIGINS',
-    default=[
-        'http://localhost:8000',
-        'http://127.0.0.1:8000',
-        'https://gleekids-1.onrender.com',
-    ],
-)
+DEFAULT_CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'https://gleekids-1.onrender.com',
+    'https://*.onrender.com',
+]
+
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(
+    env.list('CSRF_TRUSTED_ORIGINS', default=[]) + DEFAULT_CSRF_TRUSTED_ORIGINS
+))
+
+CSRF_FAILURE_VIEW = 'core.csrf.csrf_failure'
+CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE', default=not DEBUG)
+SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE', default=not DEBUG)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
