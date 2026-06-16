@@ -32,15 +32,16 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-v2rh!=93in+3ms8w5c$$7x-m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=True)
 
-ALLOWED_HOSTS = env.list(
-    'ALLOWED_HOSTS',
-    default=[
-        'localhost',
-        '127.0.0.1',
-        'gleekids-1.onrender.com',
-        '.onrender.com',
-    ],
-)
+DEFAULT_ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'gleekids-1.onrender.com',
+    '.onrender.com',
+]
+
+ALLOWED_HOSTS = list(dict.fromkeys(
+    env.list('ALLOWED_HOSTS', default=[]) + DEFAULT_ALLOWED_HOSTS
+))
 
 CSRF_TRUSTED_ORIGINS = env.list(
     'CSRF_TRUSTED_ORIGINS',
