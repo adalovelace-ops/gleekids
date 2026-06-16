@@ -1,4 +1,5 @@
 import calendar
+import logging
 from datetime import time
 import mimetypes
 from pathlib import Path
@@ -15,6 +16,8 @@ from django.utils._os import safe_join
 from django.views.decorators.csrf import csrf_exempt
 from .forms import ApplicantRegistrationForm
 from .models import Applicant, Schedule, StatusHistory
+
+logger = logging.getLogger(__name__)
 
 
 def uploaded_media(request, path):
@@ -67,6 +70,7 @@ def send_applicant_email(request):
     except BadHeaderError:
         return JsonResponse({'ok': False, 'error': 'Invalid email subject or message header.'}, status=400)
     except Exception as exc:
+        logger.exception('Failed to send applicant email to %s', recipient)
         return JsonResponse({'ok': False, 'error': f'Email provider error: {exc}'}, status=502)
 
     if not sent_count:
