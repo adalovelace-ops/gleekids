@@ -1,0 +1,164 @@
+<style>
+  #sidebar.system-sidebar {
+    position: sticky !important;
+    top: 0 !important;
+    width: 16rem !important;
+    min-height: 100vh !important;
+    flex: 0 0 16rem !important;
+    background: linear-gradient(180deg, #fff0f7 0%, #f3edff 48%, #fef7fb 100%) !important;
+    border-right: 1px solid rgba(238, 121, 174, 0.34) !important;
+    box-shadow: 0 18px 48px rgba(139, 107, 232, 0.14) !important;
+    z-index: 20 !important;
+  }
+
+  #sidebar .system-sidebar-brand {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 auto 2rem !important;
+    width: 7.5rem !important;
+    min-height: 4.25rem !important;
+    border: 1px solid rgba(245, 194, 218, 0.8) !important;
+    border-radius: 1.15rem !important;
+    background: linear-gradient(135deg, #fff, rgba(255, 240, 247, 0.96)) !important;
+    box-shadow: 0 14px 28px rgba(139, 107, 232, 0.12) !important;
+  }
+
+  #sidebar .system-sidebar-brand img {
+    max-height: 3rem !important;
+    width: auto !important;
+    object-fit: contain !important;
+  }
+
+  #sidebar .system-nav-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    border-radius: 0.85rem !important;
+    padding: 0.78rem 1rem !important;
+    color: #514674 !important;
+    font-size: 0.9rem !important;
+    font-weight: 850 !important;
+    background: transparent !important;
+    transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease !important;
+  }
+
+  #sidebar .system-nav-link:hover {
+    background: rgba(255, 255, 255, 0.72) !important;
+    color: #282064 !important;
+    transform: translateX(2px) !important;
+  }
+
+  #sidebar .system-nav-link i {
+    width: 1.1rem !important;
+    color: #ee79ae !important;
+    text-align: center !important;
+  }
+
+  #sidebar .system-nav-link.active {
+    background: linear-gradient(135deg, #ee79ae, #8b6be8) !important;
+    color: #fff !important;
+    box-shadow: 0 14px 28px rgba(238, 121, 174, 0.32) !important;
+  }
+
+  #sidebar .system-nav-link.active i,
+  #sidebar .system-nav-link.active span {
+    color: #fff !important;
+  }
+
+  #sidebar .system-nav-badge {
+    margin-left: auto !important;
+    min-width: 1.75rem !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.78) !important;
+    color: #bf4f88 !important;
+    padding: 0.15rem 0.45rem !important;
+    text-align: center !important;
+    font-size: 0.72rem !important;
+    font-weight: 900 !important;
+  }
+
+  #sidebar .system-nav-link.active .system-nav-badge {
+    background: rgba(255, 255, 255, 0.22) !important;
+    color: #fff !important;
+  }
+
+  #sidebar .system-signout-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    border-radius: 0.85rem !important;
+    padding: 0.78rem 1rem !important;
+    color: #dc2626 !important;
+    font-size: 0.9rem !important;
+    font-weight: 900 !important;
+    background: transparent !important;
+  }
+
+  #sidebar .system-signout-link:hover {
+    background: #fff1f2 !important;
+    color: #b91c1c !important;
+    transform: translateX(2px) !important;
+  }
+
+  #sidebar .system-signout-link i {
+    width: 1.1rem !important;
+    color: #ef4444 !important;
+    text-align: center !important;
+  }
+
+  @media (max-width: 900px) {
+    #sidebar.system-sidebar {
+      position: relative !important;
+      width: 100% !important;
+      min-height: auto !important;
+      flex-basis: auto !important;
+      border-right: 0 !important;
+      border-bottom: 1px solid rgba(139, 107, 232, 0.18) !important;
+    }
+
+    #sidebar nav {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+  }
+</style>
+<aside id="sidebar" class="system-sidebar">
+  <div class="p-6">
+    <a href="/admin-dashboard/" class="system-sidebar-brand" aria-label="Gleekids dashboard">
+      <img src="/media/gleelogo.png" alt="Gleekids Logo">
+    </a>
+    <nav class="space-y-2">
+      <a href="/admin-dashboard/" class="system-nav-link {% if active == 'dashboard' %}active{% endif %}">
+        <i class="fas fa-home"></i> Dashboard
+      </a>
+      <a href="/applicants/" class="system-nav-link {% if active == 'applicants' %}active{% endif %}">
+        <span class="flex items-center gap-3"><i class="fas fa-users"></i> Applicants</span>
+        {% if all_applicants_count %}<span class="system-nav-badge">{{ all_applicants_count }}</span>{% endif %}
+      </a>
+      <a href="/schedule-initial/" class="system-nav-link {% if active == 'actions' %}active{% endif %}">
+        <i class="fas fa-clipboard-check"></i> Actions
+      </a>
+      <a href="/admin-calendar/" class="system-nav-link {% if active == 'calendar' %}active{% endif %}">
+        <i class="fas fa-calendar-alt"></i> Schedules
+      </a>
+      <a href="/video-conferencing/" class="system-nav-link {% if active == 'video' %}active{% endif %}">
+        <i class="fas fa-video"></i> Video Conferencing
+      </a>
+      <a href="/evaluations/" class="system-nav-link {% if active == 'evaluations' %}active{% endif %}">
+        <i class="fas fa-star"></i> Evaluations
+      </a>
+      <a href="/reports/" class="system-nav-link {% if active == 'reports' %}active{% endif %}">
+        <i class="fas fa-chart-line"></i> Reports
+      </a>
+      <a href="/admin/" class="system-nav-link {% if active == 'django_admin' %}active{% endif %}">
+        <i class="fas fa-cog"></i> Django Admin
+      </a>
+      <div class="pt-10">
+        <a href="/logout/" class="system-signout-link">
+          <i class="fas fa-sign-out-alt"></i> Sign Out
+        </a>
+      </div>
+    </nav>
+  </div>
+</aside>
