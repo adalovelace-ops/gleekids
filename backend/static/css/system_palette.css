@@ -246,19 +246,20 @@ aside .border-yellow-200 {
   align-items: center;
   justify-content: center;
   margin: 0 auto 2rem;
-  width: 7.5rem;
-  min-height: 4.25rem;
-  border: 1px solid rgba(245, 194, 218, 0.8);
-  border-radius: 1.15rem;
-  background:
-    linear-gradient(135deg, #fff, rgba(255, 240, 247, 0.96));
-  box-shadow: 0 14px 28px rgba(139, 107, 232, 0.12);
+  width: 10rem;
+  min-height: 5.25rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .system-sidebar-brand img {
-  max-height: 3rem;
+  max-height: 4.5rem;
   width: auto;
   object-fit: contain;
+  background: transparent;
+  filter: drop-shadow(0 10px 18px rgba(40, 32, 100, 0.12));
 }
 
 .admin-page > .min-h-screen.flex {
@@ -402,4 +403,21 @@ aside .border-yellow-200 {
 #sidebar .system-nav-link.active i,
 #sidebar .system-nav-link.active span {
   color: #fff !important;
+}
+
+#sidebar .system-sidebar-brand {
+  width: 10rem !important;
+  min-height: 5.25rem !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#sidebar .system-sidebar-brand img {
+  max-height: 4.5rem !important;
+  width: auto !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  filter: drop-shadow(0 10px 18px rgba(40, 32, 100, 0.12)) !important;
 }

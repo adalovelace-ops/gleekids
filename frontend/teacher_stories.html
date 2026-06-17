@@ -304,6 +304,79 @@
       text-align: center;
     }
 
+    .reels-carousel {
+      margin-top: clamp(3rem, 6vw, 4.5rem);
+    }
+
+    .reels-carousel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .reels-carousel-title {
+      margin: 0;
+      color: #33343a;
+      font-size: clamp(1.45rem, 3vw, 2.2rem);
+      font-weight: 900;
+    }
+
+    .reels-carousel-controls {
+      display: flex;
+      gap: 0.55rem;
+    }
+
+    .reel-control {
+      display: grid;
+      place-items: center;
+      width: 2.4rem;
+      height: 2.4rem;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 1.4rem;
+      font-weight: 900;
+      line-height: 1;
+      box-shadow: 3px 3px 0 var(--ink);
+      cursor: pointer;
+    }
+
+    .reel-control:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--ink);
+    }
+
+    .reels-track {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(15.5rem, 18rem);
+      gap: clamp(1rem, 2vw, 1.4rem);
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scroll-snap-type: inline mandatory;
+      scroll-padding-inline: 0.25rem;
+      padding: 0.35rem 0.25rem 1rem;
+      scrollbar-width: thin;
+    }
+
+    .reels-track .story-embed {
+      scroll-snap-align: start;
+    }
+
+    .reels-track .story-frame {
+      aspect-ratio: 267 / 476;
+      background: #111;
+    }
+
+    .reels-track iframe {
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+
     .about {
       max-width: 45rem;
       margin: 4rem auto 0;
@@ -399,11 +472,11 @@
             </div>
             <h3 class="story-caption">Sing with Gleekids</h3>
           </article>
-          <article class="story-embed portrait">
+          <article class="story-embed video">
             <div class="story-frame">
-              <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F26110375698603207%2F&show_text=false&width=267&t=0" width="267" height="476" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids Facebook teacher moments reel"></iframe>
+              <iframe src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F1136277410670950%2F&show_text=false&width=560&t=0" width="560" height="314" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids Facebook teacher moments video"></iframe>
             </div>
-            <h3 class="story-caption">Teacher Moments</h3>
+            <h3 class="story-caption">Your Journey with Gleekids</h3>
           </article>
           <article class="story-embed video">
             <div class="story-frame">
@@ -411,12 +484,54 @@
             </div>
             <h3 class="story-caption">Gleek Fam Spring Party</h3>
           </article>
-          <article class="story-embed portrait">
+          <article class="story-embed video">
             <div class="story-frame">
-              <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F4073082706290015%2F&show_text=false&width=267&t=0" width="267" height="476" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids Facebook vertical video"></iframe>
+              <iframe src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F576034425001051%2F&show_text=false&width=560&t=0" width="560" height="314" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids Facebook behind the scenes video"></iframe>
             </div>
             <h3 class="story-caption">Gleekids Behind the Scenes</h3>
           </article>
+        </div>
+
+        <div class="reels-carousel" aria-label="Gleekids reels carousel">
+          <div class="reels-carousel-head">
+            <h3 class="reels-carousel-title">More Reels</h3>
+            <div class="reels-carousel-controls">
+              <button class="reel-control" type="button" aria-label="Previous reel" onclick="scrollReels(-1)">&lsaquo;</button>
+              <button class="reel-control" type="button" aria-label="Next reel" onclick="scrollReels(1)">&rsaquo;</button>
+            </div>
+          </div>
+          <div class="reels-track" id="reelsTrack">
+            <article class="story-embed">
+              <div class="story-frame">
+                <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F4073082706290015%2F&show_text=false&width=267&t=0" width="267" height="476" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids reel teacher moments previous"></iframe>
+              </div>
+            </article>
+            <article class="story-embed">
+              <div class="story-frame">
+                <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F409501431631834%2F&show_text=false&width=267&t=0" width="267" height="476" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids reel 1"></iframe>
+              </div>
+            </article>
+            <article class="story-embed">
+              <div class="story-frame">
+                <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F472789938448890%2F&show_text=false&width=267&t=0" width="267" height="476" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids reel 2"></iframe>
+              </div>
+            </article>
+            <article class="story-embed">
+              <div class="story-frame">
+                <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F2349574085512957%2F&show_text=false&width=267&t=0" width="267" height="476" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids reel 4"></iframe>
+              </div>
+            </article>
+            <article class="story-embed">
+              <div class="story-frame">
+                <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2FGleekidsesl6115%2Fvideos%2F1157445442421971%2F&show_text=false&width=267&t=0" width="267" height="476" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids reel 5"></iframe>
+              </div>
+            </article>
+            <article class="story-embed">
+              <div class="story-frame">
+                <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F26110375698603207%2F&show_text=false&width=267&t=0" width="267" height="476" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true" title="Gleekids reel 6"></iframe>
+              </div>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -431,5 +546,15 @@
       </section>
     </main>
   </div>
+  <script>
+    function scrollReels(direction) {
+      const track = document.getElementById('reelsTrack');
+      if (!track) return;
+
+      const firstCard = track.querySelector('.story-embed');
+      const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 280;
+      track.scrollBy({ left: direction * (cardWidth + 24), behavior: 'smooth' });
+    }
+  </script>
 </body>
 </html>

@@ -814,12 +814,13 @@
         }
 
         .footer-brand-logo {
-            height: 4.5rem;
+            height: 4.8rem;
             width: auto;
-            border-radius: 1rem;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 0.55rem;
-            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18);
+            border-radius: 0;
+            background: transparent;
+            padding: 0;
+            box-shadow: none;
+            filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.22));
         }
 
         .footer-heading {
@@ -2047,6 +2048,8 @@
             color: #fff;
             font-weight: 900;
             font-size: 1.25rem;
+            text-decoration: none;
+            cursor: pointer;
         }
 
         .gk-abc-row {
@@ -2613,9 +2616,12 @@
         }
 
         .logo-img {
-            width: 230px !important;
-            height: 82px !important;
+            width: 290px !important;
+            height: 104px !important;
             object-fit: contain;
+            background: transparent !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
         }
 
         .hero-section {
@@ -3383,8 +3389,8 @@
 
         @media (max-width: 640px) {
             .logo-img {
-                width: 172px !important;
-                height: 62px !important;
+                width: 210px !important;
+                height: 76px !important;
             }
 
             .hero-section {
@@ -4021,10 +4027,7 @@
                         Apply Now
                     </a>
                     <a href="/login/" class="btn-secondary px-6 py-2 rounded-full">
-                        Applicant Login
-                    </a>
-                    <a href="/admin-login/" class="bg-gray-800 text-white hover:bg-gray-900 px-6 py-2 rounded-full transition shadow-md">
-                        Admin Login
+                        Sign in
                     </a>
                 </div>
 
@@ -4048,7 +4051,6 @@
                 <div class="pt-4 space-y-3">
                     <a href="/apply/" class="w-full btn-secondary px-6 py-2 rounded-full text-center block">Apply Now</a>
                     <a href="/login/" class="w-full bg-yellow-500 text-white px-6 py-2 rounded-full text-center block">Applicant Login</a>
-                    <a href="/admin-login/" class="w-full bg-gray-800 text-white px-6 py-2 rounded-full text-center block">Admin Login</a>
                 </div>
             </nav>
         </div>
@@ -4088,7 +4090,7 @@
                                 <span class="gk-chat-icon"><span class="gk-chat-dot"></span></span>
                                 <b>Glee<span>kids</span></b>
                             </div>
-                            <div class="gk-menu-button">+</div>
+                            <a href="/admin-login/" class="gk-menu-button" aria-label="Staff access" title="Staff access">+</a>
                         </div>
                         <div class="gk-model-stage">
                             <div class="gk-model-frame">
@@ -4318,10 +4320,10 @@
                                         </div>
                                     </article>
                                     <article class="teacher-story-card is-extra">
-                                        <img class="teacher-story-avatar" src="/media/tes.jpg" alt="Teach Ver profile photo">
+                                        <img class="teacher-story-avatar" src="/media/meng.jpg" alt="Teach Meng profile photo">
                                         <div>
                                             <p>From day one, I felt welcomed by the Gleekids family and supported by people who care.</p>
-                                            <strong>Teach Ver</strong>
+                                            <strong>Teach Meng</strong>
                                         </div>
                                     </article>
                                 </div>
@@ -4405,9 +4407,9 @@
                                     to work with. Highly recommended!</p>
                                 <div class="testimonial-author">
                                     <img class="testimonial-avatar object-cover" src="/media/tes.jpg"
-                                        alt="Teach Ver profile photo">
+                                        alt="Teach Meng profile photo">
                                     <div>
-                                        <div class="testimonial-name">Teach Ver</div>
+                                        <div class="testimonial-name">Teach Meng</div>
                                         <div class="text-sm text-gray-500">ESL Specialist</div>
                                     </div>
                                 </div>
@@ -4577,7 +4579,7 @@
                     <div class="faq-item bg-white rounded-xl overflow-hidden shadow-sm">
                         <button onclick="toggleFAQ(this)"
                             class="w-full p-6 text-left font-semibold text-gray-800 hover:bg-gray-50 transition-colors flex justify-between items-center">
-                            What qualifications do I need to be an ESL teacher?
+                            Are you still hiring for office-based and WFH positions?
                             <svg class="faq-icon w-5 h-5 transition-transform text-yellow-600" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -4585,25 +4587,11 @@
                             </svg>
                         </button>
                         <div class="faq-answer px-6 pb-6">
-                            <p class="text-gray-600">Typically, a Bachelor's degree and TESOL/TEFL/CELTA certification
-                                are required. Some positions may have additional specific requirements detailed in job
-                                descriptions.</p>
-                        </div>
-                    </div>
-
-                    <div class="faq-item bg-white rounded-xl overflow-hidden shadow-sm">
-                        <button onclick="toggleFAQ(this)"
-                            class="w-full p-6 text-left font-semibold text-gray-800 hover:bg-gray-50 transition-colors flex justify-between items-center">
-                            Are there opportunities for non-native English speakers?
-                            <svg class="faq-icon w-5 h-5 transition-transform text-yellow-600" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </button>
-                        <div class="faq-answer px-6 pb-6">
-                            <p class="text-gray-600">Absolutely! Many opportunities are available for highly proficient
-                                non-native English speakers with excellent teaching skills and relevant qualifications.
+                            <p class="text-gray-600">
+                                <span class="font-semibold text-gray-800">Gleekids ESL</span><br>
+                                Yes, we are always open to applications. For the most up-to-date information on
+                                available positions, please visit our GLEEKIDS FB Page to see what we are currently
+                                hiring for.
                             </p>
                         </div>
                     </div>
@@ -4611,7 +4599,7 @@
                     <div class="faq-item bg-white rounded-xl overflow-hidden shadow-sm">
                         <button onclick="toggleFAQ(this)"
                             class="w-full p-6 text-left font-semibold text-gray-800 hover:bg-gray-50 transition-colors flex justify-between items-center">
-                            How does the referral program work?
+                            What are the available hours/schedule?
                             <svg class="faq-icon w-5 h-5 transition-transform text-yellow-600" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -4619,9 +4607,38 @@
                             </svg>
                         </button>
                         <div class="faq-answer px-6 pb-6">
-                            <p class="text-gray-600">Refer a friend through our form. When they're hired and complete
-                                the probationary period, you receive ₱5,000! Full terms available on our referral page.
-                            </p>
+                            <div class="space-y-2 text-gray-600">
+                                <p><span class="font-semibold text-gray-800">Full-time:</span> The operating hours are
+                                    from 1:00 PM to 10:00 PM.</p>
+                                <p><span class="font-semibold text-gray-800">Part-time:</span> The hours are from 5:00
+                                    PM to 11:00 PM.</p>
+                                <p>We require a minimum of 30 hours per week for part-time positions, but this can be
+                                    negotiated based on your availability.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item bg-white rounded-xl overflow-hidden shadow-sm">
+                        <button onclick="toggleFAQ(this)"
+                            class="w-full p-6 text-left font-semibold text-gray-800 hover:bg-gray-50 transition-colors flex justify-between items-center">
+                            What is the rate?
+                            <svg class="faq-icon w-5 h-5 transition-transform text-yellow-600" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="faq-answer px-6 pb-6">
+                            <div class="space-y-3 text-gray-600">
+                                <p>Our rates are based on the type of account:</p>
+                                <ul class="list-disc space-y-1 pl-5">
+                                    <li>5 Chinese accounts</li>
+                                    <li>1 Vietnamese account</li>
+                                    <li>2 direct accounts</li>
+                                </ul>
+                                <p>The hourly rate ranges from 70PHP to 190PHP, depending on the account type and
+                                    specific requirements.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -4730,7 +4747,6 @@
                         <li><a href="#faq" class="footer-link inline-block">FAQs</a></li>
                         <li><a href="#contact" class="footer-link inline-block">Contact Us</a></li>
                         <li><a href="/login/" class="footer-link inline-block">Applicant Login</a></li>
-                        <li><a href="/admin-login/" class="footer-link inline-block">Admin Login</a></li>
                     </ul>
                 </nav>
 
