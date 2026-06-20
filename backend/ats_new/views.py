@@ -15,7 +15,7 @@ from django.utils import timezone
 from django.utils._os import safe_join
 from django.views.decorators.csrf import csrf_exempt
 from .forms import ApplicantRegistrationForm
-from .models import Applicant, Schedule, StatusHistory
+from .models import Applicant, Evaluation, Schedule, StatusHistory
 
 logger = logging.getLogger(__name__)
 
@@ -840,6 +840,71 @@ def save_evaluation(request):
         return redirect('demo_evaluation')
     return redirect('admin_dashboard')
 
+def find_applicant_for_room(room_id, applicant_name=''):
+    schedule = Schedule.objects.filter(schedule_id=room_id).select_related('applicant').first()
+    applicant = schedule.applicant if schedule else Applicant.objects.filter(applicant_id=room_id).first()
+    if applicant:
+        return applicant, schedule
+
+    applicant_name = (applicant_name or '').strip()
+    if applicant_name:
+        name_parts = applicant_name.split()
+        matches = Applicant.objects.all()
+        for part in name_parts:
+            matches = matches.filter(Q(first_name__icontains=part) | Q(last_name__icontains=part))
+        applicant = matches.first()
+    return applicant, schedule
+
+
+@csrf_exempt
+def room_evaluation_prefill(request):
+    room_id = request.GET.get('roomId') or request.GET.get('room_id')
+    if not room_id:
+        return JsonResponse({'ok': False, 'error': 'Missing room id'}, status=400)
+
+    applicant, schedule = find_applicant_for_room(room_id)
+    if not applicant:
+        return JsonResponse({'ok': False, 'error': 'Applicant not found for this room'}, status=404)
+
+    evaluation_type = request.GET.get('evaluationType') or request.GET.get('evaluation_type')
+    if evaluation_type not in {'client', 'demo'}:
+        evaluation_type = 'client' if schedule and schedule.type == 'endorsement' else 'demo'
+
+    evaluation = applicant.evaluations.filter(evaluation_type=evaluation_type).order_by('-created_at').first()
+    data = {
+        'ok': True,
+        'roomId': str(room_id),
+        'evaluationType': evaluation_type,
+        'applicant': {
+            'id': str(applicant.applicant_id),
+            'name': applicant.full_name,
+            'email': applicant.email,
+            'phone': applicant.phone or '',
+            'status': applicant.status,
+            'workSetup': applicant.work_setup,
+            'teachingAccount': applicant.teaching_account or '',
+        },
+        'evaluation': None,
+    }
+
+    if evaluation:
+        data['evaluation'] = {
+            'id': str(evaluation.evaluation_id),
+            'type': evaluation.evaluation_type,
+            'ratings': {
+                'teaching_performance': evaluation.teaching_performance,
+                'communication_skills': evaluation.communication_skills,
+                'curriculum_understanding': evaluation.curriculum_understanding,
+                'engagement_level': evaluation.engagement_level,
+                'technical_proficiency': evaluation.technical_proficiency,
+            },
+            'totalScore': evaluation.total_score,
+            'clientDecision': evaluation.client_decision or '',
+            'comments': evaluation.comments or '',
+            'createdAt': evaluation.created_at.isoformat(),
+        }
+
+    return JsonResponse(data)
 @csrf_exempt
 def save_room_evaluation(request):
     if request.method == 'OPTIONS':

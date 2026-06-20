@@ -44,8 +44,8 @@ ALLOWED_HOSTS = list(dict.fromkeys(
 ))
 
 DEFAULT_CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8000',
-    'http://127.0.0.1:8000',
+    'http://localhost:8001',
+    'http://127.0.0.1:8001',
     'https://gleekids-1.onrender.com',
     'https://*.onrender.com',
 ]
@@ -193,7 +193,7 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
 
-ZOOM_CLONE_URL = env('ZOOM_CLONE_URL', default='http://127.0.0.1:3000/')
+ZOOM_CLONE_URL = env('ZOOM_CLONE_URL', default='http://127.0.0.1:8001/')
 
 LOG_LEVEL = env('DJANGO_LOG_LEVEL', default='INFO')
 
