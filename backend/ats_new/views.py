@@ -1,8 +1,13 @@
 import calendar
+import json
 import logging
+import secrets
 from datetime import time
 import mimetypes
 from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
@@ -77,6 +82,124 @@ def send_applicant_email(request):
         return JsonResponse({'ok': False, 'error': 'Email provider did not accept the message.'}, status=502)
 
     return JsonResponse({'ok': True})
+
+
+GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
+GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
+GOOGLE_USERINFO_URL = 'https://openidconnect.googleapis.com/v1/userinfo'
+
+
+def google_oauth_redirect_uri(request):
+    configured_uri = getattr(settings, 'GOOGLE_OAUTH_REDIRECT_URI', '')
+    if configured_uri:
+        return configured_uri
+    return request.build_absolute_uri('/auth/google/callback/')
+
+
+def render_google_auth_error(request, message, role='applicant'):
+    template = 'login.html' if role == 'admin' else 'applicant_login.html'
+    return render(request, template, {'oauth_error': message})
+
+
+def google_oauth_start(request):
+    role = request.GET.get('role') or 'applicant'
+    if role not in {'admin', 'applicant'}:
+        role = 'applicant'
+
+    client_id = getattr(settings, 'GOOGLE_OAUTH_CLIENT_ID', '')
+    if not client_id:
+        return render_google_auth_error(request, 'Google sign-in is not configured yet.', role)
+
+    state = secrets.token_urlsafe(32)
+    request.session['google_oauth_state'] = state
+    request.session['google_oauth_role'] = role
+
+    params = {
+        'client_id': client_id,
+        'redirect_uri': google_oauth_redirect_uri(request),
+        'response_type': 'code',
+        'scope': 'openid email profile',
+        'state': state,
+        'prompt': 'select_account',
+    }
+    return redirect(f'{GOOGLE_AUTH_URL}?{urlencode(params)}')
+
+
+def exchange_google_code(request, code):
+    payload = urlencode({
+        'code': code,
+        'client_id': getattr(settings, 'GOOGLE_OAUTH_CLIENT_ID', ''),
+        'client_secret': getattr(settings, 'GOOGLE_OAUTH_CLIENT_SECRET', ''),
+        'redirect_uri': google_oauth_redirect_uri(request),
+        'grant_type': 'authorization_code',
+    }).encode('utf-8')
+    token_request = Request(
+        GOOGLE_TOKEN_URL,
+        data=payload,
+        headers={'Content-Type': 'application/x-www-form-urlencoded'},
+        method='POST',
+    )
+    with urlopen(token_request, timeout=10) as response:
+        return json.loads(response.read().decode('utf-8'))
+
+
+def fetch_google_userinfo(access_token):
+    userinfo_request = Request(
+        GOOGLE_USERINFO_URL,
+        headers={'Authorization': f'Bearer {access_token}'},
+        method='GET',
+    )
+    with urlopen(userinfo_request, timeout=10) as response:
+        return json.loads(response.read().decode('utf-8'))
+
+
+def google_oauth_callback(request):
+    role = request.session.pop('google_oauth_role', 'applicant')
+    expected_state = request.session.pop('google_oauth_state', '')
+    received_state = request.GET.get('state') or ''
+    code = request.GET.get('code') or ''
+
+    if not expected_state or received_state != expected_state:
+        return render_google_auth_error(request, 'Google sign-in expired. Please try again.', role)
+    if not code:
+        return render_google_auth_error(request, 'Google did not return an authorization code.', role)
+
+    try:
+        token_data = exchange_google_code(request, code)
+        userinfo = fetch_google_userinfo(token_data.get('access_token'))
+    except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as exc:
+        logger.exception('Google OAuth failed')
+        return render_google_auth_error(request, f'Google sign-in failed: {exc}', role)
+
+    email = (userinfo.get('email') or '').strip().lower()
+    if not email or not userinfo.get('email_verified'):
+        return render_google_auth_error(request, 'Google account email must be verified.', role)
+
+    if role == 'admin':
+        User = get_user_model()
+        user = (
+            User.objects.filter(email__iexact=email).first()
+            or User.objects.filter(username__iexact=email).first()
+        )
+        if not user and email in settings.GOOGLE_ADMIN_EMAILS:
+            user = User.objects.create_user(username=email, email=email)
+            user.set_unusable_password()
+            user.is_staff = True
+            user.is_superuser = True
+            user.save(update_fields=['password', 'is_staff', 'is_superuser'])
+        if not user or not user.is_staff:
+            return render_google_auth_error(request, 'This Google account is not registered as staff.', role)
+        login(request, user)
+        return redirect('admin_dashboard')
+
+    applicant = Applicant.objects.filter(email__iexact=email).first()
+    if not applicant:
+        return render_google_auth_error(request, 'No applicant account is registered with this Google email.', role)
+    if applicant.status == 'Pending':
+        return render_google_auth_error(request, 'Your application is still pending approval. Please check back later.', role)
+
+    request.session['applicant_id'] = str(applicant.applicant_id)
+    return redirect('applicant_portal')
 
 def home_page(request):
     return render(request, 'hero.html')
@@ -447,7 +570,6 @@ def update_status(request):
         return redirect('applicant_details', applicant_id=applicant_id)
     return redirect('admin_dashboard')
 
-import json
 import uuid
 
 @login_required

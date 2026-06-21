@@ -71,6 +71,18 @@
       box-shadow: 0 20px 36px rgba(139, 107, 232, 0.3);
     }
 
+    .google-btn {
+      border: 1px solid var(--login-line);
+      background: #fff;
+      color: var(--login-ink);
+      transition: border-color 0.18s ease, transform 0.18s ease;
+    }
+
+    .google-btn:hover {
+      border-color: rgba(139, 107, 232, 0.45);
+      transform: translateY(-1px);
+    }
+
     .login-link {
       color: var(--login-violet);
       font-weight: 800;
@@ -104,6 +116,9 @@
           {% if error %}
             <div class="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700">{{ error }}</div>
           {% endif %}
+          {% if oauth_error %}
+            <div class="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700">{{ oauth_error }}</div>
+          {% endif %}
 
           <div>
             <label for="email" class="mb-2 block text-xs font-black uppercase tracking-[0.16em]" style="color: var(--login-muted);">Email</label>
@@ -122,6 +137,16 @@
           <button type="submit" class="login-btn flex w-full justify-center rounded-2xl px-5 py-3 text-sm font-black">
             Sign in to Applicant Portal
           </button>
+
+          <div class="flex items-center gap-3">
+            <span class="h-px flex-1 bg-slate-200"></span>
+            <span class="text-xs font-black uppercase tracking-[0.18em]" style="color: var(--login-muted);">or</span>
+            <span class="h-px flex-1 bg-slate-200"></span>
+          </div>
+
+          <a href="/auth/google/?role=applicant" class="google-btn flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-black">
+            <span>Sign in with Google</span>
+          </a>
         </form>
 
         <div class="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm">

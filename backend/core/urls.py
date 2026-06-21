@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, re_path
 from ats_new.views import (
-    applicant_registration, applicant_login, applicant_portal, 
+    applicant_registration, applicant_login, applicant_portal, google_oauth_start, google_oauth_callback, 
     home_page, applicant_logout, admin_login, admin_dashboard,
     applicant_details, applicants_page, update_status, schedule_initial,
     demo_evaluation, evaluations, reports, training_schedule, onboarding,
@@ -37,6 +37,8 @@ urlpatterns = [
     path('portal/', applicant_portal, name='applicant_portal'),
     path('logout/', applicant_logout, name='applicant_logout'),
     path('admin-login/', admin_login, name='admin_login'),
+    path('auth/google/', google_oauth_start, name='google_oauth_start'),
+    path('auth/google/callback/', google_oauth_callback, name='google_oauth_callback'),
     path('admin-dashboard/', admin_dashboard, name='admin_dashboard'),
     path('applicants/', applicants_page, name='applicants_page'),
     path('applicant-details/<uuid:applicant_id>/', applicant_details, name='applicant_details'),

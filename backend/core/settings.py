@@ -180,6 +180,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/admin-login/'
 
+GOOGLE_OAUTH_CLIENT_ID = env('GOOGLE_OAUTH_CLIENT_ID', default='')
+GOOGLE_OAUTH_CLIENT_SECRET = env('GOOGLE_OAUTH_CLIENT_SECRET', default='')
+GOOGLE_OAUTH_REDIRECT_URI = env('GOOGLE_OAUTH_REDIRECT_URI', default='')
+GOOGLE_ADMIN_EMAILS = [email.lower() for email in env.list('GOOGLE_ADMIN_EMAILS', default=['gleekidsesl6115@gmail.com'])]
+
 # Email
 # For Gmail, use a Google App Password in EMAIL_HOST_PASSWORD.
 EMAIL_BACKEND = env(
