@@ -220,6 +220,10 @@
             box-shadow: 0 20px 44px rgba(244, 139, 193, 0.34);
         }
 
+        [data-uppercase="true"] {
+            text-transform: uppercase;
+        }
+
         .form-note {
             color: var(--gk-muted);
             font-weight: 700;
@@ -450,15 +454,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
                                 <div>
                                     <label for="first_name" class="block text-sm font-medium mb-1">First Name *</label>
-                                    <input type="text" id="first_name" name="first_name" placeholder="First name" required pattern="[A-Za-z\s'-]+" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                    <input type="text" id="first_name" name="first_name" data-uppercase="true" autocapitalize="characters" placeholder="First name" required pattern="[A-Za-z\s'-]+" value="" class="w-full px-4 py-2 border rounded-lg" />
                                 </div>
                                 <div>
                                     <label for="middle_name" class="block text-sm font-medium mb-1">Middle Name</label>
-                                    <input type="text" id="middle_name" name="middle_name" placeholder="Middle name" pattern="[A-Za-z\s'-]*" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                    <input type="text" id="middle_name" name="middle_name" data-uppercase="true" autocapitalize="characters" placeholder="Middle name" pattern="[A-Za-z\s'-]*" value="" class="w-full px-4 py-2 border rounded-lg" />
                                 </div>
                                 <div>
                                     <label for="last_name" class="block text-sm font-medium mb-1">Last Name *</label>
-                                    <input type="text" id="last_name" name="last_name" placeholder="Last name" required pattern="[A-Za-z\s'-]+" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                    <input type="text" id="last_name" name="last_name" data-uppercase="true" autocapitalize="characters" placeholder="Last name" required pattern="[A-Za-z\s'-]+" value="" class="w-full px-4 py-2 border rounded-lg" />
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
@@ -474,7 +478,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                                 <div>
                                     <label for="country" class="block text-sm font-medium mb-1">Country *</label>
-                                    <select id="country" name="country" required class="w-full px-4 py-2 border rounded-lg">
+                                    <select id="country" name="country" data-uppercase="true" required class="w-full px-4 py-2 border rounded-lg">
                                         <option value="">Select Country</option>
                                         <option value="Philippines" selected>Philippines</option>
                                         <option value="United States" >United States</option>
@@ -489,29 +493,29 @@
                             </div>
                             <div class="mb-4">
                                 <label for="address" class="block text-sm font-medium mb-1">Street Address</label>
-                                <input type="text" id="address" name="address" placeholder="Street address" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                <input type="text" id="address" name="address" data-uppercase="true" autocapitalize="characters" placeholder="Street address" value="" class="w-full px-4 py-2 border rounded-lg" />
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
                                 <div>
                                     <label for="city" class="block text-sm font-medium mb-1">City</label>
-                                    <select id="city" name="city" autocomplete="address-level2" class="w-full px-4 py-2 border rounded-lg" disabled>
+                                    <select id="city" name="city" data-uppercase="true" autocomplete="address-level2" class="w-full px-4 py-2 border rounded-lg" disabled>
                                         <option value="">Select province first</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label for="state" class="block text-sm font-medium mb-1">State/Province</label>
-                                    <select id="state" name="state" autocomplete="address-level1" class="w-full px-4 py-2 border rounded-lg">
+                                    <select id="state" name="state" data-uppercase="true" autocomplete="address-level1" class="w-full px-4 py-2 border rounded-lg">
                                         <option value="">Select Province</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label for="zip_code" class="block text-sm font-medium mb-1">ZIP Code</label>
-                                    <input type="text" id="zip_code" name="zip_code" placeholder="ZIP Code" pattern="[0-9A-Za-z\- ]*" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                    <input type="text" id="zip_code" name="zip_code" data-uppercase="true" autocapitalize="characters" placeholder="ZIP Code" pattern="[0-9A-Za-z\- ]*" value="" class="w-full px-4 py-2 border rounded-lg" />
                                 </div>
                             </div>
                             <div class="mb-4">
                                 <label for="referral" class="block text-sm font-medium mb-1">Referral <span class="font-semibold text-slate-500">(Optional)</span></label>
-                                <input type="text" id="referral" name="referral" placeholder="Referral name" value="" class="w-full px-4 py-2 border rounded-lg" />
+                                <input type="text" id="referral" name="referral" data-uppercase="true" autocapitalize="characters" placeholder="Referral name" value="" class="w-full px-4 py-2 border rounded-lg" />
                             </div>
                             <div class="mb-4">
                                 <span class="block text-sm font-medium mb-2">Preferred Work Setup *</span>
@@ -617,6 +621,17 @@
                 btn.querySelector('svg').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 3.866-3.582 7-8 7s-8-3.134-8-7 3.582-7 8-7 8 3.134 8 7z" />';
             }
         }
+
+        const uppercaseFields = document.querySelectorAll('[data-uppercase="true"]');
+        uppercaseFields.forEach(field => {
+            if (field.tagName === 'SELECT') return;
+            const applyUppercase = () => {
+                if (field.value) field.value = field.value.toUpperCase();
+            };
+            field.addEventListener('input', applyUppercase);
+            field.addEventListener('change', applyUppercase);
+            applyUppercase();
+        });
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             const p1 = document.getElementById('password').value;
             const p2 = document.getElementById('confirm_password').value;

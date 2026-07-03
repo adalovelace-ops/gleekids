@@ -18,6 +18,28 @@
     .btn-brand { background: var(--brand); color:#2b2b2b; border:1px solid rgba(0,0,0,0.05); }
     .btn-brand:hover { background: #ffb400; }
     .btn-ghost { border:1px solid rgba(0,0,0,0.08); }
+    .room-icon-btn {
+      width: 2.55rem;
+      height: 2.55rem;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: #fff;
+      color: #374151;
+      box-shadow: 0 8px 22px rgba(31,41,51,0.08);
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, color 0.16s ease;
+    }
+    .room-icon-btn:hover,
+    .room-icon-btn:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 26px rgba(31,41,51,0.12);
+      outline: none;
+    }
+    .room-icon-btn.demo { background: var(--brand); color:#2b2b2b; }
+    .room-icon-btn.client:hover,
+    .room-icon-btn.client:focus-visible { background:#eef2ff; color:#4338ca; }
+    .room-icon-btn svg { width: 1.15rem; height: 1.15rem; stroke-width: 2.35; }
     .tab { border-bottom:2px solid transparent; }
     .tab-active { border-color: var(--brand); color:#b46900; }
   </style>
@@ -31,12 +53,14 @@
         <h1 class="text-3xl font-semibold text-gray-900">Applicant Profile</h1>
       </div>
       <div class="flex items-center gap-3">
-        <a href="{{ app.demo_room_url }}" target="_blank" rel="noopener" class="btn-brand px-4 py-2 rounded-md text-sm font-bold">
-          Demo Room
+        {% if latest_schedule.meeting_link %}
+        <a href="https://us05web.zoom.us/signin#/upcoming" data-evaluation-url="/floating-evaluation/{{ app.applicant_id }}/?type={% if app.status == 'Endorsement' %}client{% else %}demo{% endif %}" onclick="const popup = window.open(this.dataset.evaluationUrl, 'evaluationPopup', 'popup=yes,width=460,height=760,left=40,top=40,resizable=yes,scrollbars=yes'); if (popup) popup.focus(); window.location.href = this.href; return false;" class="room-icon-btn demo ot-floating-button__open" title="Open Zoom meeting" aria-label="Open Zoom meeting">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 10l4.55-2.28A1 1 0 0 1 21 8.62v6.76a1 1 0 0 1-1.45.9L15 14"></path>
+            <rect x="3" y="6" width="12" height="12" rx="2"></rect>
+          </svg>
         </a>
-        <a href="{{ app.client_room_url }}" target="_blank" rel="noopener" class="btn-ghost bg-white px-4 py-2 rounded-md text-sm font-bold text-gray-700">
-          Client Room
-        </a>
+        {% endif %}
         <a href="/admin-dashboard/" class="btn-ghost px-3 py-2 rounded-md text-sm text-gray-700">← Back to Dashboard</a>
       </div>
     </div>
@@ -116,10 +140,29 @@
           <form method="POST" action="/update-status/" class="inline">
             {% csrf_token %}
             <input type="hidden" name="applicant_id" value="{{ app.applicant_id }}" />
-            <input type="hidden" name="new_status" value="Approved" />
-            <input type="hidden" name="status_note" value="Moved forward from Training to Approved." />
+            <input type="hidden" name="new_status" value="Onboarding" />
+            <input type="hidden" name="status_note" value="Moved forward from Training to Onboarding." />
             <button type="submit" class="bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-lg hover:bg-emerald-700 transition">
-                Finalize Onboarding
+                Move to Onboarding
+            </button>
+          </form>
+          {% elif app.status == 'Onboarding' %}
+          <form method="POST" action="/update-status/" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="applicant_id" value="{{ app.applicant_id }}" />
+            <input type="hidden" name="new_status" value="Approved" />
+            <input type="hidden" name="status_note" value="Moved forward from Onboarding to Approved." />
+            <button type="submit" class="bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-lg hover:bg-emerald-700 transition">
+                Mark Approved
+            </button>
+          </form>
+          <form method="POST" action="/update-status/" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="applicant_id" value="{{ app.applicant_id }}" />
+            <input type="hidden" name="new_status" value="Training" />
+            <input type="hidden" name="status_note" value="Moved back from Onboarding to Training." />
+            <button type="submit" class="bg-white text-emerald-700 border border-emerald-200 px-6 py-2 rounded-lg text-sm font-bold shadow hover:bg-emerald-50 transition">
+                Back to Training
             </button>
           </form>
           {% elif app.status == 'Approved' %}
@@ -201,7 +244,17 @@
               <div class="w-full aspect-video rounded-xl border border-dashed border-amber-200 bg-amber-50 flex items-center justify-center text-sm text-amber-700">No video uploaded yet.</div>
             {% endif %}
             <div class="mt-4">
-              <h4 class="font-semibold text-gray-900 mb-2">Second video</h4>
+              <div class="mb-2 flex items-center justify-between gap-3">
+                <h4 class="font-semibold text-gray-900">Second video</h4>
+                <form method="POST" enctype="multipart/form-data" class="inline-flex items-center">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="upload_second_video">
+                  <label class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-amber-500 px-3 py-2 text-xs font-bold text-white shadow hover:bg-amber-600" title="Upload second video">
+                    <span>Upload</span>
+                    <input type="file" name="video_2" accept=".mp4,video/mp4" class="hidden" onchange="this.form.submit()">
+                  </label>
+                </form>
+              </div>
               {% if app.video_2 %}
                 <video controls class="w-full rounded-xl border border-gray-100" src="{{ app.video_2.url }}"></video>
               {% else %}
@@ -258,13 +311,52 @@
                 {% if latest_evaluation.comments %}
                   <div class="mt-3 p-3 rounded-lg border border-amber-100 bg-amber-50 text-xs text-amber-900 whitespace-pre-line">{{ latest_evaluation.comments }}</div>
                 {% endif %}
-                <a href="/evaluate/{{ app.applicant_id }}/" class="block text-center btn-brand px-3 py-2 rounded-md text-sm font-bold">
+                <a href="/floating-evaluation/{{ app.applicant_id }}/?type=demo" onclick="window.open(this.href, 'evaluationPopup', 'width=460,height=760,left=40,top=40,resizable=yes,scrollbars=yes'); return false;" class="ot-floating-button__open block text-center btn-brand px-3 py-2 rounded-md text-sm font-bold">
                   Edit Evaluation
                 </a>
               </div>
             {% else %}
               <div class="p-3 rounded-lg border border-dashed border-amber-200 bg-amber-50 text-sm text-amber-800">
                 No evaluation saved yet.
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="border border-gray-100 rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold text-gray-900">Client Evaluation</h3>
+              {% if latest_client_evaluation %}
+                {% if latest_client_evaluation.client_decision == "Pass" %}
+                  <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full">Pass</span>
+                {% else %}
+                  <span class="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-100 px-2 py-1 rounded-full">Fail</span>
+                {% endif %}
+              {% endif %}
+            </div>
+            {% if latest_client_evaluation %}
+              <div class="space-y-3 text-sm">
+                <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                  <span class="text-gray-800 font-medium">Decision</span>
+                  <span class="text-xs font-bold text-gray-700">{{ latest_client_evaluation.client_decision|default:"Pending" }}</span>
+                </div>
+                {% if latest_client_evaluation.comments %}
+                  <div class="p-3 rounded-lg border border-indigo-100 bg-indigo-50 text-xs text-indigo-900 whitespace-pre-line">{{ latest_client_evaluation.comments }}</div>
+                {% endif %}
+                <div class="text-xs font-semibold text-gray-400">
+                  Updated {{ latest_client_evaluation.created_at|date:"M d, Y @ h:i A" }}
+                </div>
+                <a href="/floating-evaluation/{{ app.applicant_id }}/?type=client" onclick="window.open(this.href, 'evaluationPopup', 'width=460,height=760,left=40,top=40,resizable=yes,scrollbars=yes'); return false;" class="ot-floating-button__open block text-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-bold text-white hover:bg-indigo-700">
+                  Edit Client Evaluation
+                </a>
+              </div>
+            {% else %}
+              <div class="space-y-3">
+                <div class="p-3 rounded-lg border border-dashed border-indigo-200 bg-indigo-50 text-sm text-indigo-800">
+                  No client evaluation saved yet.
+                </div>
+                <a href="/floating-evaluation/{{ app.applicant_id }}/?type=client" onclick="window.open(this.href, 'evaluationPopup', 'width=460,height=760,left=40,top=40,resizable=yes,scrollbars=yes'); return false;" class="ot-floating-button__open block text-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-bold text-white hover:bg-indigo-700">
+                  Add Client Evaluation
+                </a>
               </div>
             {% endif %}
           </div>
@@ -337,3 +429,7 @@
   })();
 </script>
 </html>
+
+
+
+

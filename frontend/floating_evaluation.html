@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evaluation Popup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #f8fafc;
+      color: #111827;
+      font-family: Arial, sans-serif;
+    }
+    .window-shell {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+    }
+    .eval-panel {
+      width: min(100%, 420px);
+      max-height: calc(100vh - 24px);
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.22);
+    }
+    .eval-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: #111827;
+      color: white;
+      cursor: move;
+      user-select: none;
+    }
+    .eval-body {
+      max-height: calc(100vh - 92px);
+      overflow: auto;
+      padding: 16px;
+    }
+    .rating-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .rating-grid input { position: absolute; opacity: 0; pointer-events: none; }
+    .rating-grid span {
+      display: grid;
+      place-items: center;
+      height: 34px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #6b7280;
+    }
+    .rating-grid input:checked + span {
+      border-color: #f59e0b;
+      background: #f59e0b;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <main class="window-shell">
+    <section id="evalPanel" class="eval-panel">
+      <header id="evalHandle" class="eval-header">
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">{{ evaluation_type|title }} Evaluation</p>
+          <h1 class="text-sm font-black">{{ app.first_name }} {{ app.last_name }}</h1>
+        </div>
+        <button type="button" onclick="window.close()" class="grid h-8 w-8 place-items-center rounded-lg bg-white/10 hover:bg-white/20" aria-label="Close">x</button>
+      </header>
+
+      <form method="POST" action="/save-evaluation/" class="eval-body space-y-4">
+        {% csrf_token %}
+        <input type="hidden" name="applicant_identifier" value="{{ app.applicant_id }}">
+        <input type="hidden" name="evaluation_type" value="{{ evaluation_type }}">
+        <input type="hidden" name="redirect_to" value="{{ request.get_full_path }}">
+
+        {% if saved %}
+          <div class="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs font-bold text-green-700">Saved.</div>
+        {% endif %}
+
+        {% if evaluation_type == 'client' %}
+          <div class="rounded-xl border border-indigo-100 bg-indigo-50 p-3">
+            <label class="mb-2 block text-xs font-black uppercase text-indigo-700">Client Decision</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="cursor-pointer rounded-lg border border-green-200 bg-white p-3 text-sm font-black text-green-700">
+                <input type="radio" name="client_decision" value="Pass" class="mr-2" {% if eval.client_decision == 'Pass' %}checked{% endif %} required>Pass
+              </label>
+              <label class="cursor-pointer rounded-lg border border-red-200 bg-white p-3 text-sm font-black text-red-700">
+                <input type="radio" name="client_decision" value="Fail" class="mr-2" {% if eval.client_decision == 'Fail' %}checked{% endif %} required>Fail
+              </label>
+            </div>
+          </div>
+        {% else %}
+          {% for item in criteria %}
+            <div>
+              <label class="mb-1 block text-xs font-black uppercase text-gray-500">{{ item.label }}</label>
+              <div class="rating-grid">
+                {% for i in "12345" %}
+                  <label class="cursor-pointer">
+                    <input type="radio" name="{{ item.key }}_rating" value="{{ i }}" {% if i == item.value %}checked{% endif %} required>
+                    <span>{{ i }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <div>
+          <label class="mb-1 block text-xs font-black uppercase text-gray-500">Comments</label>
+          <textarea name="overall_comments" rows="5" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-100" placeholder="Write evaluation notes...">{{ eval.comments|default:'' }}</textarea>
+        </div>
+
+        <button type="submit" class="w-full rounded-xl bg-gray-900 px-5 py-3 text-xs font-black uppercase tracking-wide text-white hover:bg-black">Save Evaluation</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const panel = document.getElementById('evalPanel');
+    const handle = document.getElementById('evalHandle');
+    let drag = null;
+    handle.addEventListener('pointerdown', event => {
+      if (event.target.closest('button')) return;
+      drag = { id: event.pointerId, x: event.clientX, y: event.clientY, left: panel.offsetLeft, top: panel.offsetTop };
+      panel.style.position = 'fixed';
+      panel.style.margin = '0';
+      handle.setPointerCapture(event.pointerId);
+    });
+    handle.addEventListener('pointermove', event => {
+      if (!drag) return;
+      panel.style.left = `${Math.max(8, drag.left + event.clientX - drag.x)}px`;
+      panel.style.top = `${Math.max(8, drag.top + event.clientY - drag.y)}px`;
+    });
+    handle.addEventListener('pointerup', () => { drag = null; });
+    handle.addEventListener('pointercancel', () => { drag = null; });
+  </script>
+</body>
+</html>

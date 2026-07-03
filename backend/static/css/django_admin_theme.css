@@ -103,3 +103,79 @@ input[type=submit].default,
 .submit-row input.default {
   background: linear-gradient(135deg, #ee79ae, #8b6be8);
 }
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #8b6be8;
+    --secondary: #ee79ae;
+    --accent: #fff0f7;
+    --primary-fg: #fff;
+    --body-fg: #282064;
+    --body-bg: #fbf8ff;
+    --body-quiet-color: #6d6896;
+    --body-loud-color: #282064;
+    --breadcrumbs-bg: #f3edff;
+    --breadcrumbs-fg: #6d6896;
+    --link-fg: #8b6be8;
+    --link-hover-color: #ee79ae;
+    --header-bg: linear-gradient(135deg, #ee79ae, #8b6be8);
+    --header-color: #fff;
+    --selected-row: #fff0f7;
+    --hairline-color: #eadffb;
+    --border-color: #eadffb;
+    --darkened-bg: #f7f1ff;
+  }
+}
+
+#content,
+#content-main,
+.change-list .filtered,
+.results,
+table,
+tbody,
+tr,
+td,
+th,
+.form-row,
+.aligned label,
+.object-tools a,
+.submit-row,
+#changelist,
+#changelist-filter,
+#toolbar,
+.paginator {
+  color: #282064;
+}
+
+#content,
+#content-main,
+#changelist,
+#changelist-form,
+#toolbar,
+.submit-row,
+.results,
+.paginator,
+.form-row,
+fieldset.module,
+.module table,
+tbody,
+tr,
+td,
+th {
+  background-color: #fff;
+}
+
+#changelist-filter,
+#content-related,
+.selector .selector-available h2,
+.selector .selector-chosen h2 {
+  background-color: #fff8fc;
+}
+
+input,
+textarea,
+select,
+.vTextField {
+  background-color: #fff;
+  color: #282064;
+  border-color: #eadffb;
+}

@@ -68,6 +68,7 @@
     const stageMeta = {{ stageMetaJson|safe }};
     const stageCounts = {{ stageCountsJson|safe }};
     const rawEvents = {{ eventsJson|safe }};
+    const initialDate = {{ initialDateJson|safe }};
     document.addEventListener('DOMContentLoaded', () => {
       const activeStages = {};
       const statsContainer = document.getElementById('stats-container');
@@ -108,6 +109,7 @@
 
       const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
+        initialDate,
         height: 680,
         headerToolbar: {
           left: 'prev,next today',
@@ -152,8 +154,8 @@
               <a href="${props.applicantUrl || '#'}" target="_blank" class="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2 font-semibold text-white hover:bg-violet-700">
                 View Applicant
               </a>
-              <a href="${props.zoomRoomUrl || props.meetingLink || '#'}" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700">
-                Start Room
+              <a href="https://us05web.zoom.us/signin#/upcoming" class="ot-floating-button__open inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700" onclick="const popup = window.open('/floating-evaluation/${props.applicantId}/?type=${props.stageKey === 'endorsement' ? 'client' : 'demo'}', 'evaluationPopup', 'popup=yes,width=460,height=760,left=40,top=40,resizable=yes,scrollbars=yes'); if (popup) popup.focus(); window.location.href = this.href; return false;">
+                Open Zoom
               </a>
             </div>
           `;
@@ -173,3 +175,7 @@
 
 </body>
 </html>
+
+
+
+

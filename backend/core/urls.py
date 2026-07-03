@@ -1,30 +1,16 @@
-"""
-URL configuration for core project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
+from django.conf import settings
 from django.contrib import admin
 from django.urls import path, re_path
+from django.views.static import serve as static_serve
+
 from ats_new.views import (
-    applicant_registration, applicant_login, applicant_portal, google_oauth_start, google_oauth_callback, 
+    applicant_registration, applicant_login, applicant_portal, google_oauth_start, google_oauth_callback,
     home_page, applicant_logout, admin_login, admin_dashboard,
     applicant_details, applicants_page, update_status, schedule_initial,
     demo_evaluation, evaluations, reports, training_schedule, onboarding,
     admin_calendar, schedule_action, client_endorsement,
-    evaluate_applicant, save_evaluation, video_call,
-    new_video_room, video_landing, video_room, uploaded_media, save_room_evaluation, room_evaluation_prefill,
-    send_applicant_email, sample_intro_videos, teacher_stories
+    evaluate_applicant, floating_evaluation, save_evaluation, video_call, uploaded_media,
+    send_applicant_email, sample_intro_videos, teacher_stories,
 )
 
 urlpatterns = [
@@ -53,13 +39,14 @@ urlpatterns = [
     path('schedule-action/', schedule_action, name='schedule_action'),
     path('client-endorsement/', client_endorsement, name='client_endorsement'),
     path('evaluate/<uuid:applicant_id>/', evaluate_applicant, name='evaluate_applicant'),
+    path('floating-evaluation/<uuid:applicant_id>/', floating_evaluation, name='floating_evaluation'),
     path('save-evaluation/', save_evaluation, name='save_evaluation'),
     path('send-applicant-email/', send_applicant_email, name='send_applicant_email'),
-    path('api/room-evaluation/', save_room_evaluation, name='save_room_evaluation'),
-    path('api/room-evaluation-prefill/', room_evaluation_prefill, name='room_evaluation_prefill'),
-    path('video-conferencing/', video_landing, name='video_landing'),
     path('video-call/<uuid:schedule_id>/', video_call, name='video_call'),
-    path('video-room/new/', new_video_room, name='new_video_room'),
-    path('video-room/<uuid:room_id>/', video_room, name='video_room'),
+    re_path(r'^static/(?P<path>.*)$', static_serve, {'document_root': settings.BASE_DIR / 'static'}),
     re_path(r'^media/(?P<path>.*)$', uploaded_media, name='uploaded_media'),
 ]
+
+
+
+

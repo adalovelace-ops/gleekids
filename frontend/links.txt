@@ -1,6 +1,7 @@
 Your Links are all set:
-Home: http://localhost:8000/
-Apply: http://localhost:8000/apply/
-Applicant Login: http://localhost:8000/login/
-Admin Login: http://localhost:8000/admin-login/
-Logout: http://localhost:8000/logout/
+Home: http://localhost:8001/
+Apply: http://localhost:8001/apply/
+Applicant Login: http://localhost:8001/login/
+Admin Login: http://localhost:8001/admin-login/
+Logout: http://localhost:8001/logout/
+

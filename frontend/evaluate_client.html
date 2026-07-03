@@ -28,9 +28,11 @@
         <input type="hidden" name="evaluation_type" value="client">
 
         <div>
-          <a href="{{ app.client_room_url }}" target="_blank" rel="noopener" class="inline-flex items-center rounded-lg bg-emerald-600 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-emerald-100 transition hover:bg-emerald-700">
-            <i class="fas fa-video mr-2"></i>Open Client Evaluation Room
+          {% if app.current_schedule.meeting_link %}
+          <a href="https://us05web.zoom.us/signin#/upcoming" class="inline-flex items-center rounded-lg bg-emerald-600 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-emerald-100 transition hover:bg-emerald-700">
+            <i class="fas fa-video mr-2"></i>Open Zoom
           </a>
+          {% endif %}
         </div>
 
         <div class="rounded-lg border border-amber-100 bg-amber-50/70 p-5">
@@ -96,3 +98,5 @@
   </main>
 </body>
 </html>
+
+

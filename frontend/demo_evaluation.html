@@ -43,20 +43,29 @@
                           data-email="{{ app.email }}">
                     <i class="fas fa-envelope mr-1"></i> Email
                   </button>
-                  <a href="{{ app.demo_room_url }}"
-                     target="_blank"
-                     rel="noopener"
-                     class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 transition hover:bg-emerald-200"
-                     title="Open Demo Class Room"
-                     aria-label="Open Demo Class Room">
+                  {% if app.current_schedule.meeting_link %}
+                  <a href="https://us05web.zoom.us/signin#/upcoming" data-evaluation-url="/floating-evaluation/{{ app.applicant_id }}/?type=demo"
+                     class="ot-floating-button__open inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 transition hover:bg-emerald-200"
+                     title="Open Zoom meeting"
+                     aria-label="Open Zoom meeting">
                     <i class="fas fa-video"></i>
                   </a>
-                  <a href="/evaluate/{{ app.applicant_id }}/"
-                     class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-700 transition hover:bg-amber-200"
-                     title="Score Teaching Demo"
-                     aria-label="Score Teaching Demo">
+                  {% endif %}
+                                    <button type="button"
+                          class="evaluation-popup-trigger inline-flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-700 transition hover:bg-amber-200"
+                          title="Score Teaching Demo"
+                          aria-label="Score Teaching Demo"
+                          data-eval-type="demo"
+                          data-applicant-id="{{ app.applicant_id }}"
+                          data-applicant-name="{{ app.first_name }} {{ app.last_name }}"
+                          data-teaching-performance="{{ app.current_evaluation.teaching_performance|default:'' }}"
+                          data-communication-skills="{{ app.current_evaluation.communication_skills|default:'' }}"
+                          data-curriculum-understanding="{{ app.current_evaluation.curriculum_understanding|default:'' }}"
+                          data-engagement-level="{{ app.current_evaluation.engagement_level|default:'' }}"
+                          data-technical-proficiency="{{ app.current_evaluation.technical_proficiency|default:'' }}"
+                          data-comments="{{ app.current_evaluation.comments|default_if_none:''|escape }}">
                     <i class="fas fa-star"></i>
-                  </a>
+                  </button>
                 </div>
                 <div class="text-sm text-gray-600 mt-1">{{ app.email }}</div>
                 <div class="mt-3 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">
@@ -83,9 +92,11 @@
                     <div class="text-sm font-semibold text-gray-800 mt-1">
                       {{ app.current_schedule.scheduled_at|date:"F d, Y @ h:i A" }}
                     </div>
-                    <a href="{{ app.applicant_demo_room_url }}" target="_blank" rel="noopener" class="mt-3 block truncate rounded-lg bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700 hover:bg-amber-100">
-                      <i class="fas fa-link mr-1"></i>Applicant room link
+                    {% if app.current_schedule.meeting_link %}
+                    <a href="https://us05web.zoom.us/signin#/upcoming" data-evaluation-url="/floating-evaluation/{{ app.applicant_id }}/?type=demo" class="ot-floating-button__open mt-3 block truncate rounded-lg bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700 hover:bg-amber-100">
+                      <i class="fas fa-link mr-1"></i>Zoom meeting link
                     </a>
+                    {% endif %}
                   </div>
                 {% endif %}
               </div>
@@ -113,6 +124,14 @@
                              value="{{ app.current_schedule.scheduled_at|date:'Y-m-d\TH:i' }}"
                              required>
                     </div>
+                    <div>
+                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Zoom Link</label>
+                      <input type="url"
+                             name="meeting_link"
+                             class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400"
+                             value="{{ app.current_schedule.meeting_link }}"
+                             placeholder="https://zoom.us/j/...">
+                    </div>
                     {% if app.current_schedule %}
                     <div class="rounded-xl border border-amber-100 bg-amber-50/60 p-3">
                       <label class="flex items-center gap-2 text-xs font-bold text-amber-800">
@@ -136,6 +155,25 @@
       {% endif %}
     </div>
   </main>
+
+  {% include "partials/evaluation_popup.html" %}
+  <script>
+    const openZoomWithEvaluation = button => {
+      const evalUrl = button.dataset.evaluationUrl;
+      if (evalUrl) {
+        const popup = window.open(evalUrl, 'evaluationPopup', 'popup=yes,width=460,height=760,left=40,top=40,resizable=yes,scrollbars=yes');
+        if (popup) popup.focus();
+      }
+      window.location.href = button.href;
+    };
+
+    document.querySelectorAll('.ot-floating-button__open').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        openZoomWithEvaluation(button);
+      });
+    });
+  </script>
 
   <!-- Compose Email Modal -->
   <div id="emailModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/40 px-4">
@@ -253,3 +291,11 @@
   </div>
 </body>
 </html>
+
+
+
+
+
+
+
+

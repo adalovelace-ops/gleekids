@@ -35,7 +35,7 @@
       width: 100%;
       background: #fffdf8;
       min-height: 100vh;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .nav {
@@ -102,7 +102,7 @@
       align-items: center;
       padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem);
       background: url('/media/sipalay.jpg') center / cover no-repeat;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .hero::before {
@@ -187,7 +187,7 @@
       width: min(100%, 92rem);
       margin: 0 auto;
       padding: 0 clamp(1rem, 4vw, 3rem);
-      overflow: hidden;
+      overflow: visible;
       background: #fffdf8;
     }
 
@@ -248,7 +248,7 @@
       width: 100%;
       aspect-ratio: 16 / 9;
       padding: 0;
-      overflow: hidden;
+      overflow: visible;
       border: 1px solid rgba(46, 47, 54, 0.1);
       border-radius: 8px;
       background: #fff;
@@ -377,6 +377,420 @@
       background: #000;
     }
 
+
+    .leadership-message {
+      max-width: 92rem;
+      margin: 4rem auto 0;
+      padding: 0 clamp(1rem, 4vw, 2.5rem);
+    }
+
+    .leadership-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(18rem, 0.72fr) minmax(24rem, 1fr);
+      align-items: center;
+      gap: clamp(2.2rem, 5vw, 5rem);
+      overflow: visible;
+      min-height: clamp(33rem, 46vw, 40rem);
+      padding: clamp(2.4rem, 5vw, 5rem) 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      isolation: isolate;
+      --message-cycle: 24s;
+      --message-step: 4s;
+    }
+
+    .leadership-card::before {
+      content: "\201C";
+      position: absolute;
+      top: clamp(1.2rem, 3vw, 2.7rem);
+      left: clamp(33%, 37vw, 40%);
+      z-index: 0;
+      color: #ff4fa3;
+      font-family: Georgia, serif;
+      font-size: clamp(5rem, 9vw, 8rem);
+      font-weight: 900;
+      line-height: 0.7;
+      opacity: 0.95;
+      pointer-events: none;
+    }
+
+    .leadership-card::after {
+      content: "";
+      position: absolute;
+      right: clamp(1.5rem, 4vw, 4rem);
+      bottom: clamp(1.2rem, 3vw, 2.5rem);
+      width: 9rem;
+      height: 0.35rem;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255, 79, 163, 0), #ff4fa3);
+      opacity: 0.45;
+    }
+
+    .leadership-message.is-manager {
+      margin-top: 2.4rem;
+    }
+
+    .leadership-message.is-manager .leadership-card {
+      --message-cycle: 12s;
+      --message-step: 4s;
+    }
+
+    .leadership-card.is-reversed {
+      grid-template-columns: minmax(24rem, 1fr) minmax(18rem, 0.72fr);
+    }
+
+    .leadership-card.is-reversed::before {
+      left: clamp(2rem, 5vw, 4.6rem);
+    }
+
+    .leadership-card.is-reversed::after {
+      right: auto;
+      left: clamp(1.5rem, 4vw, 4rem);
+      background: linear-gradient(90deg, #ff4fa3, rgba(255, 79, 163, 0));
+    }
+
+    .leadership-card.is-reversed .leadership-copy {
+      order: 1;
+    }
+
+    .leadership-card.is-reversed .leadership-photo {
+      order: 2;
+    }
+
+    .leadership-photo.is-placeholder {
+      place-items: center;
+    }
+
+    .leadership-placeholder-portrait {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      width: min(76%, 20rem);
+      aspect-ratio: 1;
+      border: 3px solid rgba(255, 79, 163, 0.28);
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 34%),
+        linear-gradient(135deg, rgba(255, 79, 163, 0.18), rgba(255, 193, 34, 0.18));
+      color: #ff4fa3;
+      font-family: 'Baloo 2', cursive;
+      font-size: clamp(3.6rem, 8vw, 6rem);
+      font-weight: 900;
+      box-shadow: 0 1.2rem 2rem rgba(255, 79, 163, 0.14);
+    }
+
+    .leadership-placeholder-portrait::after {
+      content: "Yenna";
+      position: absolute;
+      bottom: -1.8rem;
+      color: #161b3d;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .leadership-photo {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      align-self: center;
+      place-items: end center;
+      min-height: clamp(25rem, 39vw, 34rem);
+      overflow: hidden;
+      border-radius: 999px 999px 3rem 3rem;
+      background:
+        linear-gradient(180deg, rgba(255, 79, 163, 0.2), rgba(255, 193, 34, 0.12)),
+        #f2dcf0;
+    }
+
+    .leadership-photo::before {
+      content: "";
+      position: absolute;
+      inset: 1rem;
+      border-radius: inherit;
+      border: 2px solid rgba(255, 79, 163, 0.18);
+      pointer-events: none;
+    }
+
+    .leadership-photo img {
+      width: min(112%, 30rem);
+      max-height: clamp(29rem, 43vw, 38rem);
+      object-fit: contain;
+      object-position: bottom center;
+      filter: drop-shadow(0 1.2rem 1.1rem rgba(46, 47, 54, 0.2));
+    }
+
+    .leadership-copy {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      padding-top: clamp(2.5rem, 6vw, 4.5rem);
+    }
+
+    .leadership-kicker {
+      display: inline-flex;
+      width: max-content;
+      margin-bottom: 0.65rem;
+      color: #ff4fa3;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .leadership-title {
+      margin: 0;
+      color: #161b3d;
+      font-family: 'Baloo 2', cursive;
+      font-size: clamp(2.8rem, 4.7vw, 4.8rem);
+      font-weight: 900;
+      line-height: 0.92;
+    }
+
+    .leadership-title span {
+      color: inherit;
+    }
+
+    .leadership-copy svg {
+      width: 6.5rem;
+      margin: 1rem 0 1.25rem;
+      opacity: 0.55;
+    }
+
+    .leadership-copy svg path {
+      stroke: #ff4fa3;
+    }
+
+    .leadership-slider-wrap {
+      position: relative;
+      width: min(100%, 46rem);
+      overflow: hidden;
+    }
+
+    .leadership-slider {
+      position: relative;
+      min-height: clamp(13.5rem, 21vw, 17rem);
+      overflow: hidden;
+    }
+
+    .leadership-slider-wrap::after {
+      content: "";
+      display: block;
+      width: 7rem;
+      height: 0.28rem;
+      margin-top: 1.15rem;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ff4fa3, rgba(255, 79, 163, 0));
+      opacity: 0.65;
+      transform-origin: left center;
+      transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+
+    .leadership-card:hover .leadership-slider-wrap::after {
+      opacity: 1;
+      transform: scaleX(1.4);
+    }
+
+    .leadership-message-block {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-right: clamp(0.5rem, 2vw, 1.25rem);
+      opacity: 0;
+      transform: translateX(2rem);
+      visibility: hidden;
+      transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.65s ease;
+    }
+
+    .leadership-slider:not(.is-ready) .leadership-message-block:first-child,
+    .leadership-message-block.is-active {
+      opacity: 1;
+      transform: translateX(0);
+      visibility: visible;
+      z-index: 2;
+    }
+
+    .leadership-message-block.is-exiting {
+      opacity: 0;
+      transform: translateX(-2rem);
+      visibility: visible;
+      z-index: 1;
+    }
+
+    .leadership-section-title {
+      width: max-content;
+      max-width: 100%;
+      margin: 0 0 0.85rem;
+      padding: 0.08rem 0.5rem 0.14rem;
+      background: #ff4fa3;
+      color: #ffffff;
+      font-family: 'Nunito', sans-serif;
+      font-size: clamp(1.1rem, 1.65vw, 1.58rem);
+      font-weight: 900;
+      line-height: 1.12;
+      text-transform: uppercase;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+
+    .leadership-copy p {
+      margin: 0;
+      color: #161b3d;
+      font-size: clamp(1.08rem, 1.45vw, 1.38rem);
+      font-weight: 800;
+      line-height: 1.52;
+    }
+
+    .leadership-closing {
+      margin-top: 1rem !important;
+      color: #ff4fa3 !important;
+      font-weight: 900 !important;
+    }
+
+
+    .leadership-name {
+      margin-top: 1.35rem;
+      color: #161b3d;
+      font-family: 'Baloo 2', cursive;
+      font-size: clamp(1.55rem, 2.5vw, 2.25rem);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .leadership-name small {
+      display: block;
+      margin-top: 0.4rem;
+      color: #6c7084;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .leadership-card::before,
+    .leadership-card::after,
+    .leadership-photo,
+    .leadership-photo img,
+    .leadership-placeholder-portrait,
+    .leadership-title,
+    .leadership-copy svg,
+    .leadership-section-title,
+    .leadership-message-block p,
+    .leadership-name {
+      transition:
+        transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+        opacity 0.55s ease,
+        letter-spacing 0.45s ease,
+        box-shadow 0.45s ease;
+    }
+
+    .leadership-section-title {
+      transform-origin: left center;
+    }
+
+    .leadership-card:hover::before {
+      transform: translateY(-0.45rem) rotate(-3deg) scale(1.06);
+      opacity: 1;
+    }
+
+    .leadership-card:hover::after {
+      transform: scaleX(1.28);
+      opacity: 0.72;
+    }
+
+    .leadership-card:hover .leadership-photo {
+      transform: translateY(-0.45rem);
+    }
+
+    .leadership-card:hover .leadership-photo img,
+    .leadership-card:hover .leadership-placeholder-portrait {
+      transform: translateY(-0.35rem) scale(1.035);
+    }
+
+    .leadership-card:hover .leadership-title {
+      transform: translateY(-0.25rem);
+      letter-spacing: 0.01em;
+    }
+
+    .leadership-card:hover .leadership-copy svg {
+      transform: translateX(0.9rem) scaleX(1.12);
+      opacity: 0.8;
+    }
+
+    .leadership-card:hover .leadership-section-title {
+      transform: translateX(0.4rem) scaleX(1.03);
+      box-shadow: 0.45rem 0.45rem 0 rgba(255, 79, 163, 0.16);
+    }
+
+    .leadership-card:hover .leadership-name {
+      transform: translateY(-0.2rem);
+    }
+
+    .leadership-title,
+    .leadership-copy svg,
+    .leadership-name {
+      animation: leadership-copy-in 0.72s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .leadership-photo {
+      animation: leadership-photo-in 0.95s 0.08s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .leadership-title { animation-delay: 0.14s; }
+    .leadership-copy svg { animation-delay: 0.22s; }
+    .leadership-name { animation-delay: 0.42s; }
+
+
+    @keyframes leadership-photo-in {
+      from { opacity: 0; transform: translateY(2.5rem) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes leadership-copy-in {
+      from { opacity: 0; transform: translateY(1rem); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .leadership-photo,
+      .leadership-title,
+      .leadership-copy svg,
+      .leadership-name { animation: none; }
+
+      .leadership-message-block {
+        transition: none;
+      }
+
+      .leadership-slider:not(.is-ready) .leadership-message-block:first-child,
+      .leadership-message-block.is-active {
+        opacity: 1;
+        transform: none;
+        visibility: visible;
+      }
+.leadership-card::before,
+      .leadership-card::after,
+      .leadership-photo,
+      .leadership-photo img,
+      .leadership-placeholder-portrait,
+      .leadership-title,
+      .leadership-copy svg,
+      .leadership-section-title,
+      .leadership-message-block p,
+      .leadership-name {
+        transition: none;
+      }
+    }
     .about {
       max-width: 45rem;
       margin: 4rem auto 0;
@@ -416,10 +830,79 @@
       .stories-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+      .leadership-card,
+      .leadership-card.is-reversed {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        min-height: 0;
+        padding: 2.4rem 0 0;
+        border-radius: 0;
+      }
+      .leadership-card::before {
+        top: 1.2rem;
+        left: 1rem;
+        font-size: 10rem;
+      }
+      .leadership-card::after {
+        right: 1rem;
+        bottom: 1.4rem;
+        width: 6rem;
+      }
+      .leadership-copy {
+        order: 1;
+        max-width: none;
+        padding: 0;
+        text-align: center;
+      }
+      .leadership-slider-wrap {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .leadership-slider {
+        min-height: 17rem;
+      }
+      .leadership-message-block {
+        padding-right: 0;
+      }
+.leadership-copy svg {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .leadership-photo {
+        order: 2;
+        min-height: 24rem;
+        margin-bottom: 0;
+      }
+      .leadership-photo img {
+        max-height: 28rem;
+      }
     }
 
     @media (max-width: 560px) {
       .stories-grid { grid-template-columns: 1fr; }
+      .leadership-message {
+        padding: 0 0.9rem;
+      }
+      .leadership-card {
+        padding: 2rem 0 0;
+        border-radius: 0;
+      }
+      .leadership-title {
+        font-size: clamp(2.35rem, 12vw, 3.25rem);
+      }
+      .leadership-copy p {
+        font-size: 0.92rem;
+        line-height: 1.58;
+      }
+      .leadership-slider {
+        min-height: 19rem;
+      }
+      .leadership-photo {
+        min-height: 19rem;
+      }
+      .leadership-photo img {
+        max-height: 22rem;
+      }
     }
   </style>
   <link rel="stylesheet" href="/static/css/system_palette.css">
@@ -454,7 +937,7 @@
         <img src="/media/gleeglee.jpg" alt="Gleekids teachers together at the beach">
       </div>
       <span class="marks one">+++</span>
-      <span class="marks two">••••••</span>
+      <span class="marks two">&bull;&bull;&bull;&bull;&bull;&bull;</span>
     </header>
 
     <main class="content">
@@ -535,6 +1018,108 @@
         </div>
       </section>
 
+
+      <section class="leadership-message" id="leadership-message" aria-label="Founder message">
+        <article class="leadership-card">
+          <div class="leadership-photo">
+            <img src="/media/madam.png" alt="Gleekids founder portrait">
+          </div>
+          <div class="leadership-copy">
+            <div class="leadership-kicker"></div>
+            <h2 class="leadership-title">Mrs. Lanie <span>Yu</span></h2>
+            <svg viewBox="0 0 120 12" fill="none" aria-hidden="true">
+              <path d="M2 6C8 1 14 1 20 6C26 11 32 11 38 6C44 1 50 1 56 6C62 11 68 11 74 6C80 1 86 1 92 6C98 11 104 11 110 6C114 3 117 3 119 5" stroke="#ff4fa3" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+            <div class="leadership-slider-wrap">
+              <div class="leadership-slider" id="leadershipSlider">
+                <div class="leadership-message-block">
+                  <div class="leadership-section-title">Our Journey, Our Purpose</div>
+                  <p>
+                    As founders, we embarked on this mission fueled by a shared dream: to build a space where creativity, learning, and inspiration unite to transform lives. What began as a vision has become a movement &mdash; a community driven by passion, purpose, and the belief that everyone has the power to create and grow.
+                  </p>
+                </div>
+                <div class="leadership-message-block">
+                  <div class="leadership-section-title">To Our Valued Clients</div>
+                  <p>
+                    Thank you for your trust and belief in us. Your support empowers us to innovate, inspire, and craft experiences that truly matter. Together, we&rsquo;re shaping a future where learning is a journey of discovery and joy.
+                  </p>
+                </div>
+                <div class="leadership-message-block">
+                  <div class="leadership-section-title">To Our Dedicated Teachers</div>
+                  <p>
+                    Your unwavering dedication, patience, and passion for sharing knowledge are the heartbeat of this endeavor. You don&rsquo;t just teach skills &mdash; you nurture confidence, character, and a lifelong love of learning. You are the true catalysts of change.
+                  </p>
+                </div>
+                <div class="leadership-message-block">
+                  <div class="leadership-section-title">To Our Inspiring Students</div>
+                  <p>
+                    You are the reason we wake up every day with purpose. Your curiosity, creativity, and resilience remind us why this journey matters. Never doubt your talents &mdash; each of you has a unique and beautiful gift to offer the world. Keep dreaming, keep creating.
+                  </p>
+                </div>
+                <div class="leadership-message-block">
+                  <div class="leadership-section-title">Our Foundation</div>
+                  <p>
+                    This business was born from genuine experiences, love, and a deep desire to inspire those who may feel it is too late or too difficult to pursue their passions. We believe that regardless of stage in life, everyone can grow, create, and shine &mdash; as long as they have the passion and the courage to try.
+                  </p>
+                </div>
+                <div class="leadership-message-block">
+                  <div class="leadership-section-title">A Family, Not Just a Community</div>
+                  <p>
+                    Together, we are more than a community &mdash; we are a family that uplifts, supports, and encourages each other every step of the way.
+                  </p>
+                  <p class="leadership-closing">
+                    Thank you for being an integral part of our story. Your journey is our mission.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="leadership-name">
+              With heartfelt gratitude and love,
+              <small>The Founders</small>
+            </div>
+          </div>
+        </article>
+      </section>
+      <section class="leadership-message is-manager" id="manager-message" aria-label="Manager message">
+        <article class="leadership-card is-reversed">
+          <div class="leadership-copy">
+            <h2 class="leadership-title">Our Manager's <span>Message</span></h2>
+            <svg viewBox="0 0 120 12" fill="none" aria-hidden="true">
+              <path d="M2 6C8 1 14 1 20 6C26 11 32 11 38 6C44 1 50 1 56 6C62 11 68 11 74 6C80 1 86 1 92 6C98 11 104 11 110 6C114 3 117 3 119 5" stroke="#ff4fa3" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+            <div class="leadership-slider-wrap">
+              <div class="leadership-slider" id="managerMessageSlider">
+                <div class="leadership-message-block">
+                  <div class="leadership-section-title">Teacher Support</div>
+                  <p>
+                    Every teacher deserves guidance that feels clear, warm, and steady. Our work is to make each class feel prepared, supported, and purposeful from the first lesson onward.
+                  </p>
+                </div>
+                <div class="leadership-message-block">
+                  <div class="leadership-section-title">Student Growth</div>
+                  <p>
+                    Behind every confident learner is a team that listens, adjusts, and cares. We keep building a space where students feel safe to speak, practice, and discover what they can do.
+                  </p>
+                </div>
+                <div class="leadership-message-block">
+                  <div class="leadership-section-title">Shared Commitment</div>
+                  <p>
+                    Gleekids moves forward because our teachers, students, clients, and team choose patience, excellence, and heart every day. That commitment is what keeps our community growing.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="leadership-name">
+              Yenna Marie Rodriguez Machado
+              <small>Gleekids Manager</small>
+            </div>
+          </div>
+          <div class="leadership-photo">
+            <img src="/media/yenna.jpg" alt="Yenna Marie Rodriguez Machado portrait">
+          </div>
+        </article>
+      </section>
+
       <section class="about">
         <h2>About Us<span style="color: var(--blue);">.</span></h2>
         <svg class="squiggle" viewBox="0 0 120 12" fill="none" aria-hidden="true">
@@ -555,6 +1140,41 @@
       const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 280;
       track.scrollBy({ left: direction * (cardWidth + 24), behavior: 'smooth' });
     }
+    function startMessageCarousel(sliderId, delay) {
+      const slider = document.getElementById(sliderId);
+      if (!slider) return;
+      const slides = Array.from(slider.querySelectorAll('.leadership-message-block'));
+      if (slides.length <= 1) return;
+
+      let index = 0;
+      let timer;
+      const show = (nextIndex) => {
+        const current = slides[index];
+        const next = slides[nextIndex];
+        current.classList.remove('is-active');
+        current.classList.add('is-exiting');
+        next.classList.add('is-active');
+        window.setTimeout(() => current.classList.remove('is-exiting'), 700);
+        index = nextIndex;
+      };
+      const start = (speed) => {
+        window.clearInterval(timer);
+        timer = window.setInterval(() => show((index + 1) % slides.length), speed);
+      };
+
+      slider.classList.add('is-ready');
+      slides[0].classList.add('is-active');
+      start(delay);
+      slider.addEventListener('mouseenter', () => start(Math.max(1500, delay / 2)));
+      slider.addEventListener('mouseleave', () => start(delay));
+    }
+
+    startMessageCarousel('leadershipSlider', 3600);
+    startMessageCarousel('managerMessageSlider', 3200);
   </script>
 </body>
 </html>
+
+
+
+

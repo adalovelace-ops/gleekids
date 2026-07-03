@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import check_password, identify_hasher, make_password
 
 class Applicant(models.Model):
     NEXT_STEP_TEXT = {
@@ -9,7 +10,10 @@ class Applicant(models.Model):
         'Demo Evaluation': 'Prepare your teaching materials! Your demo evaluation session has been scheduled.',
         'Endorsement': 'You have passed the demo! We are now presenting your profile to our clients for final review.',
         'Training': 'Congratulations! You are now in the training phase. Please follow the instructions provided by your trainer.',
+        'Onboarding': 'You are in onboarding. Please complete the remaining placement and account requirements.',
         'Approved': 'Welcome to the team! We are finalizing your onboarding documents.',
+        'Resign': 'Your application record is currently marked as resigned.',
+        'Withdrawn': 'Your application is currently marked as withdrawn.',
     }
     PROGRESS_STAGES = [
         {'label': 'Pending', 'status': 'Pending', 'percent': 10},
@@ -17,7 +21,8 @@ class Applicant(models.Model):
         {'label': 'Demo', 'status': 'Demo Evaluation', 'percent': 45},
         {'label': 'Endorsement', 'status': 'Endorsement', 'percent': 65},
         {'label': 'Training', 'status': 'Training', 'percent': 85},
-        {'label': 'Onboarding', 'status': 'Approved', 'percent': 100},
+        {'label': 'Onboarding', 'status': 'Onboarding', 'percent': 95},
+        {'label': 'Approved', 'status': 'Approved', 'percent': 100},
     ]
 
     applicant_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -77,6 +82,21 @@ class Applicant(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.email})"
 
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+
+    def password_is_hashed(self):
+        try:
+            identify_hasher(self.password)
+            return True
+        except ValueError:
+            return False
+
+    def check_password(self, raw_password):
+        if self.password_is_hashed():
+            return check_password(raw_password, self.password)
+        return self.password == raw_password
+
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
@@ -95,6 +115,8 @@ class Applicant(models.Model):
 
     def update_status(self, new_status, notes=None, save=True):
         old_status = self.status
+        if old_status == new_status and not notes:
+            return
         self.status = new_status
         if save:
             self.save(update_fields=['status', 'updated_at'])
@@ -107,7 +129,8 @@ class Applicant(models.Model):
 
     def update_profile_from_post(self, data):
         for field in ['first_name', 'last_name', 'email', 'phone', 'address', 'city', 'state']:
-            setattr(self, field, data.get(field))
+            if field in data:
+                setattr(self, field, data.get(field))
         self.save()
 
     def assign_teaching_account(self, account, notes=None):
@@ -137,7 +160,7 @@ class Schedule(models.Model):
         'demo': 'Demo Evaluation',
         'endorsement': 'Endorsement',
         'training': 'Training',
-        'onboarding': 'Approved',
+        'onboarding': 'Onboarding',
     }
 
     schedule_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -229,7 +252,7 @@ class Evaluation(models.Model):
 
     @classmethod
     def rating_defaults_from_room_payload(cls, ratings, comments_text):
-        ratings = ratings or {}
+        ratings = ratings if isinstance(ratings, dict) else {}
         return {
             'evaluation_type': 'demo',
             'teaching_performance': cls.normalize_rating(ratings.get('teaching_performance')),
@@ -260,6 +283,8 @@ class Evaluation(models.Model):
 
     def __str__(self):
         return f"Eval for {self.applicant.last_name} - Score: {self.total_score}/25"
+
+
 class StatusHistory(models.Model):
     history_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     applicant = models.ForeignKey(Applicant, on_delete=models.CASCADE, related_name='history')

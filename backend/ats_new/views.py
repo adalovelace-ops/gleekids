@@ -9,28 +9,74 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+from django.contrib import messages
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Q
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.core.mail import BadHeaderError, send_mail
+from django.db.models import Q
 from django.http import FileResponse, Http404, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.conf import settings
-from django.utils.dateparse import parse_time
+from django.utils.dateparse import parse_datetime, parse_time
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils import timezone
 from django.utils._os import safe_join
-from django.views.decorators.csrf import csrf_exempt
 from .forms import ApplicantRegistrationForm
 from .models import Applicant, Evaluation, Schedule, StatusHistory
+from .validators import validate_applicant_upload
 
 logger = logging.getLogger(__name__)
 
+ZOOM_UPCOMING_URL = 'https://us05web.zoom.us/signin#/upcoming'
+
+
+def safe_post_redirect(request, fallback_view, *fallback_args, **fallback_kwargs):
+    redirect_to = (request.POST.get('redirect_to') or '').strip()
+    if redirect_to and url_has_allowed_host_and_scheme(
+        redirect_to,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return redirect(redirect_to)
+    return redirect(fallback_view, *fallback_args, **fallback_kwargs)
+
+
+def can_access_uploaded_applicant_file(request, path):
+    if request.user.is_authenticated and request.user.is_staff:
+        return True
+
+    applicant_id = request.session.get('applicant_id')
+    if not applicant_id:
+        return False
+
+    return Applicant.objects.filter(applicant_id=applicant_id).filter(
+        Q(resume=path) |
+        Q(video=path) |
+        Q(video_2=path) |
+        Q(tefl_certificate=path)
+    ).exists()
+
 
 def uploaded_media(request, path):
-    media_roots = [
-        settings.MEDIA_ROOT,
-        settings.BASE_DIR,
-        settings.BASE_DIR.parent / 'frontend',
-    ]
+    path_parts = Path(path).parts
+    if not path_parts or any(part.startswith('.') for part in path_parts):
+        raise Http404('File not found.')
+
+    allowed_upload_dirs = {'resumes', 'videos', 'certificates'}
+    public_asset_extensions = {
+        '.apng', '.avif', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg', '.webp',
+        '.mp4', '.webm',
+    }
+
+    media_roots = [settings.MEDIA_ROOT]
+    if path_parts[0] in allowed_upload_dirs:
+        if not can_access_uploaded_applicant_file(request, path):
+            raise Http404('File not found.')
+        media_roots.append(settings.BASE_DIR)
+    if len(path_parts) == 1 and Path(path).suffix.lower() in public_asset_extensions:
+        media_roots.append(settings.BASE_DIR.parent / 'frontend')
 
     for root in media_roots:
         try:
@@ -47,7 +93,6 @@ def uploaded_media(request, path):
 
     raise Http404('File not found.')
 
-
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def send_applicant_email(request):
@@ -60,6 +105,10 @@ def send_applicant_email(request):
 
     if not recipient or not subject or not message:
         return JsonResponse({'ok': False, 'error': 'Recipient, subject, and message are required.'}, status=400)
+    try:
+        validate_email(recipient)
+    except ValidationError:
+        return JsonResponse({'ok': False, 'error': 'Recipient email is invalid.'}, status=400)
 
     if not settings.EMAIL_HOST_USER or not settings.EMAIL_HOST_PASSWORD:
         return JsonResponse({'ok': False, 'error': 'Email account is not configured in .env.'}, status=500)
@@ -74,9 +123,9 @@ def send_applicant_email(request):
         )
     except BadHeaderError:
         return JsonResponse({'ok': False, 'error': 'Invalid email subject or message header.'}, status=400)
-    except Exception as exc:
+    except Exception:
         logger.exception('Failed to send applicant email to %s', recipient)
-        return JsonResponse({'ok': False, 'error': f'Email provider error: {exc}'}, status=502)
+        return JsonResponse({'ok': False, 'error': 'Email provider error. Please check the server logs.'}, status=502)
 
     if not sent_count:
         return JsonResponse({'ok': False, 'error': 'Email provider did not accept the message.'}, status=502)
@@ -190,6 +239,7 @@ def google_oauth_callback(request):
         if not user or not user.is_staff:
             return render_google_auth_error(request, 'This Google account is not registered as staff.', role)
         login(request, user)
+        request.session.pop('applicant_id', None)
         return redirect('admin_dashboard')
 
     applicant = Applicant.objects.filter(email__iexact=email).first()
@@ -198,6 +248,7 @@ def google_oauth_callback(request):
     if applicant.status == 'Pending':
         return render_google_auth_error(request, 'Your application is still pending approval. Please check back later.', role)
 
+    logout(request)
     request.session['applicant_id'] = str(applicant.applicant_id)
     return redirect('applicant_portal')
 
@@ -227,19 +278,24 @@ def sample_intro_videos(request):
 
 def applicant_login(request):
     if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        try:
-            applicant = Applicant.objects.get(email=email, password=password)
-            
+        email = (request.POST.get('email') or '').strip()
+        password = request.POST.get('password') or ''
+        applicant = Applicant.objects.filter(email__iexact=email).first()
+
+        if applicant and applicant.check_password(password):
+            if not applicant.password_is_hashed():
+                applicant.set_password(password)
+                applicant.save(update_fields=['password', 'updated_at'])
+
             if applicant.status == 'Pending':
                 return render(request, 'applicant_login.html', {'error': 'Your application is still pending approval. Please check back later.'})
-                
+
+            logout(request)
             request.session['applicant_id'] = str(applicant.applicant_id)
             return redirect('applicant_portal')
-        except Applicant.DoesNotExist:
-            return render(request, 'applicant_login.html', {'error': 'Invalid email or password'})
-    
+
+        return render(request, 'applicant_login.html', {'error': 'Invalid email or password'})
+
     return render(request, 'applicant_login.html')
 
 def applicant_portal(request):
@@ -247,7 +303,10 @@ def applicant_portal(request):
     if not applicant_id:
         return redirect('applicant_login')
     
-    applicant = Applicant.objects.get(applicant_id=applicant_id)
+    applicant = Applicant.objects.filter(applicant_id=applicant_id).first()
+    if not applicant:
+        request.session.pop('applicant_id', None)
+        return redirect('applicant_login')
     preferred_time_saved = False
     preferred_time_error = ''
     document_upload_saved = ''
@@ -276,19 +335,19 @@ def applicant_portal(request):
         elif not uploaded_file:
             document_upload_error = 'Please choose a file to upload.'
         else:
-            setattr(applicant, field_name, uploaded_file)
-            applicant.save(update_fields=[field_name, 'updated_at'])
-            document_upload_saved = upload_fields[field_name]
+            try:
+                validate_applicant_upload(field_name, uploaded_file)
+            except ValidationError as exc:
+                document_upload_error = ' '.join(exc.messages)
+            else:
+                setattr(applicant, field_name, uploaded_file)
+                applicant.save(update_fields=[field_name, 'updated_at'])
+                document_upload_saved = upload_fields[field_name]
 
     latest_evaluation = applicant.evaluations.filter(evaluation_type='demo').order_by('-created_at').first()
     latest_client_evaluation = applicant.evaluations.filter(evaluation_type='client').order_by('-created_at').first()
     latest_schedule = applicant.schedules.all().order_by('-scheduled_at').first()
-    meeting_room_id = applicant.applicant_id
-    applicant_room_url = zoom_clone_room_url(
-        meeting_room_id,
-        'applicant',
-        'client' if applicant.status == 'Endorsement' else 'demo'
-    )
+
     current_percent, current_stage_index = applicant.get_progress()
             
     context = {
@@ -307,8 +366,7 @@ def applicant_portal(request):
         'clientScore': latest_client_evaluation.client_decision if latest_client_evaluation else None,
         'clientUpdated': latest_client_evaluation.created_at.strftime('%B %d, %Y') if latest_client_evaluation else None,
         'clientSummary': latest_client_evaluation.comments if latest_client_evaluation else None,
-        'zoomCloneUrl': zoom_clone_base_url(),
-        'zoomCloneRoomUrl': applicant_room_url,
+        'meetingUrl': latest_schedule.meeting_link if latest_schedule and latest_schedule.meeting_link else ZOOM_UPCOMING_URL,
         'preferred_time_saved': preferred_time_saved,
         'preferred_time_error': preferred_time_error,
         'document_upload_saved': document_upload_saved,
@@ -318,9 +376,6 @@ def applicant_portal(request):
     }
     return render(request, 'applicant_portal.html', context)
 
-from django.contrib.auth import authenticate, get_user_model, login, logout
-from django.contrib.auth.decorators import login_required, user_passes_test
-
 SCHEDULE_COLORS = {
     'initial': '#f59e0b',
     'demo': '#ee5f88',
@@ -329,22 +384,6 @@ SCHEDULE_COLORS = {
     'endorsement': '#8b5cf6',
 }
 
-def zoom_clone_base_url():
-    return getattr(settings, 'ZOOM_CLONE_URL', 'http://127.0.0.1:3000/')
-
-
-def zoom_clone_room_url(room_id, role='applicant', evaluation_type='demo'):
-    safe_role = 'admin' if role == 'admin' else 'applicant'
-    safe_evaluation_type = 'client' if evaluation_type == 'client' else 'demo'
-    return f"{zoom_clone_base_url().rstrip('/')}/{room_id}?role={safe_role}&evaluationType={safe_evaluation_type}"
-
-
-def assign_applicant_room_urls(applicant):
-    applicant.demo_room_url = zoom_clone_room_url(applicant.applicant_id, 'admin', 'demo')
-    applicant.client_room_url = zoom_clone_room_url(applicant.applicant_id, 'admin', 'client')
-    applicant.applicant_demo_room_url = zoom_clone_room_url(applicant.applicant_id, 'applicant', 'demo')
-    applicant.applicant_client_room_url = zoom_clone_room_url(applicant.applicant_id, 'applicant', 'client')
-    return applicant
 
 
 def mini_calendar_context():
@@ -364,10 +403,12 @@ def mini_calendar_context():
         weeks.append([
             {
                 'date': day,
+                'date_iso': day.isoformat(),
                 'number': day.day,
                 'in_month': day.month == today.month,
                 'is_today': day == today,
                 'has_events': day in event_dates,
+                'calendar_url': f"/admin-calendar/?date={day.isoformat()}",
             }
             for day in week
         ])
@@ -381,6 +422,7 @@ def mini_calendar_context():
             'title': schedule.title or schedule.get_type_display(),
             'subtitle': schedule.applicant.full_name if schedule.applicant_id else schedule.get_type_display(),
             'color': SCHEDULE_COLORS.get(schedule.type, '#6b7280'),
+            'calendar_url': f"/admin-calendar/?date={timezone.localtime(schedule.scheduled_at).date().isoformat()}",
         }
         for schedule in upcoming_schedules
     ]
@@ -455,7 +497,7 @@ def applicant_admin_context(status_filter=None):
         {'key': 'Approved', 'label': 'Approved'},
     ]
     stats = [
-        {'s': 'Initial Screening', 'card_label': 'Screening', 'total': Applicant.objects.filter(status='Initial Screening').count(), 'key': 'Initial Screening'},
+        {'s': 'Initial Screening', 'card_label': 'Screening', 'total': Applicant.objects.filter(status__in=['Pending', 'Initial Screening']).count(), 'key': 'Initial Screening'},
         {'s': 'Demo Evaluation', 'card_label': 'Demo', 'total': Applicant.objects.filter(status='Demo Evaluation').count(), 'key': 'Demo Evaluation'},
         {'s': 'Client Endorsement', 'card_label': 'Endorsements', 'total': Applicant.objects.filter(status='Endorsement').count(), 'key': 'Endorsement'},
         {'s': 'Training', 'card_label': 'Training', 'total': Applicant.objects.filter(status='Training').count(), 'key': 'Training'},
@@ -463,7 +505,10 @@ def applicant_admin_context(status_filter=None):
     ]
     applicants = Applicant.objects.all().order_by('-created_at')
     if status_filter:
-        applicants = applicants.filter(status=status_filter)
+        if status_filter == 'screening':
+            applicants = applicants.filter(status__in=['Pending', 'Initial Screening'])
+        else:
+            applicants = applicants.filter(status=status_filter)
 
     pipeline_columns = [
         {
@@ -501,6 +546,7 @@ def admin_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            request.session.pop('applicant_id', None)
             return redirect('admin_dashboard')
         else:
             return render(request, 'login.html', {'error': 'Invalid credentials', 'email': email})
@@ -516,13 +562,23 @@ def admin_dashboard(request):
 def applicants_page(request):
     return render(request, 'manage_applicants.html', applicant_admin_context(request.GET.get('status')))
 
-from .models import Applicant, Schedule, Evaluation
-
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def applicant_details(request, applicant_id):
-    applicant = Applicant.objects.get(applicant_id=applicant_id)
-    assign_applicant_room_urls(applicant)
+    applicant = get_object_or_404(Applicant, applicant_id=applicant_id)
+    if request.method == 'POST' and request.POST.get('action') == 'upload_second_video':
+        uploaded_file = request.FILES.get('video_2')
+        if uploaded_file:
+            try:
+                validate_applicant_upload('video_2', uploaded_file)
+            except ValidationError as exc:
+                messages.error(request, ' '.join(exc.messages))
+            else:
+                applicant.video_2 = uploaded_file
+                applicant.save(update_fields=['video_2', 'updated_at'])
+                messages.success(request, 'Second video uploaded.')
+        return redirect('applicant_details', applicant_id=applicant.applicant_id)
+
     history = applicant.history.all().order_by('-created_at')
     latest_schedule = applicant.schedules.all().order_by('-scheduled_at').first()
     latest_evaluation = applicant.evaluations.filter(evaluation_type='demo').order_by('-created_at').first()
@@ -543,12 +599,7 @@ def applicant_details(request, applicant_id):
         'latest_evaluation': latest_evaluation,
         'latest_client_evaluation': latest_client_evaluation,
         'evaluation_items': evaluation_items,
-        'zoomCloneUrl': zoom_clone_base_url(),
-        'zoomCloneRoomUrl': zoom_clone_room_url(
-            applicant.applicant_id,
-            'admin',
-            'client' if applicant.status == 'Endorsement' else 'demo'
-        ),
+
     })
 
 @login_required
@@ -556,7 +607,7 @@ def applicant_details(request, applicant_id):
 def update_status(request):
     if request.method == 'POST':
         applicant_id = request.POST.get('applicant_id')
-        applicant = Applicant.objects.get(applicant_id=applicant_id)
+        applicant = get_object_or_404(Applicant, applicant_id=applicant_id)
         
         # Check if we are updating status or general info
         if 'new_status' in request.POST:
@@ -564,18 +615,14 @@ def update_status(request):
             applicant.update_status(new_status, notes=request.POST.get('status_note'))
         else:
             applicant.update_profile_from_post(request.POST)
-        redirect_to = request.POST.get('redirect_to')
-        if redirect_to:
-            return redirect(redirect_to)
-        return redirect('applicant_details', applicant_id=applicant_id)
+        return safe_post_redirect(request, 'applicant_details', applicant_id=applicant_id)
     return redirect('admin_dashboard')
-
-import uuid
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_calendar(request):
-    schedules = Schedule.objects.all().select_related('applicant').order_by('applicant_id', '-scheduled_at', '-created_at')
+    initial_date = request.GET.get('date') or timezone.localdate().isoformat()
+    schedules = Schedule.objects.all().select_related('applicant').order_by('scheduled_at', '-created_at')
     events = []
     
     # Colors for different stages
@@ -587,13 +634,7 @@ def admin_calendar(request):
         'onboarding': '#10b981',
     }
     
-    visible_schedules = []
-    seen_applicants = set()
     for s in schedules:
-        if s.applicant_id in seen_applicants:
-            continue
-        seen_applicants.add(s.applicant_id)
-        visible_schedules.append(s)
         events.append({
             'title': f"{s.applicant.first_name} {s.applicant.last_name} - {s.title}",
             'start': s.scheduled_at.isoformat(),
@@ -602,17 +643,7 @@ def admin_calendar(request):
                 'name': f"{s.applicant.first_name} {s.applicant.last_name}",
                 'email': s.applicant.email,
                 'phone': s.applicant.phone,
-                'meetingLink': s.meeting_link,
-                'zoomRoomUrl': zoom_clone_room_url(
-                    s.applicant.applicant_id,
-                    'admin',
-                    'client' if s.type == 'endorsement' else 'demo'
-                ),
-                'applicantRoomUrl': zoom_clone_room_url(
-                    s.applicant.applicant_id,
-                    'applicant',
-                    'client' if s.type == 'endorsement' else 'demo'
-                ),
+                'meetingLink': s.meeting_link or ZOOM_UPCOMING_URL,
                 'stageLabel': s.get_type_display(),
                 'stageKey': s.type,
                 'applicantUrl': f"/applicant-details/{s.applicant.applicant_id}/",
@@ -622,7 +653,7 @@ def admin_calendar(request):
         })
 
     stage_counts = {key: 0 for key in colors}
-    for schedule in visible_schedules:
+    for schedule in schedules:
         if schedule.type in stage_counts:
             stage_counts[schedule.type] += 1
         
@@ -636,7 +667,7 @@ def admin_calendar(request):
             'onboarding': {'label': 'Onboarding', 'color': colors['onboarding']},
         }),
         'stageCountsJson': json.dumps(stage_counts),
-        'zoomCloneUrl': zoom_clone_base_url(),
+        'initialDateJson': json.dumps(initial_date),
     }
     return render(request, 'admin_calendar.html', context)
 
@@ -647,14 +678,27 @@ def schedule_action(request):
         applicant_id = request.POST.get('applicant_identifier')
         sched_type = request.POST.get('type')
         scheduled_at = request.POST.get('scheduled_at')
-        meeting_link = request.POST.get('meeting_link')
+        meeting_link = (request.POST.get('meeting_link') or '').strip()
         title = request.POST.get('title')
         reschedule_reason = (request.POST.get('reschedule_reason') or '').strip()
         was_unavailable = request.POST.get('applicant_unavailable') == '1'
         
-        applicant = Applicant.objects.get(applicant_id=applicant_id)
+        applicant = get_object_or_404(Applicant, applicant_id=applicant_id)
+        if sched_type not in dict(Schedule.TYPE_CHOICES):
+            messages.error(request, 'Invalid schedule type.')
+            return safe_post_redirect(request, 'admin_dashboard')
+
+        parsed_scheduled_at = parse_datetime(scheduled_at or '')
+        if not parsed_scheduled_at:
+            messages.error(request, 'Invalid schedule date/time.')
+            return safe_post_redirect(request, 'admin_dashboard')
+        if timezone.is_naive(parsed_scheduled_at):
+            parsed_scheduled_at = timezone.make_aware(parsed_scheduled_at, timezone.get_current_timezone())
+
         existing_schedule = applicant.schedules.filter(type=sched_type).first()
         previous_time = existing_schedule.scheduled_at if existing_schedule else None
+        if not meeting_link and existing_schedule:
+            meeting_link = existing_schedule.meeting_link
         
         # Create or Update schedule
         schedule, _ = Schedule.objects.update_or_create(
@@ -662,23 +706,11 @@ def schedule_action(request):
             type=sched_type,
             defaults={
                 'title': title,
-                'scheduled_at': scheduled_at,
+                'scheduled_at': parsed_scheduled_at,
                 'meeting_link': meeting_link
             }
         )
         schedule.refresh_from_db()
-        old_schedules = applicant.schedules.exclude(schedule_id=schedule.schedule_id)
-        removed_schedule_labels = [
-            f"{old_schedule.get_type_display()} on {timezone.localtime(old_schedule.scheduled_at).strftime('%B %d, %Y @ %I:%M %p')}"
-            for old_schedule in old_schedules
-        ]
-        if removed_schedule_labels:
-            old_schedules.delete()
-            StatusHistory.objects.create(
-                applicant=applicant,
-                status=applicant.status,
-                notes=f"Calendar moved to {schedule.get_type_display()}; removed previous schedule(s): {', '.join(removed_schedule_labels)}.",
-            )
 
         schedule.sync_applicant_status(title)
         advance_status = request.POST.get('advance_status')
@@ -702,13 +734,8 @@ def schedule_action(request):
                 status=applicant.status,
                 notes=note,
             )
-
-        # Auto-generate meeting link if none provided
-        evaluation_type = 'client' if sched_type == 'endorsement' else 'demo'
-        schedule.meeting_link = zoom_clone_room_url(applicant.applicant_id, 'applicant', evaluation_type)
-        schedule.save(update_fields=['meeting_link'])
         
-        return redirect(request.POST.get('redirect_to', 'admin_dashboard'))
+        return safe_post_redirect(request, 'admin_dashboard')
     return redirect('admin_dashboard')
 
 @login_required
@@ -737,6 +764,12 @@ def schedule_initial(request):
         'training': {
             'label': 'Training',
             'status': 'Training',
+            'next_status': 'Onboarding',
+            'action_label': 'Move to Onboarding',
+        },
+        'onboarding': {
+            'label': 'Onboarding',
+            'status': 'Onboarding',
             'next_status': 'Approved',
             'action_label': 'Mark Hired',
         },
@@ -770,6 +803,7 @@ def schedule_initial(request):
         {'label': 'Demo', 'status': 'Demo Evaluation'},
         {'label': 'Client', 'status': 'Endorsement'},
         {'label': 'Training', 'status': 'Training'},
+        {'label': 'Onboarding', 'status': 'Onboarding'},
         {'label': 'Hired', 'status': 'Approved'},
         {'label': 'Resign', 'status': 'Resign'},
         {'label': 'Withdrawn', 'status': 'Withdrawn'},
@@ -788,7 +822,7 @@ def demo_evaluation(request):
     applicants = Applicant.objects.filter(status='Demo Evaluation')
     for app in applicants:
         app.current_schedule = app.schedules.filter(type='demo').first()
-        assign_applicant_room_urls(app)
+        app.current_evaluation = app.evaluations.filter(evaluation_type='demo').order_by('-created_at').first()
     return render(request, 'demo_evaluation.html', {'applicants': applicants})
 
 @login_required
@@ -884,23 +918,23 @@ def training_schedule(request):
         app.current_schedule = app.schedules.filter(type='training').first()
     return render(request, 'training_schedule.html', {'applicants': applicants})
 
-from .models import Applicant, Schedule, Evaluation
-
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def client_endorsement(request):
     applicants = Applicant.objects.filter(status='Endorsement')
     for app in applicants:
         app.current_schedule = app.schedules.filter(type='endorsement').first()
-        assign_applicant_room_urls(app)
+        app.current_evaluation = app.evaluations.filter(evaluation_type='client').order_by('-created_at').first()
+        app.demo_evaluation = app.evaluations.filter(evaluation_type='demo').order_by('-created_at').first()
     return render(request, 'client_endorsement.html', {'applicants': applicants})
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def evaluate_applicant(request, applicant_id):
-    applicant = Applicant.objects.get(applicant_id=applicant_id)
-    assign_applicant_room_urls(applicant)
+    applicant = get_object_or_404(Applicant, applicant_id=applicant_id)
     evaluation_type = request.GET.get('type')
+    schedule_type = 'endorsement' if evaluation_type == 'client' or applicant.status == 'Endorsement' else 'demo'
+    applicant.current_schedule = applicant.schedules.filter(type=schedule_type).first()
     if evaluation_type == 'client' or applicant.status == 'Endorsement':
         existing_eval = Evaluation.objects.filter(applicant=applicant, evaluation_type='client').first()
         return render(request, 'evaluate_client.html', {
@@ -930,20 +964,53 @@ def evaluate_applicant(request, applicant_id):
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
+def floating_evaluation(request, applicant_id):
+    applicant = get_object_or_404(Applicant, applicant_id=applicant_id)
+    evaluation_type = request.GET.get('type')
+    if evaluation_type not in {'client', 'demo'}:
+        evaluation_type = 'client' if applicant.status == 'Endorsement' else 'demo'
+
+    existing_eval = Evaluation.objects.filter(
+        applicant=applicant,
+        evaluation_type=evaluation_type,
+    ).order_by('-created_at').first()
+
+    criteria = [
+        {'key': 'teaching_performance', 'label': 'Teaching Performance'},
+        {'key': 'communication_skills', 'label': 'Communication Skills'},
+        {'key': 'curriculum_understanding', 'label': 'Curriculum Understanding'},
+        {'key': 'engagement_level', 'label': 'Engagement Level'},
+        {'key': 'technical_proficiency', 'label': 'Technical Proficiency'},
+    ]
+    for item in criteria:
+        item['value'] = str(getattr(existing_eval, item['key'], '')) if existing_eval else ''
+
+    return render(request, 'floating_evaluation.html', {
+        'app': applicant,
+        'eval': existing_eval,
+        'criteria': criteria,
+        'evaluation_type': evaluation_type,
+        'saved': request.GET.get('saved') == '1',
+    })
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def save_evaluation(request):
     if request.method == 'POST':
         applicant_id = request.POST.get('applicant_identifier')
-        applicant = Applicant.objects.get(applicant_id=applicant_id)
+        applicant = get_object_or_404(Applicant, applicant_id=applicant_id)
 
         if request.POST.get('evaluation_type') == 'client':
             decision = request.POST.get('client_decision')
             if decision not in {'Pass', 'Fail'}:
-                return redirect('evaluate_applicant', applicant_id=applicant.applicant_id)
+                return safe_post_redirect(request, 'evaluate_applicant', applicant_id=applicant.applicant_id)
 
+            defaults = Evaluation.client_defaults(decision, request.POST.get('overall_comments'))
+            defaults['evaluator'] = request.user
             evaluation, _ = Evaluation.objects.update_or_create(
                 applicant=applicant,
                 evaluation_type='client',
-                defaults=Evaluation.client_defaults(decision, request.POST.get('overall_comments'))
+                defaults=defaults,
             )
             next_status = 'Training' if decision == 'Pass' else 'Withdrawn'
             if applicant.status != next_status:
@@ -951,20 +1018,26 @@ def save_evaluation(request):
                     next_status,
                     notes=f"Client endorsement marked {decision}.",
                 )
-            return redirect('evaluations')
+            return safe_post_redirect(request, 'evaluations')
 
+        defaults = Evaluation.rating_defaults_from_request(request.POST)
+        defaults['evaluator'] = request.user
         Evaluation.objects.update_or_create(
             applicant=applicant,
             evaluation_type='demo',
-            defaults=Evaluation.rating_defaults_from_request(request.POST)
+            defaults=defaults,
         )
         
-        return redirect('demo_evaluation')
+        return safe_post_redirect(request, 'demo_evaluation')
     return redirect('admin_dashboard')
 
 def find_applicant_for_room(room_id, applicant_name=''):
-    schedule = Schedule.objects.filter(schedule_id=room_id).select_related('applicant').first()
-    applicant = schedule.applicant if schedule else Applicant.objects.filter(applicant_id=room_id).first()
+    try:
+        schedule = Schedule.objects.filter(schedule_id=room_id).select_related('applicant').first()
+        applicant = schedule.applicant if schedule else Applicant.objects.filter(applicant_id=room_id).first()
+    except (ValidationError, ValueError, TypeError):
+        schedule = None
+        applicant = None
     if applicant:
         return applicant, schedule
 
@@ -978,7 +1051,8 @@ def find_applicant_for_room(room_id, applicant_name=''):
     return applicant, schedule
 
 
-@csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def room_evaluation_prefill(request):
     room_id = request.GET.get('roomId') or request.GET.get('room_id')
     if not room_id:
@@ -1027,7 +1101,8 @@ def room_evaluation_prefill(request):
         }
 
     return JsonResponse(data)
-@csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def save_room_evaluation(request):
     if request.method == 'OPTIONS':
         return JsonResponse({'ok': True})
@@ -1044,21 +1119,16 @@ def save_room_evaluation(request):
     if not room_id:
         return JsonResponse({'ok': False, 'error': 'Missing room id'}, status=400)
 
-    schedule = Schedule.objects.filter(schedule_id=room_id).select_related('applicant').first()
-    applicant = schedule.applicant if schedule else Applicant.objects.filter(applicant_id=room_id).first()
-    if not applicant:
-        applicant_name = (payload.get('applicantName') or '').strip()
-        if applicant_name:
-            name_parts = applicant_name.split()
-            matches = Applicant.objects.all()
-            for part in name_parts:
-                matches = matches.filter(Q(first_name__icontains=part) | Q(last_name__icontains=part))
-            applicant = matches.first()
+    applicant, schedule = find_applicant_for_room(room_id, payload.get('applicantName'))
     if not applicant:
         return JsonResponse({'ok': False, 'error': 'Applicant not found for this room'}, status=404)
 
     ratings = payload.get('ratings') or {}
     comments = payload.get('comments') or {}
+    if not isinstance(ratings, dict):
+        return JsonResponse({'ok': False, 'error': 'Ratings must be an object.'}, status=400)
+    if not isinstance(comments, dict):
+        return JsonResponse({'ok': False, 'error': 'Comments must be an object.'}, status=400)
     evaluation_type = payload.get('evaluationType') or payload.get('evaluation_type')
 
     if evaluation_type == 'client':
@@ -1067,10 +1137,12 @@ def save_room_evaluation(request):
             return JsonResponse({'ok': False, 'error': 'Client decision must be Pass or Fail'}, status=400)
 
         overall_comments = payload.get('overallComments') or payload.get('commentsText') or ''
+        defaults = Evaluation.client_defaults(decision, overall_comments)
+        defaults['evaluator'] = request.user
         eval_obj, _ = Evaluation.objects.update_or_create(
             applicant=applicant,
             evaluation_type='client',
-            defaults=Evaluation.client_defaults(decision, overall_comments)
+            defaults=defaults,
         )
         next_status = 'Training' if decision == 'Pass' else 'Withdrawn'
         if applicant.status != next_status:
@@ -1093,10 +1165,12 @@ def save_room_evaluation(request):
         if comment
     )
 
+    defaults = Evaluation.rating_defaults_from_room_payload(ratings, overall_comments)
+    defaults['evaluator'] = request.user
     eval_obj, _ = Evaluation.objects.update_or_create(
         applicant=applicant,
         evaluation_type='demo',
-        defaults=Evaluation.rating_defaults_from_room_payload(ratings, overall_comments)
+        defaults=defaults,
     )
 
     return JsonResponse({
@@ -1112,7 +1186,7 @@ def onboarding(request):
     if request.method == 'POST':
         action = request.POST.get('action')
         applicant_id = request.POST.get('applicant_identifier')
-        applicant = Applicant.objects.get(applicant_id=applicant_id)
+        applicant = get_object_or_404(Applicant, applicant_id=applicant_id)
         
         if action == 'assign_account':
             applicant.assign_teaching_account(
@@ -1124,7 +1198,7 @@ def onboarding(request):
             applicant.clear_teaching_account(request.POST.get('notes'))
             return redirect('onboarding')
 
-    applicants = Applicant.objects.filter(status='Approved')
+    applicants = Applicant.objects.filter(status__in=['Onboarding', 'Approved'])
     for app in applicants:
         app.current_schedule = app.schedules.filter(type='onboarding').first()
 
@@ -1152,38 +1226,23 @@ def applicant_logout(request):
 
 def video_call(request, schedule_id):
     schedule = Schedule.objects.filter(schedule_id=schedule_id).first()
-    if not schedule:
-        return redirect(zoom_clone_room_url(schedule_id, 'applicant'))
-    role = 'admin' if request.user.is_authenticated and request.user.is_staff else 'applicant'
-    evaluation_type = 'client' if schedule.type == 'endorsement' else 'demo'
-    return redirect(zoom_clone_room_url(schedule.applicant.applicant_id, role, evaluation_type))
+    if schedule and schedule.meeting_link:
+        return redirect(schedule.meeting_link)
+    return redirect(ZOOM_UPCOMING_URL)
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
-def new_video_room(request):
-    return redirect(zoom_clone_room_url(uuid.uuid4(), 'admin'))
 
-def video_landing(request):
-    room_id = str(uuid.uuid4())
-    role = 'admin' if request.user.is_authenticated and request.user.is_staff else 'applicant'
-    zoom_clone_url = zoom_clone_room_url(room_id, role)
-    demo_room_applicants = list(Applicant.objects.filter(status='Demo Evaluation').order_by('-updated_at', '-created_at'))
-    client_room_applicants = list(Applicant.objects.filter(status='Endorsement').order_by('-updated_at', '-created_at'))
-    for applicant in [*demo_room_applicants, *client_room_applicants]:
-        assign_applicant_room_urls(applicant)
-    context = {
-        'room_id': room_id,
-        'room_title': 'Video Conference',
-        'room_subtitle': 'Live Zoom clone room',
-        'user_role': role,
-        'zoom_clone_url': zoom_clone_url,
-        'demo_room_applicants': demo_room_applicants,
-        'client_room_applicants': client_room_applicants,
-    }
-    context.update(mini_calendar_context())
-    return render(request, 'video_landing.html', context)
 
-def video_room(request, room_id):
-    is_admin = request.user.is_authenticated and request.user.is_staff
-    evaluation_type = request.GET.get('evaluationType') or request.GET.get('type') or 'demo'
-    return redirect(zoom_clone_room_url(room_id, 'admin' if is_admin else 'applicant', evaluation_type))
+
+
+
+
+
+
+
+
+
+
+
+
+
+

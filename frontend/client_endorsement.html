@@ -50,18 +50,36 @@
                 <div class="text-sm text-gray-600 mt-1">{{ app.email }}</div>
                 
                 <div class="mt-4 flex flex-col gap-2">
-                  <a href="{{ app.client_room_url }}" target="_blank" rel="noopener" class="w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-lg">
-                    <i class="fas fa-video mr-2"></i>Open Client Room
+                  {% if app.current_schedule.meeting_link %}
+                  <a href="https://us05web.zoom.us/signin#/upcoming" data-evaluation-url="/floating-evaluation/{{ app.applicant_id }}/?type=client" class="ot-floating-button__open w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-lg">
+                    <i class="fas fa-video mr-2"></i>Open Zoom
                   </a>
+                  {% endif %}
                   <a href="/applicant-details/{{ app.applicant_id }}/" class="w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-lg">
                     <i class="fas fa-user-check mr-2"></i>Finalize Endorsement
                   </a>
-                  <a href="/evaluate/{{ app.applicant_id }}/?type=client" class="w-full text-center bg-white border border-gray-200 text-gray-600 font-bold py-2 rounded-xl hover:bg-gray-50 transition">
-                    Client Decision Sheet
-                  </a>
-                  <a href="/evaluate/{{ app.applicant_id }}/" class="w-full text-center bg-white border border-gray-200 text-gray-600 font-bold py-2 rounded-xl hover:bg-gray-50 transition">
+                                    <button type="button"
+                          class="evaluation-popup-trigger w-full rounded-xl border border-gray-200 bg-white py-2 text-center font-bold text-gray-600 transition hover:bg-gray-50"
+                          data-eval-type="client"
+                          data-applicant-id="{{ app.applicant_id }}"
+                          data-applicant-name="{{ app.first_name }} {{ app.last_name }}"
+                          data-client-decision="{{ app.current_evaluation.client_decision|default:'' }}"
+                          data-comments="{{ app.current_evaluation.comments|default_if_none:''|escape }}">
+                    Client Decision Popup
+                  </button>
+                                    <button type="button"
+                          class="evaluation-popup-trigger w-full rounded-xl border border-gray-200 bg-white py-2 text-center font-bold text-gray-600 transition hover:bg-gray-50"
+                          data-eval-type="demo"
+                          data-applicant-id="{{ app.applicant_id }}"
+                          data-applicant-name="{{ app.first_name }} {{ app.last_name }}"
+                          data-teaching-performance="{{ app.demo_evaluation.teaching_performance|default:'' }}"
+                          data-communication-skills="{{ app.demo_evaluation.communication_skills|default:'' }}"
+                          data-curriculum-understanding="{{ app.demo_evaluation.curriculum_understanding|default:'' }}"
+                          data-engagement-level="{{ app.demo_evaluation.engagement_level|default:'' }}"
+                          data-technical-proficiency="{{ app.demo_evaluation.technical_proficiency|default:'' }}"
+                          data-comments="{{ app.demo_evaluation.comments|default_if_none:''|escape }}">
                     View Demo Scores
-                  </a>
+                  </button>
                 </div>
 
                 {% if app.current_schedule %}
@@ -72,9 +90,11 @@
                     <div class="text-sm font-semibold text-gray-800 mt-1">
                       {{ app.current_schedule.scheduled_at|date:"F d, Y @ h:i A" }}
                     </div>
-                    <a href="{{ app.applicant_client_room_url }}" target="_blank" rel="noopener" class="mt-3 block truncate rounded-lg bg-indigo-50 px-3 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100">
-                      <i class="fas fa-link mr-1"></i>Applicant room link
+                    {% if app.current_schedule.meeting_link %}
+                    <a href="https://us05web.zoom.us/signin#/upcoming" class="mt-3 block truncate rounded-lg bg-indigo-50 px-3 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100">
+                      <i class="fas fa-link mr-1"></i>Zoom meeting link
                     </a>
+                    {% endif %}
                   </div>
                 {% endif %}
               </div>
@@ -96,6 +116,14 @@
                              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400" 
                              value="{{ app.current_schedule.scheduled_at|date:'Y-m-d\TH:i' }}"
                              required>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Zoom Link</label>
+                      <input type="url"
+                             name="meeting_link"
+                             class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400"
+                             value="{{ app.current_schedule.meeting_link }}"
+                             placeholder="https://zoom.us/j/...">
                     </div>
                     {% if app.current_schedule %}
                     <div class="rounded-xl border border-indigo-100 bg-indigo-50/60 p-3">
@@ -120,6 +148,25 @@
       {% endif %}
     </div>
   </main>
+
+  {% include "partials/evaluation_popup.html" %}
+  <script>
+    const openZoomWithEvaluation = button => {
+      const evalUrl = button.dataset.evaluationUrl;
+      if (evalUrl) {
+        const popup = window.open(evalUrl, 'evaluationPopup', 'popup=yes,width=460,height=760,left=40,top=40,resizable=yes,scrollbars=yes');
+        if (popup) popup.focus();
+      }
+      window.location.href = button.href;
+    };
+
+    document.querySelectorAll('.ot-floating-button__open').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        openZoomWithEvaluation(button);
+      });
+    });
+  </script>
 
   <!-- Compose Email Modal -->
   <div id="emailModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/40 px-4">
@@ -237,3 +284,14 @@
   </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+

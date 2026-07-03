@@ -513,6 +513,15 @@
       color: var(--dash-ink);
       font-size: 0.75rem;
       font-weight: 900;
+      transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    a.mini-calendar-day:hover,
+    a.mini-calendar-day:focus-visible {
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 8px 16px rgba(95, 155, 255, 0.18);
+      transform: translateY(-1px);
+      outline: none;
     }
 
     .mini-calendar-day.muted {
@@ -547,6 +556,15 @@
       padding: 0.56rem 0;
       border-bottom: 1px solid rgba(246, 200, 220, 0.68);
       align-items: start;
+      border-radius: 0.7rem;
+      transition: background 0.16s ease, transform 0.16s ease;
+    }
+
+    a.mini-calendar-event:hover,
+    a.mini-calendar-event:focus-visible {
+      background: rgba(255, 255, 255, 0.68);
+      transform: translateX(2px);
+      outline: none;
     }
 
     .mini-event-dot {
@@ -911,7 +929,7 @@
                 </div>
                 <div class="mt-auto pt-6 grid gap-3">
                   {% if stat.key == 'Initial Screening' %}
-                    <a href="/schedule-initial/" class="dash-btn dash-btn-fill">Approve</a>
+                    <a href="/applicants/?status=screening" class="dash-btn dash-btn-fill">Review</a>
                   {% elif stat.key == 'Demo Evaluation' %}
                     <a href="/demo-evaluation/" class="dash-btn dash-btn-fill">Demos</a>
                   {% elif stat.key == 'Endorsement' %}
@@ -944,22 +962,22 @@
                 <div class="mini-calendar-day-name">SAT</div>
                 {% for week in mini_calendar.weeks %}
                   {% for day in week %}
-                    <div class="mini-calendar-day {% if not day.in_month %}muted{% endif %} {% if day.is_today %}today{% endif %} {% if day.has_events %}has-events{% endif %}">
+                    <a href="{{ day.calendar_url }}" class="mini-calendar-day {% if not day.in_month %}muted{% endif %} {% if day.is_today %}today{% endif %} {% if day.has_events %}has-events{% endif %}" aria-label="Open calendar for {{ day.date|date:'F j, Y' }}">
                       {{ day.number }}
-                    </div>
+                    </a>
                   {% endfor %}
                 {% endfor %}
               </div>
               <div class="mini-calendar-events">
                 {% for event in mini_calendar.upcoming_events %}
-                  <div class="mini-calendar-event">
+                  <a href="{{ event.calendar_url }}" class="mini-calendar-event" aria-label="Open {{ event.title }} for {{ event.subtitle }} in calendar">
                     <span class="mini-event-dot" style="--event-color: {{ event.color }}"></span>
                     <span class="mini-event-time">{{ event.time }}</span>
                     <span>
                       <span class="mini-event-title block">{{ event.title }}</span>
                       <span class="mini-event-subtitle block">{{ event.subtitle }}</span>
                     </span>
-                  </div>
+                  </a>
                 {% empty %}
                   <p class="py-3 text-xs font-bold text-gray-400">No upcoming schedules.</p>
                 {% endfor %}

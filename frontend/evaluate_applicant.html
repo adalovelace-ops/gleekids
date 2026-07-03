@@ -27,9 +27,11 @@
       </div>
 
       <div class="mb-6">
-        <a href="{{ app.demo_room_url }}" target="_blank" rel="noopener" class="inline-flex items-center rounded-xl bg-emerald-600 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-emerald-100 transition hover:bg-emerald-700">
-          <i class="fas fa-video mr-2"></i>Open Demo Class Room
+        {% if app.current_schedule.meeting_link %}
+        <a href="https://us05web.zoom.us/signin#/upcoming" class="inline-flex items-center rounded-xl bg-emerald-600 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-emerald-100 transition hover:bg-emerald-700">
+          <i class="fas fa-video mr-2"></i>Open Zoom
         </a>
+        {% endif %}
       </div>
 
       <form method="POST" action="/save-evaluation/" id="evalForm">
@@ -118,3 +120,5 @@
   </script>
 </body>
 </html>
+
+
