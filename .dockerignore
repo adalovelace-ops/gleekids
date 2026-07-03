@@ -1,0 +1,11 @@
+.git
+.venv
+backend/.env
+backend/db.sqlite3
+backend/media
+backend/resumes
+backend/videos
+backend/staticfiles
+backend/**/__pycache__
+backend/**/*.pyc
+frontend/**/*.log
