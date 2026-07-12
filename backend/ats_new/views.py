@@ -244,11 +244,29 @@ def google_oauth_callback(request):
             or User.objects.filter(username__iexact=email).first()
         )
         if not user and email in settings.GOOGLE_ADMIN_EMAILS:
-            user = User.objects.create_user(username=email, email=email)
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                first_name=userinfo.get('given_name') or '',
+                last_name=userinfo.get('family_name') or '',
+            )
             user.set_unusable_password()
             user.is_staff = True
             user.is_superuser = True
-            user.save(update_fields=['password', 'is_staff', 'is_superuser'])
+            user.save(update_fields=['password', 'is_staff', 'is_superuser', 'first_name', 'last_name'])
+        
+        if user:
+            # Sync name from Google if blank
+            updated_fields = []
+            if not user.first_name and userinfo.get('given_name'):
+                user.first_name = userinfo.get('given_name')
+                updated_fields.append('first_name')
+            if not user.last_name and userinfo.get('family_name'):
+                user.last_name = userinfo.get('family_name')
+                updated_fields.append('last_name')
+            if updated_fields:
+                user.save(update_fields=updated_fields)
+
         if not user or not user.is_staff:
             return render_google_auth_error(request, 'This Google account is not registered as staff.', role)
         login(request, user)
@@ -593,7 +611,7 @@ def applicant_details(request, applicant_id):
                 messages.success(request, 'Second video uploaded.')
         return redirect('applicant_details', applicant_id=applicant.applicant_id)
 
-    history = applicant.history.all().order_by('-created_at')
+    history = applicant.history.all().select_related('changed_by').order_by('-created_at')
     latest_schedule = applicant.schedules.all().order_by('-scheduled_at').first()
     latest_evaluation = applicant.evaluations.filter(evaluation_type='demo').order_by('-created_at').first()
     latest_client_evaluation = applicant.evaluations.filter(evaluation_type='client').order_by('-created_at').first()

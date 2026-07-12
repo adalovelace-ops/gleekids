@@ -387,7 +387,7 @@
               <div>
                 <p class="font-bold text-gray-900">{{ event.status }}</p>
                 <p class="text-sm text-gray-500">{{ event.notes }}</p>
-                <p class="text-[11px] text-gray-400 mt-1">Logged by: {% if event.changed_by %}{{ event.changed_by.get_full_name|default:event.changed_by.username }}{% else %}System{% endif %}</p>
+                <p class="text-[11px] text-gray-400 mt-1">Logged by: {{ event.logged_by_name }}</p>
               </div>
               <div class="text-xs font-semibold text-gray-400">
                 {{ event.created_at|date:"M d, Y @ h:i A" }}

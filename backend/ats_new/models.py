@@ -302,5 +302,17 @@ class StatusHistory(models.Model):
         verbose_name = "Activity log"
         verbose_name_plural = "Activity log"
 
+    @property
+    def logged_by_name(self):
+        if self.changed_by:
+            full_name = self.changed_by.get_full_name()
+            if full_name.strip():
+                return full_name
+            username = self.changed_by.username
+            if '@' in username:
+                return username.split('@')[0].replace('.', ' ').title()
+            return username.title()
+        return 'System'
+
     def __str__(self):
         return f"{self.applicant.last_name} moved to {self.status} on {self.created_at}"

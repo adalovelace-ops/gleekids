@@ -6,7 +6,7 @@ from django.test import RequestFactory, TestCase, Client
 from django.urls import reverse
 
 from .admin import LogEntryAdmin, ApplicantAdmin
-from .models import Applicant
+from .models import Applicant, StatusHistory
 
 
 class LogEntryAdminTests(TestCase):
@@ -166,3 +166,31 @@ class DashboardViewPermissionTests(TestCase):
         history_entry = self.applicant.history.latest('created_at')
         self.assertEqual(history_entry.status, 'Initial Screening')
         self.assertEqual(history_entry.changed_by, self.staff_user)
+
+    def test_status_history_logged_by_name_property(self):
+        # Case 1: System
+        history_entry_sys = StatusHistory.objects.create(
+            applicant=self.applicant,
+            status='Pending',
+            notes='Auto'
+        )
+        self.assertEqual(history_entry_sys.logged_by_name, 'System')
+
+        # Case 2: User with first/last name
+        self.staff_user.first_name = 'Thea'
+        self.staff_user.last_name = 'Salinas'
+        self.staff_user.save()
+        history_entry_user = StatusHistory.objects.create(
+            applicant=self.applicant,
+            status='Pending',
+            notes='Manual',
+            changed_by=self.staff_user
+        )
+        self.assertEqual(history_entry_user.logged_by_name, 'Thea Salinas')
+
+        # Case 3: User with no name, username is email
+        self.staff_user.first_name = ''
+        self.staff_user.last_name = ''
+        self.staff_user.username = 'salinas.thea2021@gmail.com'
+        self.staff_user.save()
+        self.assertEqual(history_entry_user.logged_by_name, 'Salinas Thea2021')
