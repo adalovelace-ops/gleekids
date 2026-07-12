@@ -1,0 +1,132 @@
+[INFO] 2026-07-02 23:31:19,983 django.server: "GET /admin-login/ HTTP/1.1" 200 6310
+[INFO] 2026-07-02 23:31:19,995 django.server: "GET /admin-login/ HTTP/1.1" 200 6310
+[INFO] 2026-07-02 23:31:20,017 django.server: "GET /admin-login/ HTTP/1.1" 200 6310
+[INFO] 2026-07-02 23:31:20,031 django.server: - Broken pipe from ('127.0.0.1', 54683)
+[INFO] 2026-07-02 23:31:20,372 django.server: "POST /admin-login/ HTTP/1.1" 200 6466
+[INFO] 2026-07-02 23:31:20,398 django.server: - Broken pipe from ('127.0.0.1', 54682)
+[INFO] 2026-07-02 23:31:20,438 django.server: "POST /admin-login/ HTTP/1.1" 302 0
+[INFO] 2026-07-02 23:31:20,516 django.server: - Broken pipe from ('127.0.0.1', 54684)
+[INFO] 2026-07-02 23:31:38,856 django.server: "GET /admin-login/ HTTP/1.1" 200 6310
+[INFO] 2026-07-02 23:31:39,328 django.server: "POST /admin-login/ HTTP/1.1" 302 0
+[INFO] 2026-07-02 23:31:39,361 django.server: "GET /admin-dashboard/ HTTP/1.1" 200 48466
+[INFO] 2026-07-02 23:31:39,404 django.server: - Broken pipe from ('127.0.0.1', 54690)
+[INFO] 2026-07-02 23:34:34,328 django.server: "POST /admin-login/ HTTP/1.1" 302 0
+[INFO] 2026-07-02 23:34:34,351 django.server: "GET /admin-dashboard/ HTTP/1.1" 200 48466
+[INFO] 2026-07-02 23:34:34,514 django.server: "GET /media/gleelogo.png HTTP/1.1" 200 133263
+[INFO] 2026-07-02 23:34:59,663 django.server: "GET /applicants/ HTTP/1.1" 200 23535
+[INFO] 2026-07-02 23:34:59,717 django.server: "GET /media/gleelogo.png HTTP/1.1" 200 133263
+[INFO] 2026-07-02 23:35:01,121 django.server: "GET /schedule-initial/ HTTP/1.1" 200 26091
+[INFO] 2026-07-02 23:35:01,186 django.server: "GET /media/gleelogo.png HTTP/1.1" 200 133263
+[INFO] 2026-07-02 23:35:02,398 django.server: "GET /admin-calendar/ HTTP/1.1" 200 13313
+[INFO] 2026-07-02 23:35:02,454 django.server: "GET /media/gleelogo.png HTTP/1.1" 200 133263
+[INFO] 2026-07-02 23:35:07,558 django.server: "GET /evaluations/ HTTP/1.1" 200 10870
+[INFO] 2026-07-02 23:35:07,605 django.server: "GET /media/gleelogo.png HTTP/1.1" 200 133263
+[INFO] 2026-07-02 23:35:09,142 django.server: "GET /reports/ HTTP/1.1" 200 9609
+[INFO] 2026-07-02 23:35:09,215 django.server: "GET /media/gleelogo.png HTTP/1.1" 200 133263
+[INFO] 2026-07-02 23:35:16,264 django.server: "GET /admin/ HTTP/1.1" 200 8778
+[INFO] 2026-07-02 23:35:16,306 django.server: "GET /static/css/django_admin_theme.css HTTP/1.1" 200 3398
+[INFO] 2026-07-02 23:35:16,310 django.server: "GET /static/admin/css/base.css HTTP/1.1" 200 22120
+[INFO] 2026-07-02 23:35:16,312 django.server: "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2808
+[INFO] 2026-07-02 23:35:16,315 django.server: "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+[INFO] 2026-07-02 23:35:16,316 django.server: "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+[INFO] 2026-07-02 23:35:16,317 django.server: "GET /static/admin/css/responsive.css HTTP/1.1" 200 16565
+[INFO] 2026-07-02 23:35:16,321 django.server: "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+[INFO] 2026-07-02 23:35:16,346 django.server: "GET /static/admin/js/theme.js HTTP/1.1" 200 1653
+[INFO] 2026-07-02 23:35:16,362 django.server: "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+[INFO] 2026-07-02 23:35:16,362 django.server: "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+[INFO] 2026-07-02 23:35:21,810 django.server: "GET /admin/ats_new/applicant/add/ HTTP/1.1" 200 25355
+[INFO] 2026-07-02 23:35:21,860 django.server: "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+[INFO] 2026-07-02 23:35:21,868 django.server: "GET /static/admin/css/forms.css HTTP/1.1" 200 8525
+[INFO] 2026-07-02 23:35:21,883 django.server: "GET /static/admin/js/calendar.js HTTP/1.1" 200 9141
+[INFO] 2026-07-02 23:35:21,889 django.server: "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-07-02 23:35:21,891 django.server: "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+[INFO] 2026-07-02 23:35:21,891 django.server: "GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.1" 200 19319
+[INFO] 2026-07-02 23:35:21,894 django.server: "GET /static/admin/css/widgets.css HTTP/1.1" 200 11973
+[INFO] 2026-07-02 23:35:21,895 django.server: "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+[INFO] 2026-07-02 23:35:21,897 django.server: "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+[INFO] 2026-07-02 23:35:21,906 django.server: "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9777
+[INFO] 2026-07-02 23:35:21,911 django.server: "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 586
+[INFO] 2026-07-02 23:35:21,913 django.server: "GET /static/admin/js/actions.js HTTP/1.1" 200 8076
+[INFO] 2026-07-02 23:35:21,934 django.server: "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+[INFO] 2026-07-02 23:35:21,943 django.server: "GET /static/admin/js/change_form.js HTTP/1.1" 200 606
+[INFO] 2026-07-02 23:35:21,977 django.server: "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+[INFO] 2026-07-02 23:35:22,037 django.server: "GET /static/admin/img/icon-clock.svg HTTP/1.1" 200 677
+[INFO] 2026-07-02 23:35:22,046 django.server: "GET /static/admin/img/icon-calendar.svg HTTP/1.1" 200 1086
+[INFO] 2026-07-02 23:35:22,982 django.server: "GET /admin/ HTTP/1.1" 200 8778
+[INFO] 2026-07-02 23:35:24,770 django.server: "GET /admin/auth/user/add/ HTTP/1.1" 200 15891
+[INFO] 2026-07-02 23:35:24,813 django.server: "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-07-02 23:35:24,820 django.server: "GET /static/admin/css/unusable_password_field.css HTTP/1.1" 200 663
+[INFO] 2026-07-02 23:35:24,844 django.server: "GET /static/admin/js/unusable_password_field.js HTTP/1.1" 200 1480
+[INFO] 2026-07-02 23:47:48,310 django.server: "POST /admin/auth/user/add/ HTTP/1.1" 200 16179
+[INFO] 2026-07-02 23:47:48,471 django.server: "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-07-02 23:48:12,587 django.server: "POST /admin/auth/user/add/ HTTP/1.1" 302 0
+[INFO] 2026-07-02 23:48:12,740 django.server: "GET /admin/auth/user/2/change/ HTTP/1.1" 200 24757
+[INFO] 2026-07-02 23:48:12,797 django.server: "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[INFO] 2026-07-02 23:48:12,844 django.server: "GET /static/admin/js/SelectBox.js HTTP/1.1" 200 4530
+[INFO] 2026-07-02 23:48:12,844 django.server: "GET /static/admin/js/SelectFilter2.js HTTP/1.1" 200 15845
+[INFO] 2026-07-02 23:48:12,866 django.server: "GET /static/admin/img/icon-yes.svg HTTP/1.1" 200 436
+[INFO] 2026-07-02 23:48:12,894 django.server: "GET /static/admin/img/search.svg HTTP/1.1" 200 458
+[INFO] 2026-07-02 23:48:12,903 django.server: "GET /static/admin/img/selector-icons.svg HTTP/1.1" 200 3291
+[INFO] 2026-07-02 23:49:33,547 django.server: "GET /admin/auth/user/2/change/ HTTP/1.1" 200 24519
+[INFO] 2026-07-02 23:49:35,869 django.server: "POST /admin/logout/ HTTP/1.1" 200 3200
+[INFO] 2026-07-02 23:49:38,526 django.server: "GET /admin/ HTTP/1.1" 302 0
+[INFO] 2026-07-02 23:49:38,593 django.server: "GET /admin/login/?next=/admin/ HTTP/1.1" 200 3809
+[INFO] 2026-07-02 23:49:38,646 django.server: "GET /static/admin/css/login.css HTTP/1.1" 200 951
+[INFO] 2026-07-02 23:49:42,315 django.server: "GET /admin/auth/user/2/change/ HTTP/1.1" 302 0
+[INFO] 2026-07-02 23:49:42,325 django.server: "GET /admin/login/?next=/admin/auth/user/2/change/ HTTP/1.1" 200 3847
+[INFO] 2026-07-02 23:49:44,052 django.server: "GET /admin/auth/user/add/ HTTP/1.1" 302 0
+[INFO] 2026-07-02 23:49:44,073 django.server: "GET /admin/login/?next=/admin/auth/user/add/ HTTP/1.1" 200 3837
+[INFO] 2026-07-02 23:49:57,156 django.server: "GET / HTTP/1.1" 200 182654
+[INFO] 2026-07-02 23:49:57,276 django.server: "GET /media/gleelogo.png HTTP/1.1" 200 133263
+[INFO] 2026-07-02 23:49:57,287 django.server: "GET /media/jun.png HTTP/1.1" 200 1540736
+[INFO] 2026-07-02 23:49:57,296 django.server: "GET /media/grace.png HTTP/1.1" 200 1738033
+[INFO] 2026-07-02 23:49:57,303 django.server: "GET /media/cla-orangr.png HTTP/1.1" 200 1622641
+[INFO] 2026-07-02 23:49:57,337 django.server: "GET /media/joylyn.png HTTP/1.1" 200 1769566
+[INFO] 2026-07-02 23:49:57,360 django.server: "GET /media/cla.jpg HTTP/1.1" 200 185462
+[INFO] 2026-07-02 23:49:57,361 django.server: "GET /media/joy.jpg HTTP/1.1" 200 266079
+[INFO] 2026-07-02 23:49:57,363 django.server: "GET /media/rea.jpg HTTP/1.1" 200 236695
+[INFO] 2026-07-02 23:49:57,364 django.server: "GET /media/tes.jpg HTTP/1.1" 200 261427
+[INFO] 2026-07-02 23:49:57,376 django.server: "GET /media/mission.jpg HTTP/1.1" 200 1296080
+[INFO] 2026-07-02 23:49:57,383 django.server: "GET /media/contacts.jpg HTTP/1.1" 200 800715
+[INFO] 2026-07-02 23:49:57,386 django.server: "GET /media/yenna.jpg HTTP/1.1" 200 1546008
+[INFO] 2026-07-02 23:49:57,391 django.server: "GET /media/madam.png HTTP/1.1" 200 1815311
+Not Found: /media/meng.jpg
+[WARNING] 2026-07-02 23:49:57,424 django.request: Not Found: /media/meng.jpg
+[WARNING] 2026-07-02 23:49:57,426 django.server: "GET /media/meng.jpg HTTP/1.1" 404 7892
+[INFO] 2026-07-02 23:49:57,449 django.server: "GET /media/gleeglee.jpg HTTP/1.1" 200 970839
+[INFO] 2026-07-02 23:49:59,899 django.server: "GET /admin-login/ HTTP/1.1" 200 6310
+[INFO] 2026-07-02 23:49:59,979 django.server: "GET /media/gleelogo.png HTTP/1.1" 200 133263
+[INFO] 2026-07-02 23:50:00,075 django.server: "GET /media/gleeglee.jpg HTTP/1.1" 200 970839
+[INFO] 2026-07-02 23:50:41,147 django.server: "POST /admin-login/ HTTP/1.1" 302 0
+[INFO] 2026-07-02 23:50:41,177 django.server: "GET /admin-dashboard/ HTTP/1.1" 200 48466
+[INFO] 2026-07-02 23:50:41,254 django.server: "GET /media/gleelogo.png HTTP/1.1" 200 133263
+[INFO] 2026-07-02 23:50:45,549 django.server: "GET /admin-login/ HTTP/1.1" 200 6310
+[INFO] 2026-07-02 23:50:52,571 django.server: "GET /auth/google/?role=admin HTTP/1.1" 302 0
+Not Found: /hero.html
+[WARNING] 2026-07-03 12:16:46,047 django.request: Not Found: /hero.html
+[WARNING] 2026-07-03 12:16:46,054 django.server: "GET /hero.html HTTP/1.1" 404 7718
+Not Found: /favicon.ico
+[WARNING] 2026-07-03 12:16:46,151 django.request: Not Found: /favicon.ico
+[WARNING] 2026-07-03 12:16:46,153 django.server: "GET /favicon.ico HTTP/1.1" 404 7724
+[INFO] 2026-07-03 12:16:52,754 django.server: "GET / HTTP/1.1" 200 182654
+[INFO] 2026-07-03 12:16:52,791 django.server: "GET /static/css/system_palette.css HTTP/1.1" 200 9581
+[INFO] 2026-07-03 12:16:52,792 django.server: "GET /media/gleelogo.png HTTP/1.1" 200 133263
+[INFO] 2026-07-03 12:16:52,808 django.server: "GET /media/jun.png HTTP/1.1" 200 1540736
+[INFO] 2026-07-03 12:16:52,820 django.server: "GET /media/grace.png HTTP/1.1" 200 1738033
+[INFO] 2026-07-03 12:16:52,830 django.server: "GET /media/cla-orangr.png HTTP/1.1" 200 1622641
+[INFO] 2026-07-03 12:16:52,840 django.server: "GET /media/joylyn.png HTTP/1.1" 200 1769566
+[INFO] 2026-07-03 12:16:53,272 django.server: "GET /media/mission.jpg HTTP/1.1" 200 1296080
+[INFO] 2026-07-03 12:16:53,281 django.server: "GET /media/joy.jpg HTTP/1.1" 200 266079
+[INFO] 2026-07-03 12:16:53,287 django.server: "GET /media/cla.jpg HTTP/1.1" 200 185462
+[INFO] 2026-07-03 12:16:53,294 django.server: "GET /media/rea.jpg HTTP/1.1" 200 236695
+Not Found: /media/meng.jpg
+[WARNING] 2026-07-03 12:16:53,304 django.request: Not Found: /media/meng.jpg
+[WARNING] 2026-07-03 12:16:53,306 django.server: "GET /media/meng.jpg HTTP/1.1" 404 7892
+[INFO] 2026-07-03 12:16:53,314 django.server: "GET /media/tes.jpg HTTP/1.1" 200 261427
+[INFO] 2026-07-03 12:16:53,331 django.server: "GET /media/madam.png HTTP/1.1" 200 1815311
+[INFO] 2026-07-03 12:16:53,351 django.server: "GET /media/yenna.jpg HTTP/1.1" 200 1546008
+[INFO] 2026-07-03 12:16:53,363 django.server: "GET /media/contacts.jpg HTTP/1.1" 200 800715
+[INFO] 2026-07-03 12:16:53,514 django.server: "GET /media/gleeglee.jpg HTTP/1.1" 200 970839
+[INFO] 2026-07-03 12:17:27,528 django.server: "GET /login/ HTTP/1.1" 200 5984
+[INFO] 2026-07-03 12:17:27,586 django.server: "GET /media/gleelogo.png HTTP/1.1" 200 133263
+[INFO] 2026-07-03 12:17:35,856 django.server: "GET /auth/google/?role=applicant HTTP/1.1" 302 0
