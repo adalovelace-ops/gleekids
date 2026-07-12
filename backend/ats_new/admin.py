@@ -2,7 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth import get_user_model
-from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin, GroupAdmin as DjangoGroupAdmin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import Group
 from django.utils import timezone
@@ -37,6 +37,19 @@ try:
     admin.site.unregister(User)
 except admin.sites.NotRegistered:
     pass
+
+try:
+    admin.site.unregister(Group)
+except admin.sites.NotRegistered:
+    pass
+
+@admin.register(Group)
+class GroupAdmin(DjangoGroupAdmin):
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_module_permission(self, request):
+        return request.user.is_superuser
 
 # Group model is registered by default to allow superuser to assign group permissions.
 
@@ -88,6 +101,12 @@ class UserAdmin(DjangoUserAdmin):
         label = 'Active' if obj.is_active else 'Inactive'
         css_class = 'badge-active' if obj.is_active else 'badge-inactive'
         return format_html('<span class="admin-badge {}">{}</span>', css_class, label)
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_module_permission(self, request):
+        return request.user.is_superuser
 
 
 

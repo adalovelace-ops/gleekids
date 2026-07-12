@@ -115,6 +115,33 @@ class AdminPermissionTests(TestCase):
         self.assertFalse(admin_instance.has_module_permission(request))
         self.assertFalse(admin_instance.has_view_permission(request))
 
+    def test_user_and_group_admin_superuser_only(self):
+        from django.contrib.auth.models import Group
+        from .admin import UserAdmin, GroupAdmin
+
+        user_admin = UserAdmin(self.User, admin.site)
+        group_admin = GroupAdmin(Group, admin.site)
+
+        # Superuser has access
+        request = self.factory.get('/admin/')
+        request.user = self.superuser
+        self.assertTrue(user_admin.has_module_permission(request))
+        self.assertTrue(user_admin.has_view_permission(request))
+        self.assertTrue(group_admin.has_module_permission(request))
+        self.assertTrue(group_admin.has_view_permission(request))
+
+        # Staff user is blocked, even if they have view_user/view_group permissions
+        view_user = Permission.objects.get(codename='view_user')
+        view_group = Permission.objects.get(codename='view_group')
+        self.staff_user.user_permissions.add(view_user, view_group)
+        self.staff_user = self.User.objects.get(pk=self.staff_user.pk)
+
+        request.user = self.staff_user
+        self.assertFalse(user_admin.has_module_permission(request))
+        self.assertFalse(user_admin.has_view_permission(request))
+        self.assertFalse(group_admin.has_module_permission(request))
+        self.assertFalse(group_admin.has_view_permission(request))
+
 
 class DashboardViewPermissionTests(TestCase):
     def setUp(self):
