@@ -150,6 +150,36 @@
     }));
     document.querySelectorAll('[data-close-email]').forEach(button => button.addEventListener('click', closeEmailModal));
     emailModal.addEventListener('click', event => { if (event.target === emailModal) closeEmailModal(); });
+
+    document.getElementById('emailForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const form = event.target;
+      const sendButton = form.querySelector('button[type="submit"]');
+      const originalText = sendButton.textContent;
+      sendButton.disabled = true;
+      sendButton.textContent = 'Sending...';
+
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value }
+        });
+        const data = await res.json();
+        if (res.ok && data.ok) {
+          alert('Email sent successfully.');
+          closeEmailModal();
+          form.reset();
+        } else {
+          alert(data.error || 'Failed to send email.');
+        }
+      } catch (err) {
+        alert('Failed to send email.');
+      } finally {
+        sendButton.disabled = false;
+        sendButton.textContent = originalText;
+      }
+    });
   </script>
 </body>
 </html>
