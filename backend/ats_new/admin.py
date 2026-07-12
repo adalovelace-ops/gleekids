@@ -158,6 +158,12 @@ class StatusHistoryAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_module_permission(self, request):
+        return request.user.is_superuser
+
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
@@ -197,3 +203,9 @@ class LogEntryAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_module_permission(self, request):
+        return request.user.is_superuser

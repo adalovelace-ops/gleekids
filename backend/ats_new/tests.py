@@ -44,8 +44,8 @@ class LogEntryAdminTests(TestCase):
         request.user = self.superuser
         self.assertTrue(admin_instance.has_module_permission(request))
 
-    def test_log_entry_admin_allows_staff_with_permission(self):
-        # A staff user with explicitly granted view_logentry permission can access it
+    def test_log_entry_admin_blocks_staff_even_with_permission(self):
+        # Even with the view_logentry permission, non-superuser staff users are blocked
         admin_instance = LogEntryAdmin(LogEntry, admin.site)
         
         view_logentry = Permission.objects.get(codename='view_logentry')
@@ -54,7 +54,8 @@ class LogEntryAdminTests(TestCase):
 
         request = self.factory.get('/admin/')
         request.user = self.staff_user
-        self.assertTrue(admin_instance.has_module_permission(request))
+        self.assertFalse(admin_instance.has_module_permission(request))
+        self.assertFalse(admin_instance.has_view_permission(request))
 
 
 class AdminPermissionTests(TestCase):
@@ -93,6 +94,26 @@ class AdminPermissionTests(TestCase):
         self.assertTrue(self.applicant_admin.has_module_permission(request))
         self.assertTrue(self.applicant_admin.has_view_permission(request))
         self.assertFalse(self.applicant_admin.has_delete_permission(request))
+
+    def test_status_history_admin_superuser_only(self):
+        from .admin import StatusHistoryAdmin
+        from .models import StatusHistory
+        admin_instance = StatusHistoryAdmin(StatusHistory, admin.site)
+
+        # Superuser has access
+        request = self.factory.get('/admin/')
+        request.user = self.superuser
+        self.assertTrue(admin_instance.has_module_permission(request))
+        self.assertTrue(admin_instance.has_view_permission(request))
+
+        # Staff user is blocked, even if they have view_statushistory permission
+        view_history = Permission.objects.get(codename='view_statushistory')
+        self.staff_user.user_permissions.add(view_history)
+        self.staff_user = self.User.objects.get(pk=self.staff_user.pk)
+        
+        request.user = self.staff_user
+        self.assertFalse(admin_instance.has_module_permission(request))
+        self.assertFalse(admin_instance.has_view_permission(request))
 
 
 class DashboardViewPermissionTests(TestCase):
