@@ -1063,7 +1063,7 @@ def save_evaluation(request):
         if request.POST.get('evaluation_type') == 'client':
             decision = request.POST.get('client_decision')
             if decision not in {'Pass', 'Fail'}:
-                return safe_post_redirect(request, 'evaluate_applicant', applicant_id=applicant.applicant_id)
+                return redirect(f"/floating-evaluation/{applicant.applicant_id}/?type=client")
 
             defaults = Evaluation.client_defaults(decision, request.POST.get('overall_comments'))
             defaults['evaluator'] = request.user
@@ -1086,7 +1086,7 @@ def save_evaluation(request):
                     notes=f"Saved client endorsement evaluation (Decision: {decision}).",
                     changed_by=request.user
                 )
-            return safe_post_redirect(request, 'evaluations')
+            return redirect(f"/floating-evaluation/{applicant.applicant_id}/?type=client&saved=1")
 
         defaults = Evaluation.rating_defaults_from_request(request.POST)
         defaults['evaluator'] = request.user
@@ -1103,7 +1103,7 @@ def save_evaluation(request):
             changed_by=request.user
         )
         
-        return safe_post_redirect(request, 'demo_evaluation')
+        return redirect(f"/floating-evaluation/{applicant.applicant_id}/?type=demo&saved=1")
     return redirect('admin_dashboard')
 
 def find_applicant_for_room(room_id, applicant_name=''):

@@ -145,6 +145,12 @@
     });
     handle.addEventListener('pointerup', () => { drag = null; });
     handle.addEventListener('pointercancel', () => { drag = null; });
+
+    {% if saved %}
+    if (window.opener) {
+      window.opener.location.reload();
+    }
+    {% endif %}
   </script>
 </body>
 </html>

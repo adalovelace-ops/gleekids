@@ -259,3 +259,35 @@ class DashboardViewPermissionTests(TestCase):
         self.assertIn("Updated profile details", history_entry.notes)
         self.assertIn("first name", history_entry.notes)
         self.assertEqual(history_entry.changed_by, self.staff_user)
+
+    def test_save_evaluation_redirects_to_popup(self):
+        eval_perm = Permission.objects.get(codename='add_evaluation')
+        self.staff_user.user_permissions.add(eval_perm)
+
+        self.client.login(username='staff', password='secret123')
+
+        # Test Demo Evaluation redirect
+        response = self.client.post(reverse('save_evaluation'), {
+            'applicant_identifier': str(self.applicant.applicant_id),
+            'evaluation_type': 'demo',
+            'teaching_performance_rating': '5',
+            'communication_skills_rating': '5',
+            'curriculum_understanding_rating': '5',
+            'engagement_level_rating': '5',
+            'technical_proficiency_rating': '5',
+            'overall_comments': 'Excellent job.'
+        })
+        self.assertEqual(response.status_code, 302)
+        expected_url = f"/floating-evaluation/{self.applicant.applicant_id}/?type=demo&saved=1"
+        self.assertRedirects(response, expected_url, fetch_redirect_response=False)
+
+        # Test Client Evaluation redirect
+        response = self.client.post(reverse('save_evaluation'), {
+            'applicant_identifier': str(self.applicant.applicant_id),
+            'evaluation_type': 'client',
+            'client_decision': 'Pass',
+            'overall_comments': 'Endorsed by client.'
+        })
+        self.assertEqual(response.status_code, 302)
+        expected_url_client = f"/floating-evaluation/{self.applicant.applicant_id}/?type=client&saved=1"
+        self.assertRedirects(response, expected_url_client, fetch_redirect_response=False)
