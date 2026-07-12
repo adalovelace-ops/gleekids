@@ -113,7 +113,7 @@ class Applicant(models.Model):
                 return stage['percent'], index
         return 0, 0
 
-    def update_status(self, new_status, notes=None, save=True):
+    def update_status(self, new_status, notes=None, save=True, changed_by=None):
         old_status = self.status
         if old_status == new_status and not notes:
             return
@@ -124,7 +124,8 @@ class Applicant(models.Model):
         StatusHistory.objects.create(
             applicant=self,
             status=new_status,
-            notes=notes or f"Moved from {old_status} via manual update."
+            notes=notes or f"Moved from {old_status} via manual update.",
+            changed_by=changed_by
         )
 
     def update_profile_from_post(self, data):
@@ -133,17 +134,18 @@ class Applicant(models.Model):
                 setattr(self, field, data.get(field))
         self.save()
 
-    def assign_teaching_account(self, account, notes=None):
+    def assign_teaching_account(self, account, notes=None, changed_by=None):
         self.teaching_account = account
         self.teaching_account_notes = notes
         self.save(update_fields=['teaching_account', 'teaching_account_notes', 'updated_at'])
         StatusHistory.objects.create(
             applicant=self,
             status=self.status,
-            notes=f"Assigned to {self.teaching_account} account."
+            notes=f"Assigned to {self.teaching_account} account.",
+            changed_by=changed_by
         )
 
-    def clear_teaching_account(self, notes=None):
+    def clear_teaching_account(self, notes=None, changed_by=None):
         old_account = self.teaching_account
         self.teaching_account = None
         self.teaching_account_notes = ''
@@ -151,7 +153,8 @@ class Applicant(models.Model):
         StatusHistory.objects.create(
             applicant=self,
             status=self.status,
-            notes=notes or f"Removed teaching placement{f' from {old_account} account' if old_account else ''}."
+            notes=notes or f"Removed teaching placement{f' from {old_account} account' if old_account else ''}.",
+            changed_by=changed_by
         )
 
 class Schedule(models.Model):
@@ -183,14 +186,15 @@ class Schedule(models.Model):
     def __str__(self):
         return f"{self.type.capitalize()} - {self.applicant.last_name} @ {self.scheduled_at}"
 
-    def sync_applicant_status(self, title=None):
+    def sync_applicant_status(self, title=None, changed_by=None):
         new_status = self.STATUS_BY_TYPE.get(self.type)
         if not new_status or self.applicant.status == new_status:
             return
 
         self.applicant.update_status(
             new_status,
-            notes=f"Automatically moved to {new_status} upon scheduling {title or self.title}."
+            notes=f"Automatically moved to {new_status} upon scheduling {title or self.title}.",
+            changed_by=changed_by
         )
 
 class Evaluation(models.Model):
@@ -290,6 +294,7 @@ class StatusHistory(models.Model):
     applicant = models.ForeignKey(Applicant, on_delete=models.CASCADE, related_name='history')
     status = models.CharField(max_length=50)
     notes = models.TextField(blank=True, null=True)
+    changed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='status_changes')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

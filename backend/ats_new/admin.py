@@ -128,16 +128,24 @@ class EvaluationAdmin(admin.ModelAdmin):
 
 @admin.register(StatusHistory)
 class StatusHistoryAdmin(admin.ModelAdmin):
-    list_display = ('activity_timestamp', 'applicant', 'activity_details')
+    list_display = ('activity_timestamp', 'applicant', 'logged_by_display', 'activity_details')
     list_display_links = ('applicant',)
     list_filter = ('status', 'created_at')
     search_fields = ('applicant__first_name', 'applicant__last_name', 'applicant__email', 'notes')
     ordering = ('-created_at',)
-    readonly_fields = ('applicant', 'status', 'notes', 'created_at')
+    readonly_fields = ('applicant', 'status', 'notes', 'changed_by', 'created_at')
     list_per_page = 25
+
     @admin.display(description='Timestamp', ordering='created_at')
     def activity_timestamp(self, obj):
-        return timezone.localtime(obj.created_at).strftime('%b %d, %Y ? %I:%M %p')
+        return timezone.localtime(obj.created_at).strftime('%b %d, %Y • %I:%M %p')
+
+    @admin.display(description='Logged By', ordering='changed_by__username')
+    def logged_by_display(self, obj):
+        if obj.changed_by:
+            name = obj.changed_by.get_full_name() or obj.changed_by.username or obj.changed_by.email
+            return format_html('<strong>{}</strong><br><span class="table-subtext">{}</span>', name, obj.changed_by.email or 'No email')
+        return 'System'
 
     @admin.display(description='What happened', ordering='status')
     def activity_details(self, obj):

@@ -636,7 +636,7 @@ def update_status(request):
         # Check if we are updating status or general info
         if 'new_status' in request.POST:
             new_status = request.POST.get('new_status')
-            applicant.update_status(new_status, notes=request.POST.get('status_note'))
+            applicant.update_status(new_status, notes=request.POST.get('status_note'), changed_by=request.user)
         else:
             applicant.update_profile_from_post(request.POST)
         return safe_post_redirect(request, 'applicant_details', applicant_id=applicant_id)
@@ -734,12 +734,13 @@ def schedule_action(request):
         )
         schedule.refresh_from_db()
 
-        schedule.sync_applicant_status(title)
+        schedule.sync_applicant_status(title, changed_by=request.user)
         advance_status = request.POST.get('advance_status')
         if advance_status and advance_status != applicant.status:
             applicant.update_status(
                 advance_status,
                 notes=f"Moved forward from {applicant.status} to {advance_status} after schedule update.",
+                changed_by=request.user,
             )
 
         if existing_schedule and previous_time and previous_time != schedule.scheduled_at:
@@ -755,6 +756,7 @@ def schedule_action(request):
                 applicant=applicant,
                 status=applicant.status,
                 notes=note,
+                changed_by=request.user,
             )
         
         return safe_post_redirect(request, 'admin_dashboard')
@@ -1037,6 +1039,7 @@ def save_evaluation(request):
                 applicant.update_status(
                     next_status,
                     notes=f"Client endorsement marked {decision}.",
+                    changed_by=request.user,
                 )
             return safe_post_redirect(request, 'evaluations')
 
@@ -1167,6 +1170,7 @@ def save_room_evaluation(request):
             applicant.update_status(
                 next_status,
                 notes=f"Client endorsement marked {decision} from video conference.",
+                changed_by=request.user,
             )
 
         return JsonResponse({
@@ -1210,11 +1214,12 @@ def onboarding(request):
         if action == 'assign_account':
             applicant.assign_teaching_account(
                 request.POST.get('account_slug'),
-                request.POST.get('notes')
+                request.POST.get('notes'),
+                changed_by=request.user
             )
             return redirect('onboarding')
         if action == 'clear_account':
-            applicant.clear_teaching_account(request.POST.get('notes'))
+            applicant.clear_teaching_account(request.POST.get('notes'), changed_by=request.user)
             return redirect('onboarding')
 
     applicants = Applicant.objects.filter(status__in=['Onboarding', 'Approved'])

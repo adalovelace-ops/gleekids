@@ -150,3 +150,19 @@ class DashboardViewPermissionTests(TestCase):
         response = self.client.post(reverse('delete_applicant', args=[self.applicant.applicant_id]))
         self.assertEqual(response.status_code, 302) # Redirects on successful delete
         self.assertFalse(Applicant.objects.filter(pk=self.applicant.pk).exists())
+
+    def test_update_status_records_changed_by_user(self):
+        change_perm = Permission.objects.get(codename='change_applicant')
+        self.staff_user.user_permissions.add(change_perm)
+
+        self.client.login(username='staff', password='secret123')
+        response = self.client.post(reverse('update_status'), {
+            'applicant_id': str(self.applicant.applicant_id),
+            'new_status': 'Initial Screening',
+            'status_note': 'Passed initial check.'
+        })
+        self.assertEqual(response.status_code, 302)
+
+        history_entry = self.applicant.history.latest('created_at')
+        self.assertEqual(history_entry.status, 'Initial Screening')
+        self.assertEqual(history_entry.changed_by, self.staff_user)
