@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -4773,7 +4773,7 @@
 
                                 <div class="teacher-actions">
                                     <button type="button" class="teacher-more-btn" id="teacherMoreBtn" onclick="toggleTeacherStories()" aria-expanded="false">
-                                        See more
+                                        Discover more
                                     </button>
                                     <a href="/apply/" class="teacher-apply-btn">Apply to teach</a>
                                 </div>
@@ -4859,15 +4859,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="legacy-testimonials mt-5 flex justify-end">
+                    <div class="legacy-testimonials mt-5 flex justify-center">
                         <a href="/teacher-stories/" class="teacher-reel-link">
-                            See more
+                            Discover more
                         </a>
-                    </div>
-
-                    <div class="legacy-testimonials carousel-controls">
-                        <button onclick="prevTestimonial()" class="carousel-btn">‹</button>
-                        <button onclick="nextTestimonial()" class="carousel-btn">›</button>
                     </div>
                 </div>
 
@@ -4955,7 +4950,7 @@
                         <div class="icon-box mx-auto mb-4 bg-yellow-200">
                             <svg class="w-6 h-6 text-yellow-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7zM14 2v4a2 2 0 002 2h4M10 9H8M16 13H8M16 17H8" />
+                                    d="M3 8l7.89 4.26a2.25 2.25 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold mb-2" style="color: #8A8AE2;">Initial Screening</h3>
@@ -5260,7 +5255,7 @@
             extraStories.forEach(card => card.classList.toggle('is-visible', shouldShow));
             if (teacherStories) teacherStories.classList.toggle('is-expanded', shouldShow);
             if (button) {
-                button.textContent = shouldShow ? 'Show less' : 'See more';
+                button.textContent = shouldShow ? 'Show less' : 'Discover more';
                 button.setAttribute('aria-expanded', shouldShow ? 'true' : 'false');
             }
         }

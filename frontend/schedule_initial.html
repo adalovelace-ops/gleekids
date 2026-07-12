@@ -232,10 +232,15 @@
     }
 
     .email-trigger {
-      border-radius: 0.32rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 999px;
       background: #f3edff;
       color: #8b6be8;
-      padding: 0.5rem 0.72rem;
+      padding: 0;
       font-size: 0.78rem;
       font-weight: 900;
     }
@@ -363,7 +368,14 @@
               <tr data-search="{{ app.first_name }} {{ app.last_name }} {{ app.email }}" data-name="{{ app.first_name }} {{ app.last_name }}" data-date="{{ app.created_at|date:'Y-m-d H:i:s' }}" data-work-setup="{{ app.work_setup }}">
                 <td><input type="checkbox" class="row-check" aria-label="Select {{ app.first_name }} {{ app.last_name }}"></td>
                 <td>APP-{{ forloop.counter|stringformat:"04d" }}</td>
-                <td>{{ app.first_name }} {{ app.last_name }}</td>
+                <td>
+                  <div class="flex items-center gap-3 whitespace-nowrap">
+                    <span>{{ app.first_name }} {{ app.last_name }}</span>
+                    <button type="button" class="email-trigger" data-name="{{ app.first_name }}" data-email="{{ app.email }}" title="Email {{ app.first_name }} {{ app.last_name }}" aria-label="Email {{ app.first_name }} {{ app.last_name }}">
+                      <i class="fas fa-envelope"></i>
+                    </button>
+                  </div>
+                </td>
                 <td>{{ app.email }}</td>
                 <td>ESL Teacher</td>
                 <td>{{ app.created_at|date:"d/m/Y" }}</td>
@@ -399,12 +411,19 @@
                 </td>
                 <td>
                   <div class="flex items-center gap-2">
-                    <button type="button"
-                            class="email-trigger"
-                            data-name="{{ app.first_name }}"
-                            data-email="{{ app.email }}">
-                      Email
-                    </button>
+                    {% if active_stage == 'initial' %}
+                    <form method="POST" action="/schedule-action/" class="flex items-center gap-2">
+                      {% csrf_token %}
+                      <input type="hidden" name="applicant_identifier" value="{{ app.applicant_id }}">
+                      <input type="hidden" name="type" value="initial">
+                      <input type="hidden" name="title" value="Initial Screening">
+                      <input type="hidden" name="redirect_to" value="/schedule-initial/?stage=initial">
+                      <input name="scheduled_at" type="datetime-local" required aria-label="Initial screening date and time for {{ app.first_name }} {{ app.last_name }}" class="rounded border border-pink-200 px-2 py-1 text-xs text-gray-700">
+                      <input name="meeting_link" type="url" placeholder="Meeting link" aria-label="Meeting link for {{ app.first_name }} {{ app.last_name }}" class="w-28 rounded border border-pink-200 px-2 py-1 text-xs text-gray-700">
+                      <button type="submit" class="approve-btn"><i class="fas fa-calendar-plus mr-1"></i>Schedule</button>
+                    </form>
+                    {% endif %}
+
                     <form method="POST" action="/update-status/" class="status-action-form">
                       {% csrf_token %}
                       <input type="hidden" name="applicant_id" value="{{ app.applicant_id }}">

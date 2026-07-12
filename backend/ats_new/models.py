@@ -294,7 +294,8 @@ class StatusHistory(models.Model):
 
     class Meta:
         ordering = ['created_at']
-        verbose_name_plural = "Status Histories"
+        verbose_name = "Activity log"
+        verbose_name_plural = "Activity log"
 
     def __str__(self):
         return f"{self.applicant.last_name} moved to {self.status} on {self.created_at}"

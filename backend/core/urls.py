@@ -6,7 +6,7 @@ from django.views.static import serve as static_serve
 from ats_new.views import (
     applicant_registration, applicant_login, applicant_portal, google_oauth_start, google_oauth_callback,
     home_page, applicant_logout, admin_login, admin_dashboard,
-    applicant_details, applicants_page, update_status, schedule_initial,
+    applicant_details, applicants_page, delete_applicant, update_status, schedule_initial, screening_schedule,
     demo_evaluation, evaluations, reports, training_schedule, onboarding,
     admin_calendar, schedule_action, client_endorsement,
     evaluate_applicant, floating_evaluation, save_evaluation, video_call, uploaded_media,
@@ -16,6 +16,7 @@ from ats_new.views import (
 urlpatterns = [
     path('', home_page, name='home'),
     path('teacher-stories/', teacher_stories, name='teacher_stories'),
+    path('admin/logout/', applicant_logout, name='admin_logout'),
     path('admin/', admin.site.urls),
     path('apply/', applicant_registration, name='applicant_registration'),
     path('sample-intro-videos/', sample_intro_videos, name='sample_intro_videos'),
@@ -28,8 +29,10 @@ urlpatterns = [
     path('admin-dashboard/', admin_dashboard, name='admin_dashboard'),
     path('applicants/', applicants_page, name='applicants_page'),
     path('applicant-details/<uuid:applicant_id>/', applicant_details, name='applicant_details'),
+    path('applicant-delete/<uuid:applicant_id>/', delete_applicant, name='delete_applicant'),
     path('update-status/', update_status, name='update_status'),
     path('schedule-initial/', schedule_initial, name='schedule_initial'),
+    path('screening-schedule/', screening_schedule, name='screening_schedule'),
     path('demo-evaluation/', demo_evaluation, name='demo_evaluation'),
     path('evaluations/', evaluations, name='evaluations'),
     path('reports/', reports, name='reports'),

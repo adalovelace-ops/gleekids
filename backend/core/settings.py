@@ -31,6 +31,7 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-v2rh!=93in+3ms8w5c$$7x-m
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=True)
+USE_SQLITE = env.bool('USE_SQLITE', default=DEBUG)
 
 DEFAULT_ALLOWED_HOSTS = [
     'localhost',
@@ -112,7 +113,7 @@ ASGI_APPLICATION = 'core.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-if env.bool('USE_SQLITE', default=False):
+if USE_SQLITE:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -120,6 +121,7 @@ if env.bool('USE_SQLITE', default=False):
         }
     }
 else:
+    db_sslmode = env('DB_SSLMODE', default='require' if not DEBUG else 'prefer')
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -129,7 +131,7 @@ else:
             'HOST': env('DB_HOST'),
             'PORT': env('DB_PORT', default='6543'),
             'OPTIONS': {
-                'sslmode': 'require',
+                'sslmode': db_sslmode,
             },
         }
     }

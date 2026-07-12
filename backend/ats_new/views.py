@@ -12,13 +12,15 @@ from urllib.request import Request, urlopen
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.validators import validate_email
 from django.core.mail import BadHeaderError, send_mail
 from django.db.models import Q
 from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.conf import settings
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils import timezone
@@ -30,6 +32,18 @@ from .validators import validate_applicant_upload
 logger = logging.getLogger(__name__)
 
 ZOOM_UPCOMING_URL = 'https://us05web.zoom.us/signin#/upcoming'
+
+
+def staff_permission_required(perm):
+    def decorator(view_func):
+        @login_required
+        @user_passes_test(lambda u: u.is_staff)
+        def _wrapped_view(request, *args, **kwargs):
+            if not request.user.has_perm(perm):
+                raise PermissionDenied
+            return view_func(request, *args, **kwargs)
+        return _wrapped_view
+    return decorator
 
 
 def safe_post_redirect(request, fallback_view, *fallback_args, **fallback_kwargs):
@@ -44,7 +58,7 @@ def safe_post_redirect(request, fallback_view, *fallback_args, **fallback_kwargs
 
 
 def can_access_uploaded_applicant_file(request, path):
-    if request.user.is_authenticated and request.user.is_staff:
+    if request.user.is_authenticated and request.user.is_staff and request.user.has_perm('ats_new.view_applicant'):
         return True
 
     applicant_id = request.session.get('applicant_id')
@@ -93,8 +107,7 @@ def uploaded_media(request, path):
 
     raise Http404('File not found.')
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.change_applicant')
 def send_applicant_email(request):
     if request.method != 'POST':
         return JsonResponse({'ok': False, 'error': 'POST required'}, status=405)
@@ -276,6 +289,8 @@ def sample_intro_videos(request):
     return render(request, 'sample_intro_videos.html')
 
 
+@never_cache
+@ensure_csrf_cookie
 def applicant_login(request):
     if request.method == 'POST':
         email = (request.POST.get('email') or '').strip()
@@ -533,6 +548,8 @@ def applicant_admin_context(status_filter=None):
     context.update(dashboard_panel_context(stats))
     return context
 
+@never_cache
+@ensure_csrf_cookie
 def admin_login(request):
     if request.method == 'POST':
         email = (request.POST.get('email') or '').strip()
@@ -552,18 +569,15 @@ def admin_login(request):
             return render(request, 'login.html', {'error': 'Invalid credentials', 'email': email})
     return render(request, 'login.html')
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.view_applicant')
 def admin_dashboard(request):
     return render(request, 'dashboard.html', applicant_admin_context())
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.view_applicant')
 def applicants_page(request):
     return render(request, 'manage_applicants.html', applicant_admin_context(request.GET.get('status')))
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.view_applicant')
 def applicant_details(request, applicant_id):
     applicant = get_object_or_404(Applicant, applicant_id=applicant_id)
     if request.method == 'POST' and request.POST.get('action') == 'upload_second_video':
@@ -602,8 +616,18 @@ def applicant_details(request, applicant_id):
 
     })
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.delete_applicant')
+def delete_applicant(request, applicant_id):
+    if request.method != 'POST':
+        return redirect('applicants_page')
+
+    applicant = get_object_or_404(Applicant, applicant_id=applicant_id)
+    applicant_name = applicant.full_name or applicant.email
+    applicant.delete()
+    messages.success(request, f'{applicant_name} was deleted.')
+    return redirect('applicants_page')
+
+@staff_permission_required('ats_new.change_applicant')
 def update_status(request):
     if request.method == 'POST':
         applicant_id = request.POST.get('applicant_id')
@@ -618,8 +642,7 @@ def update_status(request):
         return safe_post_redirect(request, 'applicant_details', applicant_id=applicant_id)
     return redirect('admin_dashboard')
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.view_schedule')
 def admin_calendar(request):
     initial_date = request.GET.get('date') or timezone.localdate().isoformat()
     schedules = Schedule.objects.all().select_related('applicant').order_by('scheduled_at', '-created_at')
@@ -671,8 +694,7 @@ def admin_calendar(request):
     }
     return render(request, 'admin_calendar.html', context)
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.change_schedule')
 def schedule_action(request):
     if request.method == 'POST':
         applicant_id = request.POST.get('applicant_identifier')
@@ -738,8 +760,7 @@ def schedule_action(request):
         return safe_post_redirect(request, 'admin_dashboard')
     return redirect('admin_dashboard')
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.view_schedule')
 def schedule_initial(request):
     stage = request.GET.get('stage', 'initial')
     stage_map = {
@@ -816,8 +837,14 @@ def schedule_initial(request):
         'action_status_options': action_status_options,
     })
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.view_schedule')
+def screening_schedule(request):
+    applicants = Applicant.objects.filter(status__in=['Pending', 'Initial Screening']).order_by('-created_at')
+    for applicant in applicants:
+        applicant.current_schedule = applicant.schedules.filter(type='initial').first()
+    return render(request, 'screening_schedule.html', {'applicants': applicants})
+
+@staff_permission_required('ats_new.view_evaluation')
 def demo_evaluation(request):
     applicants = Applicant.objects.filter(status='Demo Evaluation')
     for app in applicants:
@@ -825,8 +852,7 @@ def demo_evaluation(request):
         app.current_evaluation = app.evaluations.filter(evaluation_type='demo').order_by('-created_at').first()
     return render(request, 'demo_evaluation.html', {'applicants': applicants})
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.view_evaluation')
 def evaluations(request):
     query = (request.GET.get('q') or '').strip()
 
@@ -862,8 +888,7 @@ def evaluations(request):
     }
     return render(request, 'evaluations.html', context)
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.view_applicant')
 def reports(request):
     applicants = Applicant.objects.prefetch_related('history').order_by('-created_at')
     journey_rows = []
@@ -910,16 +935,14 @@ def reports(request):
         'average_time_to_hire': average_time_to_hire,
     })
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.view_schedule')
 def training_schedule(request):
     applicants = Applicant.objects.filter(status='Training')
     for app in applicants:
         app.current_schedule = app.schedules.filter(type='training').first()
     return render(request, 'training_schedule.html', {'applicants': applicants})
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.view_evaluation')
 def client_endorsement(request):
     applicants = Applicant.objects.filter(status='Endorsement')
     for app in applicants:
@@ -928,8 +951,7 @@ def client_endorsement(request):
         app.demo_evaluation = app.evaluations.filter(evaluation_type='demo').order_by('-created_at').first()
     return render(request, 'client_endorsement.html', {'applicants': applicants})
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.add_evaluation')
 def evaluate_applicant(request, applicant_id):
     applicant = get_object_or_404(Applicant, applicant_id=applicant_id)
     evaluation_type = request.GET.get('type')
@@ -962,8 +984,7 @@ def evaluate_applicant(request, applicant_id):
     }
     return render(request, 'evaluate_applicant.html', context)
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.add_evaluation')
 def floating_evaluation(request, applicant_id):
     applicant = get_object_or_404(Applicant, applicant_id=applicant_id)
     evaluation_type = request.GET.get('type')
@@ -993,8 +1014,7 @@ def floating_evaluation(request, applicant_id):
         'saved': request.GET.get('saved') == '1',
     })
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.add_evaluation')
 def save_evaluation(request):
     if request.method == 'POST':
         applicant_id = request.POST.get('applicant_identifier')
@@ -1051,8 +1071,7 @@ def find_applicant_for_room(room_id, applicant_name=''):
     return applicant, schedule
 
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.view_evaluation')
 def room_evaluation_prefill(request):
     room_id = request.GET.get('roomId') or request.GET.get('room_id')
     if not room_id:
@@ -1101,8 +1120,7 @@ def room_evaluation_prefill(request):
         }
 
     return JsonResponse(data)
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.add_evaluation')
 def save_room_evaluation(request):
     if request.method == 'OPTIONS':
         return JsonResponse({'ok': True})
@@ -1180,10 +1198,11 @@ def save_room_evaluation(request):
         'totalScore': eval_obj.total_score,
     })
 
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+@staff_permission_required('ats_new.view_schedule')
 def onboarding(request):
     if request.method == 'POST':
+        if not request.user.has_perm('ats_new.change_applicant'):
+            raise PermissionDenied
         action = request.POST.get('action')
         applicant_id = request.POST.get('applicant_identifier')
         applicant = get_object_or_404(Applicant, applicant_id=applicant_id)
