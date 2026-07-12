@@ -46,9 +46,18 @@ urlpatterns = [
     path('save-evaluation/', save_evaluation, name='save_evaluation'),
     path('send-applicant-email/', send_applicant_email, name='send_applicant_email'),
     path('video-call/<uuid:schedule_id>/', video_call, name='video_call'),
-    re_path(r'^static/(?P<path>.*)$', static_serve, {'document_root': settings.BASE_DIR / 'static'}),
     re_path(r'^media/(?P<path>.*)$', uploaded_media, name='uploaded_media'),
 ]
+
+if settings.DEBUG:
+    from django.contrib.staticfiles.views import serve as staticfiles_serve
+    urlpatterns += [
+        re_path(r'^static/(?P<path>.*)$', staticfiles_serve),
+    ]
+else:
+    urlpatterns += [
+        re_path(r'^static/(?P<path>.*)$', static_serve, {'document_root': settings.STATIC_ROOT}),
+    ]
 
 
 
