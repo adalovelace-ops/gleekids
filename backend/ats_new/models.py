@@ -128,11 +128,23 @@ class Applicant(models.Model):
             changed_by=changed_by
         )
 
-    def update_profile_from_post(self, data):
+    def update_profile_from_post(self, data, changed_by=None):
+        changed_fields = []
         for field in ['first_name', 'last_name', 'email', 'phone', 'address', 'city', 'state']:
             if field in data:
-                setattr(self, field, data.get(field))
-        self.save()
+                old_val = getattr(self, field)
+                new_val = data.get(field)
+                if str(old_val) != str(new_val):
+                    setattr(self, field, new_val)
+                    changed_fields.append(field.replace('_', ' '))
+        if changed_fields:
+            self.save()
+            StatusHistory.objects.create(
+                applicant=self,
+                status=self.status,
+                notes=f"Updated profile details: {', '.join(changed_fields)}.",
+                changed_by=changed_by
+            )
 
     def assign_teaching_account(self, account, notes=None, changed_by=None):
         self.teaching_account = account

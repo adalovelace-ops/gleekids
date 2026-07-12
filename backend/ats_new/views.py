@@ -143,6 +143,15 @@ def send_applicant_email(request):
     if not sent_count:
         return JsonResponse({'ok': False, 'error': 'Email provider did not accept the message.'}, status=502)
 
+    applicant = Applicant.objects.filter(email__iexact=recipient).first()
+    if applicant:
+        StatusHistory.objects.create(
+            applicant=applicant,
+            status=applicant.status,
+            notes=f"Sent email to applicant: \"{subject}\".",
+            changed_by=request.user
+        )
+
     return JsonResponse({'ok': True})
 
 
@@ -656,7 +665,7 @@ def update_status(request):
             new_status = request.POST.get('new_status')
             applicant.update_status(new_status, notes=request.POST.get('status_note'), changed_by=request.user)
         else:
-            applicant.update_profile_from_post(request.POST)
+            applicant.update_profile_from_post(request.POST, changed_by=request.user)
         return safe_post_redirect(request, 'applicant_details', applicant_id=applicant_id)
     return redirect('admin_dashboard')
 
@@ -753,6 +762,17 @@ def schedule_action(request):
         schedule.refresh_from_db()
 
         schedule.sync_applicant_status(title, changed_by=request.user)
+        
+        # Log new schedule creation
+        if not existing_schedule:
+            note = f"Scheduled {schedule.get_type_display()} for {timezone.localtime(schedule.scheduled_at).strftime('%B %d, %Y @ %I:%M %p')}."
+            StatusHistory.objects.create(
+                applicant=applicant,
+                status=applicant.status,
+                notes=note,
+                changed_by=request.user
+            )
+
         advance_status = request.POST.get('advance_status')
         if advance_status and advance_status != applicant.status:
             applicant.update_status(
@@ -1059,6 +1079,13 @@ def save_evaluation(request):
                     notes=f"Client endorsement marked {decision}.",
                     changed_by=request.user,
                 )
+            else:
+                StatusHistory.objects.create(
+                    applicant=applicant,
+                    status=applicant.status,
+                    notes=f"Saved client endorsement evaluation (Decision: {decision}).",
+                    changed_by=request.user
+                )
             return safe_post_redirect(request, 'evaluations')
 
         defaults = Evaluation.rating_defaults_from_request(request.POST)
@@ -1067,6 +1094,13 @@ def save_evaluation(request):
             applicant=applicant,
             evaluation_type='demo',
             defaults=defaults,
+        )
+        
+        StatusHistory.objects.create(
+            applicant=applicant,
+            status=applicant.status,
+            notes="Submitted/updated demo evaluation rating and comments.",
+            changed_by=request.user
         )
         
         return safe_post_redirect(request, 'demo_evaluation')
@@ -1211,6 +1245,13 @@ def save_room_evaluation(request):
         applicant=applicant,
         evaluation_type='demo',
         defaults=defaults,
+    )
+
+    StatusHistory.objects.create(
+        applicant=applicant,
+        status=applicant.status,
+        notes=f"Submitted demo evaluation via video conference (Score: {eval_obj.total_score}/25).",
+        changed_by=request.user
     )
 
     return JsonResponse({

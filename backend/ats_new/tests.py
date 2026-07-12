@@ -242,3 +242,20 @@ class DashboardViewPermissionTests(TestCase):
         self.staff_user.username = 'salinas.thea2021@gmail.com'
         self.staff_user.save()
         self.assertEqual(history_entry_user.logged_by_name, 'Salinas Thea2021')
+
+    def test_update_profile_records_log(self):
+        change_perm = Permission.objects.get(codename='change_applicant')
+        self.staff_user.user_permissions.add(change_perm)
+
+        self.client.login(username='staff', password='secret123')
+        response = self.client.post(reverse('update_status'), {
+            'applicant_id': str(self.applicant.applicant_id),
+            'first_name': 'Jonathan',
+            'last_name': 'Doe'
+        })
+        self.assertEqual(response.status_code, 302)
+
+        history_entry = self.applicant.history.latest('created_at')
+        self.assertIn("Updated profile details", history_entry.notes)
+        self.assertIn("first name", history_entry.notes)
+        self.assertEqual(history_entry.changed_by, self.staff_user)

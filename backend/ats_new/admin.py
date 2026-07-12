@@ -130,6 +130,40 @@ class ApplicantAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
     list_per_page = 25
 
+    def save_model(self, request, obj, form, change):
+        is_new = obj._state.adding
+        old_status = None
+        if change:
+            try:
+                old_status = Applicant.objects.get(pk=obj.pk).status
+            except Applicant.DoesNotExist:
+                pass
+
+        super().save_model(request, obj, form, change)
+
+        if is_new:
+            StatusHistory.objects.create(
+                applicant=obj,
+                status=obj.status,
+                notes="Applicant account created by admin.",
+                changed_by=request.user
+            )
+        elif change:
+            if old_status and old_status != obj.status:
+                StatusHistory.objects.create(
+                    applicant=obj,
+                    status=obj.status,
+                    notes=f"Moved from {old_status} via Django Admin update.",
+                    changed_by=request.user
+                )
+            else:
+                StatusHistory.objects.create(
+                    applicant=obj,
+                    status=obj.status,
+                    notes="Updated applicant details via Django Admin.",
+                    changed_by=request.user
+                )
+
 
 @admin.register(Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
