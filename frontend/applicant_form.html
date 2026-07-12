@@ -450,6 +450,18 @@
                     {% else %}
                         <form id="registerForm" action="" method="POST" enctype="multipart/form-data" class="space-y-6">
                             {% csrf_token %}
+                            {% if form_errors %}
+                                <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                                    <h3 class="font-extrabold mb-1"><i class="fas fa-exclamation-circle mr-2"></i>Please correct the following errors:</h3>
+                                    <ul class="list-disc list-inside font-semibold space-y-1">
+                                        {% for field, errors in form_errors.items %}
+                                            {% for error in errors %}
+                                                <li><strong>{% if field == 'tefl_certificate' %}TEFL Certificate{% elif field == 'video_2' %}Second Video{% elif field == 'first_name' %}First Name{% elif field == 'middle_name' %}Middle Name{% elif field == 'last_name' %}Last Name{% elif field == 'date_of_birth' %}Date of Birth{% elif field == 'zip_code' %}ZIP Code{% else %}{{ field|title }}{% endif %}:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
                             <!-- Personal Info -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
                                 <div>
