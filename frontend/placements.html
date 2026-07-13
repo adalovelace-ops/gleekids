@@ -93,98 +93,91 @@
                 <p class="text-sm text-gray-400">No placements or accounts configured yet.</p>
               </div>
             {% else %}
-              <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                  <table class="min-w-full divide-y divide-gray-200 text-sm">
-                    <thead class="bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-500 border-b border-gray-200">
-                      <tr>
-                        <th class="px-6 py-4 text-left font-bold">Placement Account</th>
-                        <th class="px-6 py-4 text-left font-bold">Description</th>
-                        <th class="px-6 py-4 text-center font-bold">Approved Count</th>
-                        <th class="px-6 py-4 text-left font-bold">Approved Teachers</th>
-                        <th class="px-6 py-4 text-center font-bold">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 bg-white">
-                      {% for item in placements_data %}
-                        <tr class="hover:bg-gray-50/50 transition">
-                          <!-- Placement Account Name -->
-                          <td class="px-6 py-5 whitespace-nowrap">
-                            <div class="flex items-center gap-2">
-                              <div class="h-8 w-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-sm shadow-sm">
-                                <i class="fas fa-briefcase text-xs"></i>
-                              </div>
-                              <div>
-                                <span class="font-bold text-gray-900 block text-sm">{{ item.placement.name }}</span>
-                                <span class="text-[10px] text-gray-400 font-medium">Slug: {{ item.placement.slug }}</span>
-                              </div>
-                            </div>
-                          </td>
-                          
-                          <!-- Description -->
-                          <td class="px-6 py-5">
-                            {% if item.placement.description %}
-                              <span class="text-xs text-gray-600 leading-relaxed block max-w-xs truncate" title="{{ item.placement.description }}">
-                                {{ item.placement.description }}
-                              </span>
-                            {% else %}
-                              <span class="text-xs text-gray-400 italic font-medium">No description provided</span>
-                            {% endif %}
-                          </td>
+              <div class="space-y-6">
+                {% for item in placements_data %}
+                  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    
+                    <!-- Placement Header -->
+                    <div class="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-start gap-4">
+                      <div>
+                        <div class="flex items-center gap-3">
+                          <h3 class="text-base font-bold text-gray-900">{{ item.placement.name }}</h3>
+                          <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-full">
+                            {{ item.approved_count }} Approved Teacher{{ item.approved_count|pluralize }}
+                          </span>
+                        </div>
+                        {% if item.placement.description %}
+                          <p class="text-xs text-gray-500 mt-1">{{ item.placement.description }}</p>
+                        {% else %}
+                          <p class="text-xs text-gray-400 mt-1 italic">No description provided.</p>
+                        {% endif %}
+                      </div>
+                      
+                      <!-- CRUD Actions (Edit, Delete) -->
+                      <div class="flex items-center gap-2">
+                        <button type="button" 
+                                onclick="editPlacement('{{ item.placement.id }}', '{{ item.placement.name|escapejs }}', '{{ item.placement.description|escapejs }}')"
+                                class="h-8 w-8 rounded-lg bg-white border border-gray-200 text-gray-600 hover:text-black flex items-center justify-center text-xs transition shadow-sm hover:shadow"
+                                title="Edit Account">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        
+                        <form method="POST" action="" onsubmit="return confirm('Are you sure you want to delete the placement \'{{ item.placement.name|escapejs }}\'?');" class="inline">
+                          {% csrf_token %}
+                          <input type="hidden" name="action" value="delete">
+                          <input type="hidden" name="placement_id" value="{{ item.placement.id }}">
+                          <button type="submit" 
+                                  class="h-8 w-8 rounded-lg bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 flex items-center justify-center text-xs transition shadow-sm hover:shadow"
+                                  title="Delete Account">
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </div>
 
-                          <!-- Approved Count -->
-                          <td class="px-6 py-5 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center justify-center px-3 py-1 text-xs font-bold rounded-full {% if item.approved_count > 0 %}bg-green-50 border border-green-100 text-green-700{% else %}bg-gray-50 border border-gray-100 text-gray-500{% endif %}">
-                              {{ item.approved_count }} Teacher{{ item.approved_count|pluralize }}
-                            </span>
-                          </td>
-
-                          <!-- Approved Teachers -->
-                          <td class="px-6 py-5">
-                            {% if not item.approved_applicants %}
-                              <span class="text-xs text-gray-400 italic font-medium">No teachers assigned</span>
-                            {% else %}
-                              <div class="space-y-1.5 max-w-xs">
-                                {% for app in item.approved_applicants %}
-                                  <div class="flex items-center justify-between gap-3 text-xs bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-1 hover:bg-violet-50 hover:border-violet-100 transition">
-                                    <span class="font-semibold text-gray-800">{{ app.first_name }} {{ app.last_name }}</span>
+                    <!-- Approved Applicants Table for this placement -->
+                    <div class="p-6">
+                      <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Approved Placement Roster</h4>
+                      
+                      {% if not item.approved_applicants %}
+                        <div class="py-6 text-center border border-dashed border-gray-100 rounded-xl bg-gray-50/20">
+                          <p class="text-xs text-gray-400 italic">No approved applicants assigned to this placement account yet.</p>
+                        </div>
+                      {% else %}
+                        <div class="overflow-hidden border border-gray-100 rounded-xl">
+                          <table class="min-w-full divide-y divide-gray-100 text-sm">
+                            <thead class="bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                              <tr>
+                                <th class="px-4 py-3 text-left font-bold">Teacher Name</th>
+                                <th class="px-4 py-3 text-left font-bold">Email</th>
+                                <th class="px-4 py-3 text-center font-bold">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 bg-white">
+                              {% for app in item.approved_applicants %}
+                                <tr class="hover:bg-gray-50/50 transition">
+                                  <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">
+                                    {{ app.first_name }} {{ app.last_name }}
+                                  </td>
+                                  <td class="px-4 py-3 whitespace-nowrap text-gray-500">
+                                    {{ app.email }}
+                                  </td>
+                                  <td class="px-4 py-3 whitespace-nowrap text-center">
                                     <a href="/applicant-details/{{ app.applicant_id }}/" 
-                                       class="text-[10px] font-bold text-violet-600 hover:text-violet-800 whitespace-nowrap">
-                                      Profile <i class="fas fa-arrow-right ml-0.5"></i>
+                                       class="text-xs font-bold text-violet-600 hover:text-violet-800 inline-flex items-center gap-1">
+                                      View Profile <i class="fas fa-arrow-right text-[10px]"></i>
                                     </a>
-                                  </div>
-                                {% endfor %}
-                              </div>
-                            {% endif %}
-                          </td>
+                                  </td>
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                      {% endif %}
+                    </div>
 
-                          <!-- Actions -->
-                          <td class="px-6 py-5 whitespace-nowrap text-center">
-                            <div class="flex items-center justify-center gap-2">
-                              <button type="button" 
-                                      onclick="editPlacement('{{ item.placement.id }}', '{{ item.placement.name|escapejs }}', '{{ item.placement.description|escapejs }}')"
-                                      class="h-7 w-7 rounded-lg bg-white border border-gray-200 text-gray-600 hover:text-black flex items-center justify-center text-xs transition shadow-sm hover:shadow"
-                                      title="Edit Account">
-                                <i class="fas fa-edit"></i>
-                              </button>
-                              
-                              <form method="POST" action="" onsubmit="return confirm('Are you sure you want to delete the placement \'{{ item.placement.name|escapejs }}\'?');" class="inline">
-                                {% csrf_token %}
-                                <input type="hidden" name="action" value="delete">
-                                <input type="hidden" name="placement_id" value="{{ item.placement.id }}">
-                                <button type="submit" 
-                                        class="h-7 w-7 rounded-lg bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 flex items-center justify-center text-xs transition shadow-sm hover:shadow"
-                                        title="Delete Account">
-                                  <i class="fas fa-trash-alt"></i>
-                                </button>
-                              </form>
-                            </div>
-                          </td>
-                        </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
+                  </div>
+                {% endfor %}
               </div>
             {% endif %}
           </div>
