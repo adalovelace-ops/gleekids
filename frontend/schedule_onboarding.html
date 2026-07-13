@@ -90,7 +90,7 @@
                   </div>
                   {% endif %}
 
-                  {% if app.current_schedule %}
+                  {% if app.status != 'Approved' and app.current_schedule %}
                   <div class="p-4 bg-white rounded-xl border border-blue-200 shadow-sm">
                     <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Final Orientation</p>
                     <p class="text-sm font-bold text-gray-800 mt-1">
@@ -146,6 +146,7 @@
                 </div>
 
                 <!-- Form 2: Orientation Schedule -->
+                {% if app.status != 'Approved' %}
                 <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                   <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Final Orientation Schedule</h3>
                   <form method="POST" action="/schedule-action/" class="space-y-4">
@@ -186,6 +187,7 @@
                     </button>
                   </form>
                 </div>
+                {% endif %}
               </div>
             </div>
           </div>
