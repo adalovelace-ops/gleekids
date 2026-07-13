@@ -8,7 +8,7 @@ from django.contrib.auth.models import Group
 from django.utils import timezone
 from django.utils.html import format_html
 
-from .models import Applicant, Evaluation, Schedule, StatusHistory
+from .models import Applicant, Evaluation, Schedule, StatusHistory, Placement
 
 User = get_user_model()
 
@@ -262,3 +262,9 @@ class LogEntryAdmin(admin.ModelAdmin):
 
     def has_module_permission(self, request):
         return request.user.is_superuser
+
+
+@admin.register(Placement)
+class PlacementAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'description')
+    prepopulated_fields = {'slug': ('name',)}

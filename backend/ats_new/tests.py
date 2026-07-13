@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .admin import LogEntryAdmin, ApplicantAdmin
-from .models import Applicant, StatusHistory
+from .models import Applicant, StatusHistory, Placement
 
 
 class LogEntryAdminTests(TestCase):
@@ -407,3 +407,90 @@ class DashboardViewPermissionTests(TestCase):
         messages = list(response.wsgi_request._messages)
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), 'Training sessions must be scheduled between 7:00 AM and 11:00 PM.')
+
+
+class PlacementCRUDTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.User = get_user_model()
+        self.superuser = self.User.objects.create_superuser(
+            username='superuser',
+            email='super@example.com',
+            password='secret123'
+        )
+        self.staff_user = self.User.objects.create_user(
+            username='staff',
+            email='staff@example.com',
+            password='secret123',
+            is_staff=True
+        )
+        # Give view_applicant permission to staff_user
+        view_perm = Permission.objects.get(codename='view_applicant')
+        self.staff_user.user_permissions.add(view_perm)
+        
+        self.applicant = Applicant.objects.create(
+            first_name='John',
+            last_name='Doe',
+            email='john.doe@example.com',
+            country='Philippines',
+            status='Approved'
+        )
+
+    def test_placement_crud_requires_login(self):
+        response = self.client.get(reverse('placements_list'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_placement_crud_view_allowed_for_staff(self):
+        self.client.login(username='staff', password='secret123')
+        response = self.client.get(reverse('placements_list'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_placement_crud_create(self):
+        self.client.login(username='superuser', password='secret123')
+        response = self.client.post(reverse('placements_list'), {
+            'action': 'create',
+            'name': 'Korean Account',
+            'description': 'Online tutoring for Korean students'
+        })
+        self.assertEqual(response.status_code, 302)
+        korean_placement = Placement.objects.filter(slug='korean-account').first()
+        self.assertIsNotNone(korean_placement)
+        self.assertEqual(korean_placement.name, 'Korean Account')
+        self.assertEqual(korean_placement.description, 'Online tutoring for Korean students')
+
+    def test_placement_crud_update(self):
+        self.client.login(username='superuser', password='secret123')
+        placement = Placement.objects.create(name='Japanese Account', slug='japanese-account')
+        response = self.client.post(reverse('placements_list'), {
+            'action': 'update',
+            'placement_id': placement.id,
+            'name': 'Updated Japanese Account',
+            'description': 'Tutoring in Tokyo'
+        })
+        self.assertEqual(response.status_code, 302)
+        placement.refresh_from_db()
+        self.assertEqual(placement.name, 'Updated Japanese Account')
+        self.assertEqual(placement.description, 'Tutoring in Tokyo')
+
+    def test_placement_crud_delete(self):
+        self.client.login(username='superuser', password='secret123')
+        placement = Placement.objects.create(name='Spanish Account', slug='spanish-account')
+        response = self.client.post(reverse('placements_list'), {
+            'action': 'delete',
+            'placement_id': placement.id
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Placement.objects.filter(id=placement.id).exists())
+
+    def test_placement_delete_blocked_when_has_applicants(self):
+        self.client.login(username='superuser', password='secret123')
+        placement = Placement.objects.create(name='French Account', slug='french-account')
+        self.applicant.teaching_account = placement
+        self.applicant.save()
+        
+        response = self.client.post(reverse('placements_list'), {
+            'action': 'delete',
+            'placement_id': placement.id
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Placement.objects.filter(id=placement.id).exists())

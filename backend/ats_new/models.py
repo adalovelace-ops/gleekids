@@ -3,6 +3,15 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password, identify_hasher, make_password
 
+class Placement(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Applicant(models.Model):
     NEXT_STEP_TEXT = {
         'Pending': 'Our team is currently reviewing your application. Please wait for an approval email to proceed.',
@@ -49,12 +58,7 @@ class Applicant(models.Model):
     preferred_demo_time = models.TimeField(blank=True, null=True)
     
     # Placement
-    ACCOUNT_CHOICES = [
-        ('Vietnamese', 'Vietnamese Account'),
-        ('Chinese', 'Chinese Account'),
-        ('Direct', 'Direct Account'),
-    ]
-    teaching_account = models.CharField(max_length=50, choices=ACCOUNT_CHOICES, blank=True, null=True)
+    teaching_account = models.ForeignKey(Placement, on_delete=models.SET_NULL, blank=True, null=True, related_name='applicants')
     teaching_account_notes = models.TextField(blank=True, null=True)
     
     # Files
@@ -153,7 +157,7 @@ class Applicant(models.Model):
         StatusHistory.objects.create(
             applicant=self,
             status=self.status,
-            notes=f"Assigned to {self.teaching_account} account.",
+            notes=f"Assigned to {self.teaching_account.name if self.teaching_account else ''} account.",
             changed_by=changed_by
         )
 
@@ -165,7 +169,7 @@ class Applicant(models.Model):
         StatusHistory.objects.create(
             applicant=self,
             status=self.status,
-            notes=notes or f"Removed teaching placement{f' from {old_account} account' if old_account else ''}.",
+            notes=notes or f"Removed teaching placement{f' from {old_account.name} account' if old_account else ''}.",
             changed_by=changed_by
         )
 

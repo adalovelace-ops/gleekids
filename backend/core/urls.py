@@ -10,7 +10,7 @@ from ats_new.views import (
     demo_evaluation, evaluations, reports, training_schedule, onboarding,
     admin_calendar, schedule_action, client_endorsement,
     evaluate_applicant, floating_evaluation, save_evaluation, video_call, uploaded_media,
-    send_applicant_email, sample_intro_videos, teacher_stories,
+    send_applicant_email, sample_intro_videos, teacher_stories, placements_list,
 )
 
 urlpatterns = [
@@ -46,6 +46,7 @@ urlpatterns = [
     path('save-evaluation/', save_evaluation, name='save_evaluation'),
     path('send-applicant-email/', send_applicant_email, name='send_applicant_email'),
     path('video-call/<uuid:schedule_id>/', video_call, name='video_call'),
+    path('placements/', placements_list, name='placements_list'),
     re_path(r'^media/(?P<path>.*)$', uploaded_media, name='uploaded_media'),
 ]
 

@@ -83,7 +83,7 @@
                   {% if app.teaching_account %}
                   <div class="p-4 bg-amber-50 rounded-xl border border-amber-200 shadow-sm">
                     <p class="text-[10px] font-bold text-amber-600 uppercase tracking-widest">Assigned Account</p>
-                    <p class="text-sm font-bold text-amber-900 mt-1">{{ app.teaching_account }} Account</p>
+                    <p class="text-sm font-bold text-amber-900 mt-1">{{ app.teaching_account.name }}</p>
                     {% if app.teaching_account_notes %}
                     <p class="text-[10px] text-amber-700 mt-2 italic">Note: {{ app.teaching_account_notes }}</p>
                     {% endif %}
@@ -116,8 +116,8 @@
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Select Account</label>
                         <select name="account_slug" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400" required>
                           <option value="">Choose Account...</option>
-                          {% for slug, label in accounts %}
-                            <option value="{{ slug }}" {% if app.teaching_account == slug %}selected{% endif %}>{{ label }}</option>
+                          {% for acc in accounts %}
+                            <option value="{{ acc.slug }}" {% if app.teaching_account.slug == acc.slug %}selected{% endif %}>{{ acc.name }}</option>
                           {% endfor %}
                         </select>
                       </div>

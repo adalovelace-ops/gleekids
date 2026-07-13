@@ -26,7 +26,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils import timezone
 from django.utils._os import safe_join
 from .forms import ApplicantRegistrationForm
-from .models import Applicant, Evaluation, Schedule, StatusHistory
+from .models import Applicant, Evaluation, Schedule, StatusHistory, Placement
 from .validators import validate_applicant_upload
 
 logger = logging.getLogger(__name__)
@@ -1292,8 +1292,9 @@ def onboarding(request):
         applicant = get_object_or_404(Applicant, applicant_id=applicant_id)
         
         if action == 'assign_account':
+            placement = get_object_or_404(Placement, slug=request.POST.get('account_slug'))
             applicant.assign_teaching_account(
-                request.POST.get('account_slug'),
+                placement,
                 request.POST.get('notes'),
                 changed_by=request.user
             )
@@ -1308,18 +1309,18 @@ def onboarding(request):
 
     placement_groups = [
         {
-            'slug': slug,
-            'label': label,
-            'applicants': applicants.filter(teaching_account=slug),
+            'slug': placement.slug,
+            'label': placement.name,
+            'applicants': applicants.filter(teaching_account=placement),
         }
-        for slug, label in Applicant.ACCOUNT_CHOICES
+        for placement in Placement.objects.all()
     ]
     
     context = {
         'applicants': applicants,
-        'accounts': Applicant.ACCOUNT_CHOICES,
+        'accounts': Placement.objects.all(),
         'placement_groups': placement_groups,
-        'unassigned_count': applicants.filter(teaching_account__isnull=True).count() + applicants.filter(teaching_account='').count(),
+        'unassigned_count': applicants.filter(teaching_account__isnull=True).count(),
     }
     return render(request, 'schedule_onboarding.html', context)
 
@@ -1333,6 +1334,82 @@ def video_call(request, schedule_id):
     if schedule and schedule.meeting_link:
         return redirect(schedule.meeting_link)
     return redirect(ZOOM_UPCOMING_URL)
+
+
+@staff_permission_required('ats_new.view_applicant')
+def placements_list(request):
+    from django.utils.text import slugify
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'create':
+            if not request.user.has_perm('ats_new.add_placement'):
+                raise PermissionDenied
+            name = (request.POST.get('name') or '').strip()
+            description = (request.POST.get('description') or '').strip()
+            
+            if not name:
+                messages.error(request, 'Placement name is required.')
+            else:
+                slug = slugify(name)
+                if Placement.objects.filter(slug=slug).exists():
+                    messages.error(request, f'A placement with name "{name}" already exists.')
+                else:
+                    Placement.objects.create(name=name, slug=slug, description=description)
+                    messages.success(request, f'Placement "{name}" created successfully.')
+            return redirect('placements_list')
+            
+        elif action == 'update':
+            if not request.user.has_perm('ats_new.change_placement'):
+                raise PermissionDenied
+            placement_id = request.POST.get('placement_id')
+            placement = get_object_or_404(Placement, id=placement_id)
+            name = (request.POST.get('name') or '').strip()
+            description = (request.POST.get('description') or '').strip()
+            
+            if not name:
+                messages.error(request, 'Placement name is required.')
+            else:
+                slug = slugify(name)
+                if Placement.objects.filter(slug=slug).exclude(id=placement.id).exists():
+                    messages.error(request, f'A placement with name "{name}" already exists.')
+                else:
+                    placement.name = name
+                    placement.slug = slug
+                    placement.description = description
+                    placement.save()
+                    messages.success(request, f'Placement "{name}" updated successfully.')
+            return redirect('placements_list')
+            
+        elif action == 'delete':
+            if not request.user.has_perm('ats_new.delete_placement'):
+                raise PermissionDenied
+            placement_id = request.POST.get('placement_id')
+            placement = get_object_or_404(Placement, id=placement_id)
+            
+            if placement.applicants.exists():
+                messages.error(request, f'Cannot delete "{placement.name}" because applicants are currently assigned to it.')
+            else:
+                placement.delete()
+                messages.success(request, f'Placement deleted successfully.')
+            return redirect('placements_list')
+
+    placements = Placement.objects.all().order_by('name')
+    placements_data = []
+    for placement in placements:
+        approved_applicants = placement.applicants.filter(status='Approved')
+        placements_data.append({
+            'placement': placement,
+            'approved_applicants': approved_applicants,
+            'approved_count': approved_applicants.count(),
+        })
+        
+    context = {
+        'placements_data': placements_data,
+        'active': 'placements',
+        'all_applicants_count': Applicant.objects.count(),
+    }
+    return render(request, 'placements.html', context)
 
 
 

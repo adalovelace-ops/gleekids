@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Teaching Placements</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/system_palette.css">
+</head>
+<body class="min-h-screen text-gray-800 bg-gray-50/50">
+  <div class="flex min-h-screen">
+    {% include "partials/admin_sidebar.html" with active="placements" %}
+
+    <main class="flex-1 p-8">
+      <div class="max-w-7xl mx-auto space-y-8">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-gray-100 pb-5">
+          <div>
+            <p class="text-sm uppercase tracking-[0.2em] text-pink-500">Resource Management</p>
+            <h1 class="mt-1 text-3xl font-bold text-gray-900">Teaching Accounts</h1>
+            <p class="mt-2 text-sm text-gray-500">Manage placement accounts and monitor approved teachers assigned to each.</p>
+          </div>
+        </div>
+
+        <!-- Alert messages -->
+        {% if messages %}
+          <div class="space-y-3">
+            {% for message in messages %}
+              <div class="p-4 rounded-xl border text-sm flex items-center gap-2 {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% else %}bg-red-50 border-red-200 text-red-800{% endif %}">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Two column split layout: CRUD form (Left) and List/Approved Applicants (Right) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          <!-- Left Column: Dynamic CRUD Form -->
+          <div class="lg:col-span-1">
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm sticky top-8">
+              <h2 id="form-title" class="text-lg font-bold text-gray-900 mb-4">Add New Teaching Account</h2>
+              
+              <form method="POST" action="" class="space-y-4">
+                {% csrf_token %}
+                <input type="hidden" name="action" id="form-action" value="create">
+                <input type="hidden" name="placement_id" id="placement-id-input" value="">
+
+                <div>
+                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Account Name</label>
+                  <input type="text" 
+                         name="name" 
+                         id="name-input"
+                         placeholder="e.g. Japanese Account"
+                         class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400"
+                         required>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
+                  <textarea name="description" 
+                            id="description-input"
+                            rows="4" 
+                            placeholder="Optional placement or account details..."
+                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400"></textarea>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                  <button type="submit" class="flex-1 bg-gray-900 hover:bg-black text-white font-bold py-2 rounded-lg text-sm transition">
+                    <i class="fas fa-save mr-2"></i>Save Account
+                  </button>
+                  <button type="button" 
+                          id="cancel-edit-btn"
+                          onclick="cancelEdit()"
+                          style="display: none;"
+                          class="px-4 py-2 border border-gray-200 hover:bg-gray-50 rounded-lg text-sm text-gray-600 transition">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Right Column: Placement Cards & Assigned Approved Applicants -->
+          <div class="lg:col-span-2 space-y-6">
+            <h2 class="text-lg font-bold text-gray-900">Active Placement Accounts</h2>
+            
+            {% if not placements_data %}
+              <div class="p-8 text-center bg-white border border-gray-100 rounded-2xl shadow-sm">
+                <p class="text-sm text-gray-400">No placements or accounts configured yet.</p>
+              </div>
+            {% else %}
+              <div class="space-y-6">
+                {% for item in placements_data %}
+                  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    
+                    <!-- Placement Header -->
+                    <div class="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-start gap-4">
+                      <div>
+                        <div class="flex items-center gap-3">
+                          <h3 class="text-base font-bold text-gray-900">{{ item.placement.name }}</h3>
+                          <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-full">
+                            {{ item.approved_count }} Approved Teacher{{ item.approved_count|pluralize }}
+                          </span>
+                        </div>
+                        {% if item.placement.description %}
+                          <p class="text-xs text-gray-500 mt-1">{{ item.placement.description }}</p>
+                        {% else %}
+                          <p class="text-xs text-gray-400 mt-1 italic">No description provided.</p>
+                        {% endif %}
+                      </div>
+                      
+                      <!-- CRUD Actions (Edit, Delete) -->
+                      <div class="flex items-center gap-2">
+                        <button type="button" 
+                                onclick="editPlacement('{{ item.placement.id }}', '{{ item.placement.name|escapejs }}', '{{ item.placement.description|escapejs }}')"
+                                class="h-8 w-8 rounded-lg bg-white border border-gray-200 text-gray-600 hover:text-black flex items-center justify-center text-xs transition shadow-sm"
+                                title="Edit Account">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        
+                        <form method="POST" action="" onsubmit="return confirm('Are you sure you want to delete the placement \'{{ item.placement.name|escapejs }}\'?');">
+                          {% csrf_token %}
+                          <input type="hidden" name="action" value="delete">
+                          <input type="hidden" name="placement_id" value="{{ item.placement.id }}">
+                          <button type="submit" 
+                                  class="h-8 w-8 rounded-lg bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 flex items-center justify-center text-xs transition shadow-sm"
+                                  title="Delete Account">
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+
+                    <!-- Approved Applicants Per Placement -->
+                    <div class="p-6">
+                      <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Approved Placement Roster</h4>
+                      
+                      {% if not item.approved_applicants %}
+                        <div class="py-4 text-center border-2 border-dashed border-gray-100 rounded-xl">
+                          <p class="text-xs text-gray-400 italic">No approved applicants assigned to this placement account yet.</p>
+                        </div>
+                      {% else %}
+                        <div class="divide-y divide-gray-100">
+                          {% for app in item.approved_applicants %}
+                            <div class="py-3 flex items-center justify-between first:pt-0 last:pb-0">
+                              <div>
+                                <p class="text-sm font-bold text-gray-900">{{ app.first_name }} {{ app.last_name }}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">{{ app.email }}</p>
+                              </div>
+                              <a href="/applicant-details/{{ app.applicant_id }}/" 
+                                 class="text-xs font-bold text-violet-600 hover:text-violet-800 flex items-center gap-1">
+                                View Profile <i class="fas fa-arrow-right text-[10px]"></i>
+                              </a>
+                            </div>
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                    </div>
+
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function editPlacement(id, name, description) {
+        document.getElementById('form-action').value = 'update';
+        document.getElementById('form-title').innerText = 'Edit Teaching Account';
+        document.getElementById('placement-id-input').value = id;
+        document.getElementById('name-input').value = name;
+        document.getElementById('description-input').value = description;
+        document.getElementById('cancel-edit-btn').style.display = 'inline-block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+        document.getElementById('form-action').value = 'create';
+        document.getElementById('form-title').innerText = 'Add New Teaching Account';
+        document.getElementById('placement-id-input').value = '';
+        document.getElementById('name-input').value = '';
+        document.getElementById('description-input').value = '';
+        document.getElementById('cancel-edit-btn').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
