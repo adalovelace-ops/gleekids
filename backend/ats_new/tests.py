@@ -345,3 +345,34 @@ class DashboardViewPermissionTests(TestCase):
         messages = list(response.wsgi_request._messages)
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), 'Demo interviews must be scheduled between 1:00 PM and 5:00 PM.')
+
+    def test_admin_schedule_client_time_validation(self):
+        self.client.login(username='superuser', password='secret123')
+
+        # Valid admin client slot (9:30 AM)
+        response = self.client.post(reverse('schedule_action'), {
+            'applicant_identifier': str(self.applicant.applicant_id),
+            'type': 'endorsement',
+            'scheduled_date': '2026-07-20',
+            'scheduled_time': '09:30',
+            'title': 'Client Final Interview',
+            'redirect_to': '/client-endorsement/'
+        })
+        self.assertEqual(response.status_code, 302)
+        client_schedule = self.applicant.schedules.filter(type='endorsement').first()
+        self.assertIsNotNone(client_schedule)
+        self.assertEqual(timezone.localtime(client_schedule.scheduled_at).time().strftime('%H:%M'), '09:30')
+
+        # Invalid admin client slot (5:00 AM)
+        response = self.client.post(reverse('schedule_action'), {
+            'applicant_identifier': str(self.applicant.applicant_id),
+            'type': 'endorsement',
+            'scheduled_date': '2026-07-20',
+            'scheduled_time': '05:00',
+            'title': 'Client Final Interview',
+            'redirect_to': '/client-endorsement/'
+        })
+        self.assertEqual(response.status_code, 302)
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Client interviews must be scheduled between 7:00 AM and 11:00 PM.')
