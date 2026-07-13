@@ -291,3 +291,25 @@ class DashboardViewPermissionTests(TestCase):
         self.assertEqual(response.status_code, 302)
         expected_url_client = f"/floating-evaluation/{self.applicant.applicant_id}/?type=client&saved=1"
         self.assertRedirects(response, expected_url_client, fetch_redirect_response=False)
+
+    def test_update_preferred_demo_time_validation(self):
+        session = self.client.session
+        session['applicant_id'] = str(self.applicant.applicant_id)
+        session.save()
+
+        # Valid slot (2:30 PM)
+        response = self.client.post(reverse('applicant_portal'), {
+            'action': 'update_preferred_demo_time',
+            'preferred_demo_time': '14:30'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.applicant.refresh_from_db()
+        self.assertEqual(self.applicant.preferred_demo_time.strftime('%H:%M'), '14:30')
+
+        # Invalid slot (9:00 AM)
+        response = self.client.post(reverse('applicant_portal'), {
+            'action': 'update_preferred_demo_time',
+            'preferred_demo_time': '09:00'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Please select a time between 1:00 PM and 5:00 PM.')

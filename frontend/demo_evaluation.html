@@ -115,7 +115,7 @@
                       <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Date & Time</label>
                       {% if app.preferred_demo_time %}
                         <p class="mb-2 text-xs font-bold text-amber-700">
-                          Applicant prefers {{ app.preferred_demo_time|time:"g:i A" }}. Schedule from morning through 5:00 PM.
+                          Applicant prefers {{ app.preferred_demo_time|time:"g:i A" }}. Schedule between 1:00 PM and 5:00 PM.
                         </p>
                       {% endif %}
                       <input type="datetime-local" 

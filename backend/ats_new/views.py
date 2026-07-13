@@ -356,12 +356,12 @@ def applicant_portal(request):
 
     if request.method == 'POST' and request.POST.get('action') == 'update_preferred_demo_time':
         selected_time = parse_time(request.POST.get('preferred_demo_time') or '')
-        if selected_time and time(8, 0) <= selected_time <= time(17, 0):
+        if selected_time and time(13, 0) <= selected_time <= time(17, 0):
             applicant.preferred_demo_time = selected_time
             applicant.save(update_fields=['preferred_demo_time', 'updated_at'])
             preferred_time_saved = True
         else:
-            preferred_time_error = 'Please select a time between 8:00 AM and 5:00 PM.'
+            preferred_time_error = 'Please select a time between 1:00 PM and 5:00 PM.'
     elif request.method == 'POST' and request.POST.get('action') == 'upload_document':
         upload_fields = {
             'resume': 'Resume/CV',
