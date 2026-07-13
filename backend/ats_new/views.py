@@ -759,6 +759,12 @@ def schedule_action(request):
                 messages.error(request, 'Client interviews must be scheduled between 7:00 AM and 11:00 PM.')
                 return safe_post_redirect(request, 'admin_dashboard')
 
+        if sched_type == 'training':
+            local_scheduled_time = timezone.localtime(parsed_scheduled_at).time()
+            if not (time(7, 0) <= local_scheduled_time <= time(23, 0)):
+                messages.error(request, 'Training sessions must be scheduled between 7:00 AM and 11:00 PM.')
+                return safe_post_redirect(request, 'admin_dashboard')
+
         existing_schedule = applicant.schedules.filter(type=sched_type).first()
         previous_time = existing_schedule.scheduled_at if existing_schedule else None
         if not meeting_link and existing_schedule:
