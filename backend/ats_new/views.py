@@ -46,6 +46,24 @@ def staff_permission_required(perm):
     return decorator
 
 
+def ensure_staff_permissions(user):
+    if user.is_staff and not user.is_superuser:
+        from django.contrib.auth.models import Group, Permission
+        group, created = Group.objects.get_or_create(name='Recruiters')
+        if created:
+            codenames = [
+                'view_applicant', 'change_applicant',
+                'add_schedule', 'view_schedule', 'change_schedule',
+                'add_evaluation', 'view_evaluation', 'change_evaluation',
+                'view_placement', 'add_placement', 'change_placement', 'delete_placement',
+                'view_statushistory', 'view_logentry'
+            ]
+            perms = Permission.objects.filter(codename__in=codenames)
+            group.permissions.set(perms)
+        if not user.groups.filter(id=group.id).exists():
+            user.groups.add(group)
+
+
 def safe_post_redirect(request, fallback_view, *fallback_args, **fallback_kwargs):
     redirect_to = (request.POST.get('redirect_to') or '').strip()
     if redirect_to and url_has_allowed_host_and_scheme(
@@ -278,6 +296,7 @@ def google_oauth_callback(request):
 
         if not user or not user.is_staff:
             return render_google_auth_error(request, 'This Google account is not registered as staff.', role)
+        ensure_staff_permissions(user)
         login(request, user)
         request.session.pop('applicant_id', None)
         return redirect('admin_dashboard')
@@ -589,6 +608,7 @@ def admin_login(request):
         username = matched_user.get_username() if matched_user else email
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            ensure_staff_permissions(user)
             login(request, user)
             request.session.pop('applicant_id', None)
             return redirect('admin_dashboard')
