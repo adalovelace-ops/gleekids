@@ -726,7 +726,10 @@ def schedule_action(request):
     if request.method == 'POST':
         applicant_id = request.POST.get('applicant_identifier')
         sched_type = request.POST.get('type')
-        scheduled_at = request.POST.get('scheduled_at')
+        scheduled_date = request.POST.get('scheduled_date')
+        scheduled_time = request.POST.get('scheduled_time')
+        if scheduled_date and scheduled_time:
+            scheduled_at = f"{scheduled_date}T{scheduled_time}"
         meeting_link = (request.POST.get('meeting_link') or '').strip()
         title = request.POST.get('title')
         reschedule_reason = (request.POST.get('reschedule_reason') or '').strip()
@@ -743,6 +746,12 @@ def schedule_action(request):
             return safe_post_redirect(request, 'admin_dashboard')
         if timezone.is_naive(parsed_scheduled_at):
             parsed_scheduled_at = timezone.make_aware(parsed_scheduled_at, timezone.get_current_timezone())
+
+        if sched_type == 'demo':
+            local_scheduled_time = timezone.localtime(parsed_scheduled_at).time()
+            if not (time(13, 0) <= local_scheduled_time <= time(17, 0)):
+                messages.error(request, 'Demo interviews must be scheduled between 1:00 PM and 5:00 PM.')
+                return safe_post_redirect(request, 'admin_dashboard')
 
         existing_schedule = applicant.schedules.filter(type=sched_type).first()
         previous_time = existing_schedule.scheduled_at if existing_schedule else None

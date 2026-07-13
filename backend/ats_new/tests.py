@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.test import RequestFactory, TestCase, Client
 from django.urls import reverse
+from django.utils import timezone
 
 from .admin import LogEntryAdmin, ApplicantAdmin
 from .models import Applicant, StatusHistory
@@ -313,3 +314,34 @@ class DashboardViewPermissionTests(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Please select a time between 1:00 PM and 5:00 PM.')
+
+    def test_admin_schedule_demo_time_validation(self):
+        self.client.login(username='superuser', password='secret123')
+
+        # Valid admin demo slot (2:00 PM)
+        response = self.client.post(reverse('schedule_action'), {
+            'applicant_identifier': str(self.applicant.applicant_id),
+            'type': 'demo',
+            'scheduled_date': '2026-07-20',
+            'scheduled_time': '14:00',
+            'title': 'Teaching Demo Interview',
+            'redirect_to': '/demo-evaluation/'
+        })
+        self.assertEqual(response.status_code, 302)
+        demo_schedule = self.applicant.schedules.filter(type='demo').first()
+        self.assertIsNotNone(demo_schedule)
+        self.assertEqual(timezone.localtime(demo_schedule.scheduled_at).time().strftime('%H:%M'), '14:00')
+
+        # Invalid admin demo slot (9:00 AM)
+        response = self.client.post(reverse('schedule_action'), {
+            'applicant_identifier': str(self.applicant.applicant_id),
+            'type': 'demo',
+            'scheduled_date': '2026-07-20',
+            'scheduled_time': '09:00',
+            'title': 'Teaching Demo Interview',
+            'redirect_to': '/demo-evaluation/'
+        })
+        self.assertEqual(response.status_code, 302)
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Demo interviews must be scheduled between 1:00 PM and 5:00 PM.')
