@@ -495,6 +495,32 @@ class PlacementCRUDTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Placement.objects.filter(id=placement.id).exists())
 
+    def test_approved_applicant_shows_in_placements_list(self):
+        self.client.login(username='superuser', password='secret123')
+        placement = Placement.objects.create(name='German Account', slug='german-account')
+        self.applicant.teaching_account = placement
+        self.applicant.status = 'Approved'
+        self.applicant.save()
+
+        response = self.client.get(reverse('placements_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'German Account')
+        self.assertContains(response, 'John Doe')  # self.applicant's name is John Doe
+
+    def test_onboarding_applicant_shows_in_placements_list(self):
+        self.client.login(username='superuser', password='secret123')
+        placement = Placement.objects.create(name='Italian Account', slug='italian-account')
+        self.applicant.teaching_account = placement
+        self.applicant.status = 'Onboarding'
+        self.applicant.save()
+
+        response = self.client.get(reverse('placements_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Italian Account')
+        self.assertContains(response, 'John Doe')
+
+
+
 
 class ScheduleActionTests(TestCase):
     def setUp(self):
@@ -556,12 +582,40 @@ class ScheduleActionTests(TestCase):
         self.assertContains(response, 'https://zoom.us/j/123456789')
         self.assertContains(response, 'Your interview is scheduled')
 
+    def test_schedule_action_keeps_only_one_active_schedule(self):
+        # Create initial schedule
+        from .models import Schedule
+        Schedule.objects.create(
+            applicant=self.applicant,
+            type='initial',
+            title='Initial Screening',
+            scheduled_at=timezone.now()
+        )
+        self.assertEqual(self.applicant.schedules.count(), 1)
+
+        # Schedule a new action for demo session
+        self.client.login(username='staff_recruiter', password='secret123')
+        response = self.client.post(reverse('schedule_action'), {
+            'applicant_identifier': self.applicant.applicant_id,
+            'type': 'demo',
+            'title': 'Demo Session',
+            'scheduled_at': '2026-07-26T15:30',
+            'meeting_link': 'https://zoom.us/j/987654321'
+        })
+        self.assertEqual(response.status_code, 302)
+
+        # Count schedules - should now only be 1 (the new demo session)
+        self.assertEqual(self.applicant.schedules.count(), 1)
+        sched = self.applicant.schedules.first()
+        self.assertEqual(sched.type, 'demo')
+
     def test_uploaded_media_assets(self):
         # We can request an asset file through the uploaded_media view
         response = self.client.get('/media/assets/glee2.jpg')
         # Should be successful if the file exists under frontend/assets/
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'image/jpeg')
+
 
 
 

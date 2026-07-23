@@ -783,6 +783,9 @@ def schedule_action(request):
                 'meeting_link': meeting_link
             }
         )
+        # Keep only the latest schedule as applicant moves through stages
+        applicant.schedules.exclude(schedule_id=schedule.schedule_id).delete()
+
         schedule.refresh_from_db()
 
         schedule.sync_applicant_status(title, changed_by=request.user)
@@ -1400,7 +1403,7 @@ def placements_list(request):
     placements = Placement.objects.all().order_by('name')
     placements_data = []
     for placement in placements:
-        approved_applicants = placement.applicants.filter(status='Approved')
+        approved_applicants = placement.applicants.filter(status__in=['Onboarding', 'Approved'])
         placements_data.append({
             'placement': placement,
             'approved_applicants': approved_applicants,
