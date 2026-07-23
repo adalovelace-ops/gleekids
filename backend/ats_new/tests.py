@@ -556,4 +556,12 @@ class ScheduleActionTests(TestCase):
         self.assertContains(response, 'https://zoom.us/j/123456789')
         self.assertContains(response, 'Your interview is scheduled')
 
+    def test_uploaded_media_assets(self):
+        # We can request an asset file through the uploaded_media view
+        response = self.client.get('/media/assets/glee2.jpg')
+        # Should be successful if the file exists under frontend/assets/
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'image/jpeg')
+
+
 

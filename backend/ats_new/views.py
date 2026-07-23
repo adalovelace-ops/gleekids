@@ -89,9 +89,7 @@ def uploaded_media(request, path):
         if not can_access_uploaded_applicant_file(request, path):
             raise Http404('File not found.')
         media_roots.append(settings.BASE_DIR)
-    if len(path_parts) == 1 and Path(path).suffix.lower() in public_asset_extensions:
-        media_roots.append(settings.BASE_DIR.parent / 'frontend')
-    elif len(path_parts) == 2 and path_parts[0] == 'assets' and Path(path).suffix.lower() in public_asset_extensions:
+    if (len(path_parts) == 1 or path_parts[0] == 'assets') and Path(path).suffix.lower() in public_asset_extensions:
         media_roots.append(settings.BASE_DIR.parent / 'frontend')
 
     for root in media_roots:
