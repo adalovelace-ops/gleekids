@@ -726,10 +726,12 @@ def schedule_action(request):
     if request.method == 'POST':
         applicant_id = request.POST.get('applicant_identifier')
         sched_type = request.POST.get('type')
-        scheduled_date = request.POST.get('scheduled_date')
-        scheduled_time = request.POST.get('scheduled_time')
-        if scheduled_date and scheduled_time:
-            scheduled_at = f"{scheduled_date}T{scheduled_time}"
+        scheduled_at = (request.POST.get('scheduled_at') or '').strip()
+        if not scheduled_at:
+            scheduled_date = request.POST.get('scheduled_date')
+            scheduled_time = request.POST.get('scheduled_time')
+            if scheduled_date and scheduled_time:
+                scheduled_at = f"{scheduled_date}T{scheduled_time}"
         meeting_link = (request.POST.get('meeting_link') or '').strip()
         title = request.POST.get('title')
         reschedule_reason = (request.POST.get('reschedule_reason') or '').strip()

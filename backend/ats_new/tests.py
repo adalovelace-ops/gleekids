@@ -494,3 +494,42 @@ class PlacementCRUDTests(TestCase):
         })
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Placement.objects.filter(id=placement.id).exists())
+
+
+class ScheduleActionTests(TestCase):
+    def setUp(self):
+        self.User = get_user_model()
+        self.staff_user = self.User.objects.create_user(
+            username='staff_recruiter',
+            email='recruiter@example.com',
+            password='secret123',
+            is_staff=True,
+        )
+        for perm_code in ['view_schedule', 'change_schedule']:
+            perm = Permission.objects.get(codename=perm_code)
+            self.staff_user.user_permissions.add(perm)
+
+        self.applicant = Applicant.objects.create(
+            first_name='Jane',
+            last_name='Smith',
+            email='jane.smith@example.com',
+            status='Pending'
+        )
+
+    def test_schedule_action_with_scheduled_at_field(self):
+        self.client.login(username='staff_recruiter', password='secret123')
+        response = self.client.post(reverse('schedule_action'), {
+            'applicant_identifier': self.applicant.applicant_id,
+            'type': 'initial',
+            'title': 'Initial Screening',
+            'scheduled_at': '2026-07-25T14:30',
+            'meeting_link': 'https://zoom.us/j/123456789'
+        })
+        self.assertEqual(response.status_code, 302)
+
+        self.applicant.refresh_from_db()
+        self.assertEqual(self.applicant.status, 'Initial Screening')
+        sched = self.applicant.schedules.filter(type='initial').first()
+        self.assertIsNotNone(sched)
+        self.assertEqual(sched.meeting_link, 'https://zoom.us/j/123456789')
+
