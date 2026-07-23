@@ -91,6 +91,8 @@ def uploaded_media(request, path):
         media_roots.append(settings.BASE_DIR)
     if len(path_parts) == 1 and Path(path).suffix.lower() in public_asset_extensions:
         media_roots.append(settings.BASE_DIR.parent / 'frontend')
+    elif len(path_parts) == 2 and path_parts[0] == 'assets' and Path(path).suffix.lower() in public_asset_extensions:
+        media_roots.append(settings.BASE_DIR.parent / 'frontend')
 
     for root in media_roots:
         try:

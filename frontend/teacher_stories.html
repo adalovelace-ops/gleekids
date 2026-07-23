@@ -903,6 +903,111 @@
       .leadership-photo img {
         max-height: 22rem;
       }
+    /* Image Slider Carousel */
+    .image-slider-section {
+      width: min(100%, 92rem);
+      margin: 4rem auto 0;
+      padding: 0 clamp(1rem, 4vw, 3rem);
+    }
+    
+    .image-slider-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .image-slider-title {
+      margin: 0;
+      color: #33343a;
+      font-size: clamp(1.45rem, 3vw, 2.2rem);
+      font-weight: 900;
+      font-family: 'Baloo 2', cursive;
+    }
+    
+    .image-slider-controls {
+      display: flex;
+      gap: 0.55rem;
+    }
+    
+    .image-slider-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 38rem;
+      border: 3px solid var(--ink);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--paper);
+      box-shadow: 6px 6px 0 var(--ink);
+    }
+    
+    .image-slider-track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    
+    .image-slide {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    
+    .image-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    
+    .image-slide-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(0deg, rgba(46, 47, 54, 0.88) 0%, rgba(46, 47, 54, 0.3) 70%, transparent 100%);
+      padding: 2.5rem 2rem 1.5rem;
+      color: #ffffff;
+    }
+    
+    .image-slide-title {
+      font-family: 'Baloo 2', cursive;
+      font-size: clamp(1.25rem, 2.5vw, 1.8rem);
+      margin: 0 0 0.5rem 0;
+      color: var(--red);
+    }
+    
+    .image-slide-desc {
+      font-size: clamp(0.85rem, 1.5vw, 1.05rem);
+      margin: 0;
+      opacity: 0.95;
+      font-weight: 600;
+    }
+    
+    .image-slider-indicators {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+    }
+    
+    .indicator-dot {
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 999px;
+      background: #d8d5cf;
+      border: 1px solid var(--ink);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .indicator-dot.is-active {
+      background: var(--red);
+      width: 1.5rem;
     }
   </style>
   <link rel="stylesheet" href="/static/css/system_palette.css">
@@ -1015,6 +1120,67 @@
               </div>
             </article>
           </div>
+        </div>
+      </section>
+
+
+      <!-- Image Slider Carousel Section -->
+      <section class="image-slider-section" aria-label="Gleekids moments gallery">
+        <div class="image-slider-head">
+          <h3 class="image-slider-title">Moments at Gleekids</h3>
+          <div class="image-slider-controls">
+            <button class="reel-control" type="button" aria-label="Previous slide" onclick="changeImageSlide(-1)">&lsaquo;</button>
+            <button class="reel-control" type="button" aria-label="Next slide" onclick="changeImageSlide(1)">&rsaquo;</button>
+          </div>
+        </div>
+        <div class="image-slider-container" onmouseenter="pauseImageSlider()" onmouseleave="startImageSlider()">
+          <div class="image-slider-track" id="imageSliderTrack">
+            <div class="image-slide">
+              <img src="/media/gleeglee.jpg" alt="Teachers gathering at Gleekids">
+              <div class="image-slide-overlay">
+                <h4 class="image-slide-title">Welcome to Gleekids</h4>
+                <p class="image-slide-desc">A vibrant community of passionate educators and eager learners.</p>
+              </div>
+            </div>
+            <div class="image-slide">
+              <img src="/media/assets/glee2.jpg" alt="Interactive teaching sessions">
+              <div class="image-slide-overlay">
+                <h4 class="image-slide-title">Fun ESL Learning</h4>
+                <p class="image-slide-desc">Making every online lesson dynamic, engaging, and memorable.</p>
+              </div>
+            </div>
+            <div class="image-slide">
+              <img src="/media/assets/glee3.jpg" alt="Halloween celebration moments">
+              <div class="image-slide-overlay">
+                <h4 class="image-slide-title">Celebrations & Theme Days</h4>
+                <p class="image-slide-desc">Bringing cultural festivities and joy directly into our classrooms.</p>
+              </div>
+            </div>
+            <div class="image-slide">
+              <img src="/media/assets/glee4.jpg" alt="Behind the scenes with our team">
+              <div class="image-slide-overlay">
+                <h4 class="image-slide-title">Teacher Training & Support</h4>
+                <p class="image-slide-desc">Constant growth and continuous mentorship for our ESL specialists.</p>
+              </div>
+            </div>
+            <div class="image-slide">
+              <img src="/media/assets/play.jpg" alt="Interactive games during classes">
+              <div class="image-slide-overlay">
+                <h4 class="image-slide-title">Gamified Classrooms</h4>
+                <p class="image-slide-desc">Integrating play, reward systems, and laughter to inspire student growth.</p>
+              </div>
+            </div>
+            <div class="image-slide">
+              <img src="/media/assets/com.jpg" alt="Gleekids Community Support">
+              <div class="image-slide-overlay">
+                <h4 class="image-slide-title">Global ESL Community</h4>
+                <p class="image-slide-desc">Fostering collaboration, support, and friendship among educators.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="image-slider-indicators" id="imageSliderIndicators">
+          <!-- Dots generated via JS -->
         </div>
       </section>
 
@@ -1171,6 +1337,65 @@
 
     startMessageCarousel('leadershipSlider', 3600);
     startMessageCarousel('managerMessageSlider', 3200);
+
+    // Image Slider Carousel Logic
+    let currentImageIndex = 0;
+    let imageSliderTimer;
+    const imageSliderTrack = document.getElementById('imageSliderTrack');
+    const imageSlides = imageSliderTrack ? Array.from(imageSliderTrack.querySelectorAll('.image-slide')) : [];
+    const imageIndicatorsContainer = document.getElementById('imageSliderIndicators');
+
+    function initImageSlider() {
+      if (imageSlides.length === 0) return;
+      
+      // Generate indicators
+      imageIndicatorsContainer.innerHTML = '';
+      imageSlides.forEach((_, idx) => {
+        const dot = document.createElement('span');
+        dot.className = `indicator-dot${idx === 0 ? ' is-active' : ''}`;
+        dot.setAttribute('aria-label', `Go to slide ${idx + 1}`);
+        dot.onclick = () => jumpToImageSlide(idx);
+        imageIndicatorsContainer.appendChild(dot);
+      });
+      
+      startImageSlider();
+    }
+
+    function updateImageSlider() {
+      if (!imageSliderTrack || imageSlides.length === 0) return;
+      imageSliderTrack.style.transform = `translateX(-${currentImageIndex * 100}%)`;
+      
+      // Update indicators
+      const dots = imageIndicatorsContainer.querySelectorAll('.indicator-dot');
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('is-active', idx === currentImageIndex);
+      });
+    }
+
+    function changeImageSlide(direction) {
+      if (imageSlides.length === 0) return;
+      currentImageIndex = (currentImageIndex + direction + imageSlides.length) % imageSlides.length;
+      updateImageSlider();
+    }
+
+    function jumpToImageSlide(index) {
+      currentImageIndex = index;
+      updateImageSlider();
+    }
+
+    function startImageSlider() {
+      if (imageSlides.length <= 1) return;
+      clearInterval(imageSliderTimer);
+      imageSliderTimer = setInterval(() => {
+        changeImageSlide(1);
+      }, 4000);
+    }
+
+    function pauseImageSlider() {
+      clearInterval(imageSliderTimer);
+    }
+
+    initImageSlider();
   </script>
 </body>
 </html>
