@@ -533,3 +533,27 @@ class ScheduleActionTests(TestCase):
         self.assertIsNotNone(sched)
         self.assertEqual(sched.meeting_link, 'https://zoom.us/j/123456789')
 
+    def test_applicant_portal_renders_schedule(self):
+        # Create a schedule
+        from .models import Schedule
+        sched = Schedule.objects.create(
+            applicant=self.applicant,
+            type='initial',
+            title='Initial Screening',
+            scheduled_at=timezone.now() + timezone.timedelta(days=1),
+            meeting_link='https://zoom.us/j/123456789'
+        )
+        self.applicant.status = 'Initial Screening'
+        self.applicant.save()
+
+        # Set session
+        session = self.client.session
+        session['applicant_id'] = str(self.applicant.applicant_id)
+        session.save()
+
+        response = self.client.get(reverse('applicant_portal'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'https://zoom.us/j/123456789')
+        self.assertContains(response, 'Your interview is scheduled')
+
+

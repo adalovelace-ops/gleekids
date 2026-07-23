@@ -399,6 +399,7 @@ def applicant_portal(request):
         'current_stage_index': current_stage_index,
         'next_step_text': applicant.get_next_step_text(),
         'latest_schedule': latest_schedule,
+        'schedule': latest_schedule,
         'history': applicant.history.all().order_by('-created_at'),
         'demoEval': latest_evaluation,
         'demoScore': f"{latest_evaluation.total_score}/25" if latest_evaluation else None,
