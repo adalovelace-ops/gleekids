@@ -699,7 +699,8 @@ def admin_calendar(request):
                 'stageKey': s.type,
                 'applicantUrl': f"/applicant-details/{s.applicant.applicant_id}/",
                 'applicantId': str(s.applicant.applicant_id),
-                'scheduleId': str(s.schedule_id)
+                'scheduleId': str(s.schedule_id),
+                'scheduledDisplay': timezone.localtime(s.scheduled_at).strftime('%m/%d/%Y, %I:%M:%S %p')
             }
         })
 

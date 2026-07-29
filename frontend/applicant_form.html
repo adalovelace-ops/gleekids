@@ -621,6 +621,25 @@
         </div>
     </main>
 
+    <!-- Submission Loading Modal -->
+    <div id="loadingModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-[#2c2a78]/40 backdrop-blur-md px-4 transition-all duration-300">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border-4 border-[#fff0f8] transform transition-all duration-300 scale-95 opacity-0" id="loadingModalContent" style="box-shadow: 0 20px 50px rgba(44, 42, 120, 0.15);">
+            <!-- Bouncy Spinner -->
+            <div class="flex justify-center mb-6">
+                <div class="relative w-20 h-20">
+                    <div class="absolute inset-0 rounded-full bg-[#fff0f8] animate-ping opacity-75"></div>
+                    <div class="absolute inset-0 rounded-full border-4 border-[#eef1ff]"></div>
+                    <div class="absolute inset-0 rounded-full border-4 border-t-[#f48bc1] border-r-[#7d6bd6] animate-spin"></div>
+                </div>
+            </div>
+            <h3 class="text-2xl font-bold text-[#2c2a78] mb-2 font-['Baloo_2']">Sending Application...</h3>
+            <p class="text-sm text-[#737894] leading-relaxed mb-4">We're uploading your resume and video introduction. Please wait, this might take a moment!</p>
+            <div class="inline-flex items-center gap-1 bg-[#fff0f8] text-[#f48bc1] font-black text-xs px-4 py-2 rounded-full uppercase tracking-wider animate-pulse">
+                <span>Do not close this page</span>
+            </div>
+        </div>
+    </div>
+
     <script>
         function togglePassword(fieldId, btn) {
             const input = document.getElementById(fieldId);
@@ -648,14 +667,30 @@
             const p1 = document.getElementById('password').value;
             const p2 = document.getElementById('confirm_password').value;
             const hasCapital = /[A-Z]/.test(p1);
+            let isValid = true;
             if (p1 !== p2) {
                 e.preventDefault();
                 document.getElementById('passwordMatch').textContent = 'Passwords do not match';
                 document.getElementById('passwordMatch').classList.remove('hidden');
+                isValid = false;
             } else if (p1.length < 8 || !hasCapital) {
                 e.preventDefault();
                 document.getElementById('passwordMatch').textContent = 'Password must be at least 8 characters and include one capital letter';
                 document.getElementById('passwordMatch').classList.remove('hidden');
+                isValid = false;
+            }
+
+            if (isValid && this.checkValidity()) {
+                const modal = document.getElementById('loadingModal');
+                const content = document.getElementById('loadingModalContent');
+                if (modal && content) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    setTimeout(() => {
+                        content.classList.remove('scale-95', 'opacity-0');
+                        content.classList.add('scale-100', 'opacity-100');
+                    }, 50);
+                }
             }
         });
 
