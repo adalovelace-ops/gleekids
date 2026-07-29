@@ -674,6 +674,16 @@ def update_status(request):
 def admin_calendar(request):
     initial_date = request.GET.get('date') or timezone.localdate().isoformat()
     schedules = Schedule.objects.all().select_related('applicant').order_by('scheduled_at', '-created_at')
+    
+    # Keep only the latest schedule for each applicant to prevent duplicates on the calendar
+    seen_applicants = set()
+    latest_schedules = []
+    for s in sorted(schedules, key=lambda x: x.created_at, reverse=True):
+        if s.applicant_id not in seen_applicants:
+            seen_applicants.add(s.applicant_id)
+            latest_schedules.append(s)
+    latest_schedules.sort(key=lambda x: x.scheduled_at)
+
     events = []
     
     # Colors for different stages
@@ -685,7 +695,7 @@ def admin_calendar(request):
         'onboarding': '#10b981',
     }
     
-    for s in schedules:
+    for s in latest_schedules:
         events.append({
             'title': f"{s.applicant.first_name} {s.applicant.last_name} - {s.title}",
             'start': s.scheduled_at.isoformat(),
@@ -705,7 +715,7 @@ def admin_calendar(request):
         })
 
     stage_counts = {key: 0 for key in colors}
-    for schedule in schedules:
+    for schedule in latest_schedules:
         if schedule.type in stage_counts:
             stage_counts[schedule.type] += 1
         
