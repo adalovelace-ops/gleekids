@@ -191,6 +191,7 @@ class Schedule(models.Model):
         ('onboarding', 'Onboarding'),
     ]
     applicant = models.ForeignKey(Applicant, on_delete=models.CASCADE, related_name='schedules')
+    evaluator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='schedules')
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     title = models.CharField(max_length=200)
     scheduled_at = models.DateTimeField()

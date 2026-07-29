@@ -410,17 +410,34 @@
                   {% endif %}
                 </td>
                 <td>
-                  <div class="flex items-center gap-2">
-                    {% if active_stage == 'initial' %}
-                    <form method="POST" action="/schedule-action/" class="flex items-center gap-2">
+                  <div class="flex flex-wrap items-center gap-3">
+                    {% if app.current_schedule %}
+                    <div class="text-xs text-gray-600 bg-white border border-pink-100 rounded-lg p-2 shadow-sm whitespace-nowrap">
+                      <p class="font-bold text-pink-600"><i class="fas fa-clock mr-1"></i>{{ app.current_schedule.get_type_display }}:</p>
+                      <p class="font-semibold text-gray-800">{{ app.current_schedule.scheduled_at|date:"M d, Y @ h:i A" }}</p>
+                      {% if app.current_schedule.evaluator %}
+                      <p class="font-semibold text-gray-700"><i class="fas fa-user-tie mr-1"></i>Eval: {{ app.current_schedule.evaluator.first_name }} {{ app.current_schedule.evaluator.last_name|default:app.current_schedule.evaluator.username }}</p>
+                      {% endif %}
+                      {% if app.current_schedule.meeting_link %}
+                      <a href="{{ app.current_schedule.meeting_link }}" target="_blank" rel="noopener" class="text-blue-600 underline font-semibold block truncate max-w-[12rem]"><i class="fas fa-link mr-1"></i>Meeting Link</a>
+                      {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if current_stage.schedule_type %}
+                    <form method="POST" action="/schedule-action/" class="flex flex-wrap items-center gap-2">
                       {% csrf_token %}
                       <input type="hidden" name="applicant_identifier" value="{{ app.applicant_id }}">
-                      <input type="hidden" name="type" value="initial">
-                      <input type="hidden" name="title" value="Initial Screening">
-                      <input type="hidden" name="redirect_to" value="/schedule-initial/?stage=initial">
-                      <input name="scheduled_at" type="datetime-local" required aria-label="Initial screening date and time for {{ app.first_name }} {{ app.last_name }}" class="rounded border border-pink-200 px-2 py-1 text-xs text-gray-700">
-                      <input name="meeting_link" type="url" placeholder="Meeting link" aria-label="Meeting link for {{ app.first_name }} {{ app.last_name }}" class="w-28 rounded border border-pink-200 px-2 py-1 text-xs text-gray-700">
-                      <button type="submit" class="approve-btn"><i class="fas fa-calendar-plus mr-1"></i>Schedule</button>
+                      <input type="hidden" name="type" value="{{ current_stage.schedule_type }}">
+                      <input type="hidden" name="title" value="{{ current_stage.schedule_title }}">
+                      <input type="hidden" name="redirect_to" value="/schedule-initial/?stage={{ active_stage }}">
+                      
+                      <select name="evaluator" onchange="this.form.submit()" aria-label="Select evaluator for {{ app.first_name }} {{ app.last_name }}" class="rounded border border-pink-200 px-2 py-1 text-xs text-gray-700">
+                        <option value="">Assign Evaluator</option>
+                        {% for user in evaluators %}
+                          <option value="{{ user.id }}" {% if app.current_schedule.evaluator.id == user.id %}selected{% endif %}>{{ user.first_name }} {{ user.last_name|default:user.username }}</option>
+                        {% endfor %}
+                      </select>
                     </form>
                     {% endif %}
 

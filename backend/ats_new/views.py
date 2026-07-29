@@ -754,36 +754,55 @@ def schedule_action(request):
             messages.error(request, 'Invalid schedule type.')
             return safe_post_redirect(request, 'admin_dashboard')
 
-        parsed_scheduled_at = parse_datetime(scheduled_at or '')
+        existing_schedule = applicant.schedules.filter(type=sched_type).first()
+        previous_time = existing_schedule.scheduled_at if existing_schedule else None
+        
+        has_new_schedule_time = False
+        if scheduled_at:
+            parsed_scheduled_at = parse_datetime(scheduled_at)
+            if parsed_scheduled_at:
+                has_new_schedule_time = True
+                if timezone.is_naive(parsed_scheduled_at):
+                    parsed_scheduled_at = timezone.make_aware(parsed_scheduled_at, timezone.get_current_timezone())
+        
+        if not has_new_schedule_time:
+            if existing_schedule:
+                parsed_scheduled_at = existing_schedule.scheduled_at
+            else:
+                parsed_scheduled_at = timezone.now()
+
         if not parsed_scheduled_at:
             messages.error(request, 'Invalid schedule date/time.')
             return safe_post_redirect(request, 'admin_dashboard')
-        if timezone.is_naive(parsed_scheduled_at):
-            parsed_scheduled_at = timezone.make_aware(parsed_scheduled_at, timezone.get_current_timezone())
 
-        if sched_type == 'demo':
-            local_scheduled_time = timezone.localtime(parsed_scheduled_at).time()
-            if not (time(13, 0) <= local_scheduled_time <= time(17, 0)):
-                messages.error(request, 'Demo interviews must be scheduled between 1:00 PM and 5:00 PM.')
-                return safe_post_redirect(request, 'admin_dashboard')
+        if has_new_schedule_time:
+            if sched_type == 'demo':
+                local_scheduled_time = timezone.localtime(parsed_scheduled_at).time()
+                if not (time(13, 0) <= local_scheduled_time <= time(17, 0)):
+                    messages.error(request, 'Demo interviews must be scheduled between 1:00 PM and 5:00 PM.')
+                    return safe_post_redirect(request, 'admin_dashboard')
 
-        if sched_type == 'endorsement':
-            local_scheduled_time = timezone.localtime(parsed_scheduled_at).time()
-            if not (time(7, 0) <= local_scheduled_time <= time(23, 0)):
-                messages.error(request, 'Client interviews must be scheduled between 7:00 AM and 11:00 PM.')
-                return safe_post_redirect(request, 'admin_dashboard')
+            if sched_type == 'endorsement':
+                local_scheduled_time = timezone.localtime(parsed_scheduled_at).time()
+                if not (time(7, 0) <= local_scheduled_time <= time(23, 0)):
+                    messages.error(request, 'Client interviews must be scheduled between 7:00 AM and 11:00 PM.')
+                    return safe_post_redirect(request, 'admin_dashboard')
 
-        if sched_type == 'training':
-            local_scheduled_time = timezone.localtime(parsed_scheduled_at).time()
-            if not (time(7, 0) <= local_scheduled_time <= time(23, 0)):
-                messages.error(request, 'Training sessions must be scheduled between 7:00 AM and 11:00 PM.')
-                return safe_post_redirect(request, 'admin_dashboard')
+            if sched_type == 'training':
+                local_scheduled_time = timezone.localtime(parsed_scheduled_at).time()
+                if not (time(7, 0) <= local_scheduled_time <= time(23, 0)):
+                    messages.error(request, 'Training sessions must be scheduled between 7:00 AM and 11:00 PM.')
+                    return safe_post_redirect(request, 'admin_dashboard')
 
-        existing_schedule = applicant.schedules.filter(type=sched_type).first()
-        previous_time = existing_schedule.scheduled_at if existing_schedule else None
         if not meeting_link and existing_schedule:
             meeting_link = existing_schedule.meeting_link
         
+        evaluator_id = request.POST.get('evaluator')
+        evaluator = None
+        if evaluator_id:
+            User = get_user_model()
+            evaluator = User.objects.filter(id=evaluator_id).first()
+
         # Create or Update schedule
         schedule, _ = Schedule.objects.update_or_create(
             applicant=applicant,
@@ -791,7 +810,8 @@ def schedule_action(request):
             defaults={
                 'title': title,
                 'scheduled_at': parsed_scheduled_at,
-                'meeting_link': meeting_link
+                'meeting_link': meeting_link,
+                'evaluator': evaluator
             }
         )
         # Keep only the latest schedule as applicant moves through stages
@@ -847,30 +867,40 @@ def schedule_initial(request):
             'status': 'Initial Screening',
             'next_status': 'Demo Evaluation',
             'action_label': 'Approve for Demo',
+            'schedule_type': 'initial',
+            'schedule_title': 'Initial Screening',
         },
         'demo': {
             'label': 'Demo',
             'status': 'Demo Evaluation',
             'next_status': 'Endorsement',
             'action_label': 'Move to Client',
+            'schedule_type': 'demo',
+            'schedule_title': 'Teaching Demo Interview',
         },
         'client': {
             'label': 'Client',
             'status': 'Endorsement',
             'next_status': 'Training',
             'action_label': 'Move to Training',
+            'schedule_type': 'endorsement',
+            'schedule_title': 'Client Final Interview',
         },
         'training': {
             'label': 'Training',
             'status': 'Training',
             'next_status': 'Onboarding',
             'action_label': 'Move to Onboarding',
+            'schedule_type': 'training',
+            'schedule_title': 'Training Session',
         },
         'onboarding': {
             'label': 'Onboarding',
             'status': 'Onboarding',
             'next_status': 'Approved',
             'action_label': 'Mark Hired',
+            'schedule_type': 'onboarding',
+            'schedule_title': 'Final Teacher Onboarding & Orientation',
         },
         'hired': {
             'label': 'Hired',
@@ -893,6 +923,14 @@ def schedule_initial(request):
     }
     current_stage = stage_map.get(stage, stage_map['initial'])
     applicants = Applicant.objects.filter(status=current_stage['status']).order_by('-created_at')
+    
+    sched_type = current_stage.get('schedule_type')
+    for app in applicants:
+        if sched_type:
+            app.current_schedule = app.schedules.filter(type=sched_type).first()
+        else:
+            app.current_schedule = None
+
     stage_tabs = [
         {'key': key, **value}
         for key, value in stage_map.items()
@@ -907,12 +945,17 @@ def schedule_initial(request):
         {'label': 'Resign', 'status': 'Resign'},
         {'label': 'Withdrawn', 'status': 'Withdrawn'},
     ]
+    
+    User = get_user_model()
+    evaluators = User.objects.filter(is_active=True).order_by('first_name', 'username')
+
     return render(request, 'schedule_initial.html', {
         'applicants': applicants,
         'active_stage': stage,
         'current_stage': current_stage,
         'stage_tabs': stage_tabs,
         'action_status_options': action_status_options,
+        'evaluators': evaluators,
     })
 
 @staff_permission_required('ats_new.view_schedule')
@@ -920,7 +963,9 @@ def screening_schedule(request):
     applicants = Applicant.objects.filter(status__in=['Pending', 'Initial Screening']).order_by('-created_at')
     for applicant in applicants:
         applicant.current_schedule = applicant.schedules.filter(type='initial').first()
-    return render(request, 'screening_schedule.html', {'applicants': applicants})
+    User = get_user_model()
+    evaluators = User.objects.filter(is_active=True).order_by('first_name', 'username')
+    return render(request, 'screening_schedule.html', {'applicants': applicants, 'evaluators': evaluators})
 
 @staff_permission_required('ats_new.view_evaluation')
 def demo_evaluation(request):
@@ -928,7 +973,9 @@ def demo_evaluation(request):
     for app in applicants:
         app.current_schedule = app.schedules.filter(type='demo').first()
         app.current_evaluation = app.evaluations.filter(evaluation_type='demo').order_by('-created_at').first()
-    return render(request, 'demo_evaluation.html', {'applicants': applicants})
+    User = get_user_model()
+    evaluators = User.objects.filter(is_active=True).order_by('first_name', 'username')
+    return render(request, 'demo_evaluation.html', {'applicants': applicants, 'evaluators': evaluators})
 
 @staff_permission_required('ats_new.view_evaluation')
 def evaluations(request):
@@ -1018,7 +1065,9 @@ def training_schedule(request):
     applicants = Applicant.objects.filter(status='Training')
     for app in applicants:
         app.current_schedule = app.schedules.filter(type='training').first()
-    return render(request, 'training_schedule.html', {'applicants': applicants})
+    User = get_user_model()
+    evaluators = User.objects.filter(is_active=True).order_by('first_name', 'username')
+    return render(request, 'training_schedule.html', {'applicants': applicants, 'evaluators': evaluators})
 
 @staff_permission_required('ats_new.view_evaluation')
 def client_endorsement(request):
@@ -1027,7 +1076,9 @@ def client_endorsement(request):
         app.current_schedule = app.schedules.filter(type='endorsement').first()
         app.current_evaluation = app.evaluations.filter(evaluation_type='client').order_by('-created_at').first()
         app.demo_evaluation = app.evaluations.filter(evaluation_type='demo').order_by('-created_at').first()
-    return render(request, 'client_endorsement.html', {'applicants': applicants})
+    User = get_user_model()
+    evaluators = User.objects.filter(is_active=True).order_by('first_name', 'username')
+    return render(request, 'client_endorsement.html', {'applicants': applicants, 'evaluators': evaluators})
 
 @staff_permission_required('ats_new.add_evaluation')
 def evaluate_applicant(request, applicant_id):
@@ -1333,11 +1384,15 @@ def onboarding(request):
         for placement in Placement.objects.all()
     ]
     
+    User = get_user_model()
+    evaluators = User.objects.filter(is_active=True).order_by('first_name', 'username')
+
     context = {
         'applicants': applicants,
         'accounts': Placement.objects.all(),
         'placement_groups': placement_groups,
         'unassigned_count': applicants.filter(teaching_account__isnull=True).count(),
+        'evaluators': evaluators,
     }
     return render(request, 'schedule_onboarding.html', context)
 

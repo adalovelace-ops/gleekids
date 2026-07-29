@@ -96,6 +96,12 @@
                     <p class="text-sm font-bold text-gray-800 mt-1">
                       {{ app.current_schedule.scheduled_at|date:"M d, Y @ h:i A" }}
                     </p>
+                    {% if app.current_schedule.evaluator %}
+                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-2">Orientation Evaluator</p>
+                    <p class="text-xs font-bold text-gray-700 mt-1">
+                      {{ app.current_schedule.evaluator.first_name }} {{ app.current_schedule.evaluator.last_name|default:app.current_schedule.evaluator.username }}
+                    </p>
+                    {% endif %}
                   </div>
                   {% endif %}
                 </div>
@@ -171,6 +177,15 @@
                              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400"
                              value="{{ app.current_schedule.meeting_link }}"
                              placeholder="https://zoom.us/j/...">
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Evaluator</label>
+                      <select name="evaluator" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400">
+                        <option value="">Select Evaluator</option>
+                        {% for user in evaluators %}
+                          <option value="{{ user.id }}" {% if app.current_schedule.evaluator.id == user.id %}selected{% endif %}>{{ user.first_name }} {{ user.last_name|default:user.username }}</option>
+                        {% endfor %}
+                      </select>
                     </div>
                       {% if app.current_schedule %}
                       <div class="rounded-xl border border-amber-100 bg-amber-50/60 p-3">
