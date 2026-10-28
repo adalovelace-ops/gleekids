@@ -108,10 +108,15 @@
       const detailsEl = document.getElementById('eventDetails');
 
       const calendar = new FullCalendar.Calendar(calendarEl, {
-        timeZone: 'UTC',
+        timeZone: 'local',
         initialView: 'dayGridMonth',
         initialDate,
         height: 680,
+        eventTimeFormat: {
+          hour: 'numeric',
+          minute: '2-digit',
+          meridiem: 'short'
+        },
         headerToolbar: {
           left: 'prev,next today',
           center: 'title',
@@ -140,7 +145,7 @@
             <div class="rounded-2xl border border-gray-100 bg-white p-4 space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-gray-500">Scheduled</span>
-                <span class="font-semibold text-gray-900">${props.scheduledDisplay || info.event.start.toLocaleString(undefined, { timeZone: 'UTC' })}</span>
+                <span class="font-semibold text-gray-900">${props.scheduledDisplay || info.event.start.toLocaleString(undefined, { timeZone: 'Asia/Manila' })}</span>
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-gray-500">Email</span>
