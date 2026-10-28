@@ -123,6 +123,27 @@
           right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
         },
         selectable: false,
+        eventContent(arg) {
+          const props = arg.event.extendedProps || {};
+          let timeLabel = props.timeDisplay;
+          if (!timeLabel && props.scheduledDisplay) {
+            const m = props.scheduledDisplay.match(/(\d{1,2}):(\d{2})(?::\d{2})?\s*([AP]M)/i);
+            if (m) {
+              timeLabel = `${parseInt(m[1], 10)}:${m[2]} ${m[3].toUpperCase()}`;
+            }
+          }
+          if (!timeLabel) {
+            timeLabel = arg.timeText || '';
+          }
+          return {
+            html: `
+              <div class="fc-custom-event flex items-center gap-1 overflow-hidden px-1 py-0.5 text-[11px] leading-tight" title="${arg.event.title}">
+                <span class="fc-custom-time font-bold flex-shrink-0">${timeLabel}</span>
+                <span class="fc-custom-title truncate">${arg.event.title}</span>
+              </div>
+            `
+          };
+        },
         events(fetchInfo, successCallback) {
           const filtered = rawEvents.filter(evt => {
             const stageKey = evt.extendedProps?.stageKey;

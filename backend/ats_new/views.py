@@ -697,6 +697,7 @@ def admin_calendar(request):
     
     for s in latest_schedules:
         local_sched = timezone.localtime(s.scheduled_at)
+        time_label = local_sched.strftime('%I:%M %p').lstrip('0')
         events.append({
             'title': f"{s.applicant.first_name} {s.applicant.last_name} - {s.title}",
             'start': local_sched.strftime('%Y-%m-%dT%H:%M:%S'),
@@ -711,7 +712,8 @@ def admin_calendar(request):
                 'applicantUrl': f"/applicant-details/{s.applicant.applicant_id}/",
                 'applicantId': str(s.applicant.applicant_id),
                 'scheduleId': str(s.schedule_id),
-                'scheduledDisplay': local_sched.strftime('%m/%d/%Y, %I:%M:%S %p')
+                'timeDisplay': time_label,
+                'scheduledDisplay': local_sched.strftime('%m/%d/%Y, %I:%M %p')
             }
         })
 
